@@ -93,7 +93,7 @@ public:
         // The number of threads for compression. If set to 0, BamWriter will
         // attempt to determine a reasonable estimate. If set to 1, this will
         // force single-threaded execution. No checks are made against an upper limit.
-        size_t numThreads = 4;
+        std::size_t numThreads = 4;
 
         // If ON, ensures that proper BAI bin numbers are provided for all records.
         BamWriter::BinCalculationMode binCalculationMode = BamWriter::BinCalculation_ON;
@@ -137,7 +137,7 @@ public:
     ///
     BamWriter(const std::string& filename, const BamHeader& header,
               BamWriter::CompressionLevel compressionLevel = BamWriter::DefaultCompression,
-              size_t numThreads = 4,
+              std::size_t numThreads = 4,
               BinCalculationMode binCalculationMode = BamWriter::BinCalculation_ON,
               bool useTempFile = true);
 

@@ -14,7 +14,7 @@ VcfReader::VcfReader(const VcfFile& file) : in_{file.Filename()}, header_{file.H
     // skip header lines
     const auto& header = file.Header();
     std::string line;
-    for (size_t i = header.NumLines(); i > 0; --i) {
+    for (std::size_t i = header.NumLines(); i > 0; --i) {
         std::getline(in_, line);
     }
 

@@ -26,7 +26,7 @@ TEST(VCF_VcfSort, sorts_input_file)
     const std::vector<std::string> expectedIds{"variant0", "variant5", "variant1",
                                                "variant3", "variant4", "variant2"};
 
-    size_t i = 0;
+    std::size_t i = 0;
     VcfQuery query{VcfSortTests::outputFn};
     for (const auto& var : query) {
         EXPECT_EQ(expectedIds.at(i), var.Id());

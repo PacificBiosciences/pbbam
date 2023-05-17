@@ -13,7 +13,7 @@ namespace BAM {
 
 PbiBuilderBase::PbiBuilderBase(const std::string& pbiFilename,
                                const PbiBuilder::CompressionLevel compressionLevel,
-                               size_t numThreads, size_t bufferSize)
+                               std::size_t numThreads, std::size_t bufferSize)
     : pbiFilename_{pbiFilename}
     , tempFilename_{pbiFilename + ".build"}
     , tempFile_{std::fopen(tempFilename_.c_str(), "w+b")}
@@ -245,7 +245,7 @@ void PbiBuilderBase::OpenPbiFile()
         throw std::runtime_error{msg.str()};
     }
     // if no explicit thread count given, attempt built-in check
-    size_t actualNumThreads = numThreads_;
+    std::size_t actualNumThreads = numThreads_;
     if (actualNumThreads == 0) {
         actualNumThreads = std::thread::hardware_concurrency();
 
@@ -347,14 +347,14 @@ void PbiBuilderBase::WriteReferenceData()
 // PbiReferenceDataBuilder
 // -------------------------
 
-PbiReferenceDataBuilder::PbiReferenceDataBuilder(size_t numReferenceSequences)
+PbiReferenceDataBuilder::PbiReferenceDataBuilder(std::size_t numReferenceSequences)
 {
     // initialize with number of references we expect to see
     //
     // we can add more later, but want to ensure known references have an entry
     // even if no records are observed mapping to it
     //
-    for (size_t i = 0; i < numReferenceSequences; ++i) {
+    for (std::size_t i = 0; i < numReferenceSequences; ++i) {
         rawReferenceEntries_[i] = PbiReferenceEntry(i);
     }
 
@@ -434,7 +434,7 @@ void PbiReferenceDataBuilder::WriteData(BGZF* bgzf)
 
     // reference entries
     numRefs = refData.entries_.size();  // need to reset after maybe endian-swapping
-    for (size_t i = 0; i < numRefs; ++i) {
+    for (std::size_t i = 0; i < numRefs; ++i) {
         auto& entry = refData.entries_[i];
         auto tId = entry.tId_;
         auto beginRow = entry.beginRow_;

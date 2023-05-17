@@ -26,8 +26,8 @@ std::optional<ControlKit::CustomSequence> UpdateControlKitCache(const ControlKit
     const auto& customSeq = kit.ChildText("CustomSequence");
     const auto lines = [](const std::string& input) {
         std::vector<std::string> result;
-        size_t pos = 0;
-        size_t found = input.find("\\n");
+        std::size_t pos = 0;
+        std::size_t found = input.find("\\n");
         while (found != std::string::npos) {
             result.push_back(input.substr(pos, found - pos));
             pos = found + 2;  // "\n"
@@ -423,8 +423,8 @@ bool AutomationParameters::HasUseStageHotStart() const
 
 std::string AutomationParameters::GetParameter(const std::string& param) const
 {
-    const size_t count = NumChildren();
-    for (size_t i = 0; i < count; ++i) {
+    const std::size_t count = NumChildren();
+    for (std::size_t i = 0; i < count; ++i) {
         const internal::DataSetElement& child = *(children_.at(i).get());
         if (child.Attribute("Name") == param) {
             return child.Attribute("SimpleValue");
@@ -438,8 +438,8 @@ AutomationParameters& AutomationParameters::SetParameter(const std::string& name
                                                          const std::string& type,
                                                          const std::string& value)
 {
-    const size_t count = NumChildren();
-    for (size_t i = 0; i < count; ++i) {
+    const std::size_t count = NumChildren();
+    for (std::size_t i = 0; i < count; ++i) {
         internal::DataSetElement* child = children_.at(i).get();
         if (child->Attribute("Name") == name) {
             child->Attribute("ValueDataType", type);
@@ -455,8 +455,8 @@ AutomationParameters& AutomationParameters::SetParameter(const std::string& name
 
 bool AutomationParameters::HasParameter(const std::string& param) const
 {
-    const size_t count = NumChildren();
-    for (size_t i = 0; i < count; ++i) {
+    const std::size_t count = NumChildren();
+    for (std::size_t i = 0; i < count; ++i) {
         const internal::DataSetElement* child = children_.at(i).get();
         if (child->Attribute("Name") == param) {
             return true;

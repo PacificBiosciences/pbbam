@@ -32,7 +32,7 @@ const std::vector<PacBio::Data::GenomicInterval> ExpectedIntervals {
 
 void CheckManualIteration(const std::string& fn)
 {
-    size_t count = 0;
+    std::size_t count = 0;
     BedReader reader{fn};
     PacBio::Data::GenomicInterval interval;
     while (reader.GetNext(interval)) {
@@ -44,7 +44,7 @@ void CheckManualIteration(const std::string& fn)
 
 void CheckRangeFor(const std::string& fn)
 {
-    size_t count = 0;
+    std::size_t count = 0;
     BedReader reader{fn};
     for (const auto& interval : reader) {
         EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
@@ -55,7 +55,7 @@ void CheckRangeFor(const std::string& fn)
 
 void CheckReadAll(const std::string& fn)
 {
-    size_t count = 0;
+    std::size_t count = 0;
     for (const auto& interval : BedReader::ReadAll(fn)) {
         EXPECT_EQ(BedReaderTests::ExpectedIntervals.at(count), interval);
         ++count;

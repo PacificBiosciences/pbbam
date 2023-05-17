@@ -19,7 +19,7 @@ namespace BAM {
 class ZmwChunkedFastxTextReader final : public ZmwChunkedFastxReaderImpl
 {
 public:
-    ZmwChunkedFastxTextReader(std::string filename, size_t numChunks);
+    ZmwChunkedFastxTextReader(std::string filename, std::size_t numChunks);
 
     void Seek(uint64_t pos) final;
     FastaSequence ReadNextFasta(bool skipName) final;
@@ -31,7 +31,7 @@ private:
     // kseq needs a '__read' function with this signature, so fread does not work
     // in this case. gzread/bgzf_read match but we want better seek performance
     // than gzstream and are specifically not using indexed BGZF
-    static int ReadFromFile(FILE* fp, void* data, size_t length);
+    static int ReadFromFile(FILE* fp, void* data, std::size_t length);
 
     // specialize kseq_t for FILE handle
     KSEQ_INIT(FILE*, ReadFromFile)

@@ -218,37 +218,37 @@ public:
     uint8_t MapQuality() const;
 
     /// \returns the number of deleted bases (relative to reference)
-    size_t NumDeletedBases() const;
+    std::size_t NumDeletedBases() const;
 
     /// \returns the number of deletion operations (e.g. 'D' in CIGAR)
-    size_t NumDeletionOperations() const;
+    std::size_t NumDeletionOperations() const;
 
     /// \returns a tuple containing NumInsertedBases (first) and NumDeletedBases
     ///         (second)
     ///
-    std::pair<size_t, size_t> NumInsertedAndDeletedBases() const;
+    std::pair<std::size_t, std::size_t> NumInsertedAndDeletedBases() const;
 
     /// \returns the number of inserted bases (relative to reference)
-    size_t NumInsertedBases() const;
+    std::size_t NumInsertedBases() const;
 
     /// \returns a tuple containing NumInsertionOperations (first) and
     ///          NumDeletionOperations (second)
     ///
-    std::pair<size_t, size_t> NumInsertionAndDeletionOperations() const;
+    std::pair<std::size_t, std::size_t> NumInsertionAndDeletionOperations() const;
 
     /// \returns the number of insertion operations (e.g. 'I' in CIGAR)
-    size_t NumInsertionOperations() const;
+    std::size_t NumInsertionOperations() const;
 
     /// \returns the number of matching bases (sum of '=' CIGAR op lengths)
-    size_t NumMatches() const;
+    std::size_t NumMatches() const;
 
     /// \returns a tuple containing NumMatches (first) and NumMismatches
     ///         (second)
     ///
-    std::pair<size_t, size_t> NumMatchesAndMismatches() const;
+    std::pair<std::size_t, std::size_t> NumMatchesAndMismatches() const;
 
     /// \returns the number of mismatching bases (sum of 'X' CIGAR op lengths)
-    size_t NumMismatches() const;
+    std::size_t NumMismatches() const;
 
     /// \returns this record's reference ID, or -1 if unmapped.
     ///
@@ -1482,8 +1482,8 @@ public:
     };
     static SplitBasemods ClipBasemodsTag(const std::string& seq,
                                          const std::string& oldBasemodsString,
-                                         const std::vector<uint8_t>& basemodsQVs, size_t clipFrom,
-                                         size_t clipLength);
+                                         const std::vector<uint8_t>& basemodsQVs,
+                                         std::size_t clipFrom, std::size_t clipLength);
 
     /// Applies clipping to this record
     BamRecord& Clip(ClipType clipType, Data::Position start, Data::Position end,
@@ -1532,13 +1532,13 @@ private:
 
 public:
     /// clips the PacBio tags to a specified length
-    void ClipTags(size_t clipPos, size_t clipLength);
+    void ClipTags(std::size_t clipPos, std::size_t clipLength);
 
 private:
     ///\internal
     /// clipping methods
 
-    void ClipFields(size_t clipPos, size_t clipLength);
+    void ClipFields(std::size_t clipPos, std::size_t clipLength);
 
     BamRecord& ClipToQuery(Data::Position start, Data::Position end);
     BamRecord& ClipToReference(Data::Position start, Data::Position end,

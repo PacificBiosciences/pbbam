@@ -158,7 +158,7 @@ TEST(BAM_PbiFilterCompositeBamReader, can_handle_normal_filters)
     {
         // all records from RG ("b89a4406") with numMatches >= 1200
         const std::string rg{"b89a4406"};
-        const size_t minNumMatches = 1200;
+        const std::size_t minNumMatches = 1200;
         const auto filter = PbiFilter::Intersection({
             PbiReadGroupFilter{rg},
             PbiNumMatchesFilter{minNumMatches, Compare::GREATER_THAN_EQUAL}});
@@ -166,7 +166,7 @@ TEST(BAM_PbiFilterCompositeBamReader, can_handle_normal_filters)
         PbiFilterCompositeBamReader<> reader{filter, bamFiles};
         EXPECT_EQ(4, reader.NumReads());
 
-        size_t i = 0;
+        std::size_t i = 0;
         const auto count = std::count_if(reader.begin(), reader.end(),
             [&](const BamRecord& r) {
                 const std::string qName =

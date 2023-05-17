@@ -54,7 +54,7 @@ TEST(BAM_IndexedBamWriter, writes_valid_bam_and_pbi_on_success)
 
         BamReader reader{outBam};
         BamRecord b;
-        for (size_t i = 0; i < 24; ++i) {
+        for (std::size_t i = 0; i < 24; ++i) {
             reader.GetNext(b);
             EXPECT_EQ(expectedQNames.at(i), b.FullName());
         }

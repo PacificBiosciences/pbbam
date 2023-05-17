@@ -20,10 +20,10 @@ struct FaiZmwChunk
     uint64_t FirstSeqOffset;
 
     // Total number of records in chunk.
-    size_t NumRecords;
+    std::size_t NumRecords;
 
     // Number of unique ZMWs
-    size_t NumZmws;
+    std::size_t NumZmws;
 };
 
 ///
@@ -42,7 +42,7 @@ public:
     /// Actual chunk count may be smaller than the requested number, if the input
     /// size is smaller.
     ///
-    FaiZmwChunker(const FaiIndex& index, size_t numChunks);
+    FaiZmwChunker(const FaiIndex& index, std::size_t numChunks);
 
     ///
     /// \brief Construct a new FaiZmwChunker
@@ -53,7 +53,7 @@ public:
     /// Actual chunk count may be smaller than the requested number, if the input
     /// size is smaller.
     ///
-    FaiZmwChunker(const std::string& filename, size_t numChunks);
+    FaiZmwChunker(const std::string& filename, std::size_t numChunks);
 
     FaiZmwChunker(const FaiZmwChunker&);
     FaiZmwChunker(FaiZmwChunker&&) noexcept;
@@ -62,8 +62,8 @@ public:
     ~FaiZmwChunker();
 
 public:
-    const FaiZmwChunk& Chunk(size_t chunk) const;
-    size_t NumChunks() const;
+    const FaiZmwChunk& Chunk(std::size_t chunk) const;
+    std::size_t NumChunks() const;
 
 private:
     std::vector<FaiZmwChunk> chunks_;

@@ -18,7 +18,7 @@ using namespace PacBio::BAM;
 
 namespace FastqReaderTests {
 
-void CheckFastqSequence(const size_t index, const FastqSequence& seq)
+void CheckFastqSequence(const std::size_t index, const FastqSequence& seq)
 {
     SCOPED_TRACE("checking FASTA seq:" + std::to_string(index));
     const auto& expected = FastxTests::ExpectedFastq.at(index);
@@ -29,7 +29,7 @@ void CheckFastqSequence(const size_t index, const FastqSequence& seq)
 
 void CheckManualIteration(const std::string& fn)
 {
-    size_t count = 0;
+    std::size_t count = 0;
     FastqSequence seq;
     FastqReader reader{fn};
     while (reader.GetNext(seq)) {
@@ -41,7 +41,7 @@ void CheckManualIteration(const std::string& fn)
 
 void CheckRangeFor(const std::string& fn)
 {
-    size_t count = 0;
+    std::size_t count = 0;
     FastqReader reader{fn};
     for (const auto& seq : reader) {
         CheckFastqSequence(count, seq);
@@ -52,7 +52,7 @@ void CheckRangeFor(const std::string& fn)
 
 void CheckReadAll(const std::string& fn)
 {
-    size_t count = 0;
+    std::size_t count = 0;
     for (const auto& seq : FastqReader::ReadAll(fn)) {
         CheckFastqSequence(count, seq);
         ++count;
@@ -180,7 +180,7 @@ TEST(BAM_FastqMerging, can_merge_bams_to_fastq_output)
 
     const auto seqs = FastqReader::ReadAll(outFastq);
     ASSERT_EQ(mergedFastqNames.size(), seqs.size());
-    for (size_t i = 0; i < seqs.size(); ++i) {
+    for (std::size_t i = 0; i < seqs.size(); ++i) {
         EXPECT_EQ(mergedFastqNames[i], seqs[i].Name());
     }
 

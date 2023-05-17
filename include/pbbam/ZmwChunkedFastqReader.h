@@ -29,7 +29,7 @@ public:
     /// Actual chunk count may be smaller than the requested number, if the input
     /// size is smaller.
     ///
-    ZmwChunkedFastqReader(const std::string& fn, size_t numChunks);
+    ZmwChunkedFastqReader(const std::string& fn, std::size_t numChunks);
 
     ZmwChunkedFastqReader(ZmwChunkedFastqReader&&) noexcept;
     ZmwChunkedFastqReader& operator=(ZmwChunkedFastqReader&&) noexcept;
@@ -41,17 +41,17 @@ public:
     /// Actual chunk count may be smaller than the requested number, if the input
     /// size is smaller.
     ///
-    size_t NumChunks() const;
+    std::size_t NumChunks() const;
 
     ///
     /// Sets current chunk to start iterating over.
     ///
-    ZmwChunkedFastqReader& Chunk(size_t chunkId);
+    ZmwChunkedFastqReader& Chunk(std::size_t chunkId);
 
     ///
     /// \returns the current chunk in use
     ///
-    size_t Chunk() const;
+    std::size_t Chunk() const;
 
 public:
     ///

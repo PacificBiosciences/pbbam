@@ -116,8 +116,8 @@ public:
     using iterator_type = internal::DataSetElementIterator<value_type>;
     using const_iterator_type = internal::DataSetElementConstIterator<value_type>;
 
-    const value_type& operator[](size_t index) const;
-    value_type& operator[](size_t index);
+    const value_type& operator[](std::size_t index) const;
+    value_type& operator[](std::size_t index);
 
     iterator_type begin();
     const_iterator_type begin() const;

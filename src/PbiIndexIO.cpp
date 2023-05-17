@@ -23,7 +23,8 @@ namespace PacBio {
 namespace BAM {
 namespace {
 
-void CheckContainer(const std::string& container, const size_t expected, const size_t observed)
+void CheckContainer(const std::string& container, const std::size_t expected,
+                    const std::size_t observed)
 {
     if (observed != expected) {
         std::ostringstream msg;
@@ -33,14 +34,14 @@ void CheckContainer(const std::string& container, const size_t expected, const s
     }
 }
 
-void CheckExpectedSize(const PbiRawBarcodeData& barcodeData, const size_t numReads)
+void CheckExpectedSize(const PbiRawBarcodeData& barcodeData, const std::size_t numReads)
 {
     CheckContainer("BarcodeData.bc_forward", numReads, barcodeData.bcForward_.size());
     CheckContainer("BarcodeData.bc_reverse", numReads, barcodeData.bcReverse_.size());
     CheckContainer("BarcodeData.bc_qual", numReads, barcodeData.bcReverse_.size());
 }
 
-void CheckExpectedSize(const PbiRawBasicData& basicData, const size_t numReads)
+void CheckExpectedSize(const PbiRawBasicData& basicData, const std::size_t numReads)
 {
     CheckContainer("BasicData.rgId", numReads, basicData.rgId_.size());
     CheckContainer("BasicData.qStart", numReads, basicData.qStart_.size());
@@ -51,7 +52,7 @@ void CheckExpectedSize(const PbiRawBasicData& basicData, const size_t numReads)
     CheckContainer("BasicData.fileOffset", numReads, basicData.fileOffset_.size());
 }
 
-void CheckExpectedSize(const PbiRawMappedData& mappedData, const size_t numReads)
+void CheckExpectedSize(const PbiRawMappedData& mappedData, const std::size_t numReads)
 {
     CheckContainer("MappedData.tId", numReads, mappedData.tId_.size());
     CheckContainer("MappedData.tStart", numReads, mappedData.tStart_.size());
@@ -272,7 +273,7 @@ void PbiIndexIO::LoadHeader(PbiRawData& index, BGZF* fp)
     }
 
     // skip reserved section
-    size_t reservedLength = 18;
+    std::size_t reservedLength = 18;
     // adjust depending on version
     char reserved[18];
     bytesRead = bgzf_read(fp, &reserved, reservedLength);

@@ -23,7 +23,7 @@ public:
 public:
     // general lines
 
-    size_t NumLines() const;
+    std::size_t NumLines() const;
 
     const std::string& FileDate() const;
     const std::string& Version() const;
@@ -52,8 +52,8 @@ public:
 
     // samples
 
-    size_t IndexOfSample(const Sample& sample) const;
-    const Sample& SampleAt(size_t index) const;
+    std::size_t IndexOfSample(const Sample& sample) const;
+    const Sample& SampleAt(std::size_t index) const;
     const std::vector<Sample>& Samples() const;
 
 public:
@@ -97,12 +97,12 @@ private:
     std::vector<VCF::FormatDefinition> formatDefinitions_;
     std::vector<VCF::Sample> samples_;
 
-    std::unordered_map<std::string, size_t> generalLookup_;
-    std::unordered_map<std::string, size_t> contigLookup_;
-    std::unordered_map<std::string, size_t> infoLookup_;
-    std::unordered_map<std::string, size_t> filterLookup_;
-    std::unordered_map<std::string, size_t> formatLookup_;
-    std::unordered_map<std::string, size_t> sampleLookup_;
+    std::unordered_map<std::string, std::size_t> generalLookup_;
+    std::unordered_map<std::string, std::size_t> contigLookup_;
+    std::unordered_map<std::string, std::size_t> infoLookup_;
+    std::unordered_map<std::string, std::size_t> filterLookup_;
+    std::unordered_map<std::string, std::size_t> formatLookup_;
+    std::unordered_map<std::string, std::size_t> sampleLookup_;
 };
 
 }  // namespace VCF

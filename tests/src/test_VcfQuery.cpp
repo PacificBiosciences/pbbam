@@ -30,7 +30,7 @@ const std::string VcfFn{PacBio::BAM::PbbamTestsConfig::Data_Dir + "/vcf/structur
 
 TEST(VCF_VcfQuery, can_use_range_over_input_filename)
 {
-    size_t i = 0;
+    std::size_t i = 0;
     VcfQuery query{VcfQueryTests::VcfFn};
     for (const auto& var : query) {
         EXPECT_EQ(VcfQueryTests::ExpectedIds.at(i), var.Id());
@@ -42,7 +42,7 @@ TEST(VCF_VcfQuery, can_use_range_over_input_file_object)
 {
     const VcfFile file{VcfQueryTests::VcfFn};
 
-    size_t i = 0;
+    std::size_t i = 0;
     VcfQuery query{file};
     for (const auto& var : query) {
         EXPECT_EQ(VcfQueryTests::ExpectedIds.at(i), var.Id());

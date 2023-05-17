@@ -95,7 +95,7 @@ int setenv(const char* name, const char* value, int overwrite)
 {
     int err = 0;
     if (!overwrite) {
-        size_t sz = 0;
+        std::size_t sz = 0;
         err = getenv_s(&sz, NULL, 0, name);
         if (err || sz) return err;
     }

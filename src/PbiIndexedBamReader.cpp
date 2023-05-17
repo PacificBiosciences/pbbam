@@ -49,7 +49,7 @@ public:
             IndexList indices;
             indices.reserve(totalReads);
             const auto& idx = *index_;
-            for (size_t i = 0; i < totalReads; ++i) {
+            for (std::size_t i = 0; i < totalReads; ++i) {
                 if (filter_.Accepts(idx, i)) {
                     indices.push_back(i);
                     ++numMatchingReads_;
@@ -119,7 +119,7 @@ public:
     PbiFilter filter_;
     std::shared_ptr<PbiRawData> index_;
     IndexResultBlocks blocks_;
-    size_t currentBlockReadCount_;
+    std::size_t currentBlockReadCount_;
     uint32_t numMatchingReads_;
 };
 

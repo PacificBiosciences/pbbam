@@ -40,7 +40,7 @@ public:
         }
 
         // if no explicit thread count given, attempt built-in check
-        size_t actualNumThreads = config.NumThreads;
+        std::size_t actualNumThreads = config.NumThreads;
         if (actualNumThreads == 0) {
             actualNumThreads = std::thread::hardware_concurrency();
 
@@ -56,7 +56,7 @@ public:
         }
     }
 
-    size_t Write(const void* data, size_t numBytes)
+    std::size_t Write(const void* data, std::size_t numBytes)
     {
         const auto written = bgzf_write(bgzf_.get(), data, numBytes);
         if (written < 0) {
@@ -66,7 +66,7 @@ public:
             MaybePrintErrnoReason(s);
             throw std::runtime_error{s.str()};
         }
-        return static_cast<size_t>(written);
+        return static_cast<std::size_t>(written);
     }
 
     std::string usingFilename_;
@@ -88,7 +88,10 @@ BgzipWriter& BgzipWriter::operator=(BgzipWriter&&) noexcept = default;
 
 BgzipWriter::~BgzipWriter() = default;
 
-size_t BgzipWriter::Write(const void* data, size_t numBytes) { return d_->Write(data, numBytes); }
+size_t BgzipWriter::Write(const void* data, std::size_t numBytes)
+{
+    return d_->Write(data, numBytes);
+}
 
 size_t BgzipWriter::Write(const std::string& data) { return d_->Write(data.c_str(), data.size()); }
 

@@ -140,7 +140,7 @@ PbiFilterCompositeBamReader<OrderByType>& PbiFilterCompositeBamReader<OrderByTyp
     // create readers for files
     container_type updatedMergeItems;
     std::vector<std::string> missingPbi;
-    for (size_t i = 0; i < this->bamFiles_.size(); ++i) {
+    for (std::size_t i = 0; i < this->bamFiles_.size(); ++i) {
         const auto& bamFile = this->bamFiles_.at(i);
         if (bamFile.PacBioIndexExists()) {
             auto item = internal::CompositeMergeItem{std::unique_ptr<BamReader>{

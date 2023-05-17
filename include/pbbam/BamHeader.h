@@ -180,7 +180,7 @@ public:
     bool HasSequence(const std::string& name) const;
 
     /// \returns number of sequences (\@SQ entries) stored in this header
-    size_t NumSequences() const;
+    std::size_t NumSequences() const;
 
     /// \returns numeric ID for sequence matching \p name (\@SQ:SN)
     ///

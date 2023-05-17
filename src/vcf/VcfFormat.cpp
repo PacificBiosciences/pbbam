@@ -389,7 +389,7 @@ VcfHeader VcfFormat::ParsedHeader(const std::string& hdrText)
             // and read the remaining column labels as sample names.
             //
             auto columns = BAM::Split(line, '\t');
-            for (size_t i = 9; i < columns.size(); ++i) {
+            for (std::size_t i = 9; i < columns.size(); ++i) {
                 samples.push_back(std::move(columns[i]));
             }
             hdr.Samples(std::move(samples));
@@ -520,7 +520,7 @@ VcfVariant VcfFormat::ParsedVariant(const std::string& line)
         var.GenotypeIds(BAM::Split(fields.at(8), ':'));
 
         std::vector<GenotypeField> genotypes;
-        for (size_t i = 9; i < fields.size(); ++i) {
+        for (std::size_t i = 9; i < fields.size(); ++i) {
             genotypes.emplace_back(ParsedGenotypeField(fields.at(i)));
         }
         var.Genotypes(std::move(genotypes));

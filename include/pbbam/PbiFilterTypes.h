@@ -53,7 +53,7 @@ template <typename T, PbiFile::BarcodeField field>
 class BarcodeDataFilterBase : public FilterBase<T>
 {
 public:
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 protected:
     BarcodeDataFilterBase(T value, Compare::Type cmp);
@@ -68,7 +68,7 @@ template <typename T, PbiFile::BasicField field>
 class BasicDataFilterBase : public FilterBase<T>
 {
 public:
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 protected:
     BasicDataFilterBase(T value, Compare::Type cmp);
@@ -83,7 +83,7 @@ template <typename T, PbiFile::MappedField field>
 class MappedDataFilterBase : public FilterBase<T>
 {
 public:
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 protected:
     MappedDataFilterBase(T value, Compare::Type cmp);
@@ -132,7 +132,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 };
 
 /// \brief The PbiAlignedStartFilter class provides a PbiFilter-compatible
@@ -208,7 +208,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 private:
     PbiFilter compositeFilter_;
@@ -329,7 +329,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 private:
     PbiFilter compositeFilter_;
@@ -356,7 +356,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 };
 
 /// \brief The PbiLocalContextFilter class provides a PbiFilter-compatible
@@ -431,7 +431,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 private:
     std::set<std::string> movieNames_;
@@ -447,7 +447,7 @@ private:
 /// \sa BamRecord::NumDeletedBases
 ///
 class PbiNumDeletedBasesFilter
-    : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_DEL>
+    : public internal::MappedDataFilterBase<std::size_t, PbiFile::MappedField::N_DEL>
 {
 public:
     /// \brief Creates a filter on the number of deleted bases.
@@ -455,7 +455,7 @@ public:
     /// \param[in] numDeletions value to compare on
     /// \param[in] cmp          compare type
     ///
-    PbiNumDeletedBasesFilter(size_t numDeletions, Compare::Type cmp = Compare::EQUAL);
+    PbiNumDeletedBasesFilter(std::size_t numDeletions, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiNumInsertededBasesFilter class provides a PbiFilter-compatible
@@ -466,7 +466,7 @@ public:
 /// \sa BamRecord::NumInsertedBases
 ///
 class PbiNumInsertedBasesFilter
-    : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_INS>
+    : public internal::MappedDataFilterBase<std::size_t, PbiFile::MappedField::N_INS>
 {
 public:
     /// \brief Creates a filter on the number of inserted bases.
@@ -474,7 +474,7 @@ public:
     /// \param[in] numInsertions    value to compare on
     /// \param[in] cmp              compare type
     ///
-    PbiNumInsertedBasesFilter(size_t numInsertions, Compare::Type cmp = Compare::EQUAL);
+    PbiNumInsertedBasesFilter(std::size_t numInsertions, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiNumMatchesFilter class provides a PbiFilter-compatible filter
@@ -484,7 +484,8 @@ public:
 ///
 /// \sa BamRecord::NumMatches
 ///
-class PbiNumMatchesFilter : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_M>
+class PbiNumMatchesFilter
+    : public internal::MappedDataFilterBase<std::size_t, PbiFile::MappedField::N_M>
 {
 public:
     /// \brief Creates a filter on the number of matched bases.
@@ -492,7 +493,7 @@ public:
     /// \param[in] numMatchedBases  value to compare on
     /// \param[in] cmp              compare type
     ///
-    PbiNumMatchesFilter(size_t numMatchedBases, Compare::Type cmp = Compare::EQUAL);
+    PbiNumMatchesFilter(std::size_t numMatchedBases, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiNumMismatchesFilter class provides a PbiFilter-compatible
@@ -503,7 +504,7 @@ public:
 /// \sa BamRecord::NumMismatches
 ///
 class PbiNumMismatchesFilter
-    : public internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_MM>
+    : public internal::MappedDataFilterBase<std::size_t, PbiFile::MappedField::N_MM>
 {
 public:
     /// \brief Creates a filter on the number of mismatched bases.
@@ -511,7 +512,7 @@ public:
     /// \param[in] numMismatchedBases   value to compare on
     /// \param[in] cmp                  compare type
     ///
-    PbiNumMismatchesFilter(size_t numMismatchedBases, Compare::Type cmp = Compare::EQUAL);
+    PbiNumMismatchesFilter(std::size_t numMismatchedBases, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiNumSubreadsFilter class provides a PbiFilter-compatible
@@ -537,7 +538,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 private:
     struct PbiNumSubreadsFilterPrivate;
@@ -585,7 +586,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 };
 
 /// \brief The PbiQueryNameFilter class provides a PbiFilter-compatible filter
@@ -630,7 +631,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 private:
     struct PbiQueryNameFilterPrivate;
@@ -756,7 +757,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 private:
     void AddReadGroups(const std::vector<ReadGroupInfo>& readGroups);
@@ -848,7 +849,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 private:
     mutable bool initialized_ = false;
@@ -916,7 +917,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 private:
     Compare::Type cmp_;
@@ -948,7 +949,7 @@ public:
     ///
     /// Most client code should not need to use this method directly.
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 private:
     uint32_t denominator_;

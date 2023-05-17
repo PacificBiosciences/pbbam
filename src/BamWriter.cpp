@@ -47,7 +47,8 @@ class BamWriter::BamWriterPrivate
 {
 public:
     BamWriterPrivate(const std::string& filename, const std::shared_ptr<bam_hdr_t> rawHeader,
-                     const BamWriter::CompressionLevel compressionLevel, const size_t numThreads,
+                     const BamWriter::CompressionLevel compressionLevel,
+                     const std::size_t numThreads,
                      const BamWriter::BinCalculationMode binCalculationMode, const bool useTempFile)
         : calculateBins_{binCalculationMode == BamWriter::BinCalculation_ON}, header_{rawHeader}
     {
@@ -68,7 +69,7 @@ public:
         }
 
         // if no explicit thread count given, attempt built-in check
-        size_t actualNumThreads = numThreads;
+        std::size_t actualNumThreads = numThreads;
         if (actualNumThreads == 0) {
             actualNumThreads = std::thread::hardware_concurrency();
 
@@ -141,8 +142,9 @@ public:
 };
 
 BamWriter::BamWriter(const std::string& filename, const BamHeader& header,
-                     const BamWriter::CompressionLevel compressionLevel, const size_t numThreads,
-                     const BinCalculationMode binCalculationMode, const bool useTempFile)
+                     const BamWriter::CompressionLevel compressionLevel,
+                     const std::size_t numThreads, const BinCalculationMode binCalculationMode,
+                     const bool useTempFile)
     : IRecordWriter()
 {
 #if PBBAM_AUTOVALIDATE

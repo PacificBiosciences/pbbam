@@ -29,7 +29,7 @@ namespace BAM {
 struct PBBAM_EXPORT IndexResultBlock
 {
 public:
-    IndexResultBlock(size_t idx, size_t numReads);
+    IndexResultBlock(std::size_t idx, std::size_t numReads);
 
     IndexResultBlock() = default;
 
@@ -38,8 +38,9 @@ public:
     bool operator!=(const IndexResultBlock& other) const noexcept;
 
 public:
-    size_t firstIndex_ = 0;  ///< index of block's first record in BAM/PBI files (e.g. i-th record)
-    size_t numReads_ = 0;    ///< number of reads in this block
+    std::size_t firstIndex_ =
+        0;  ///< index of block's first record in BAM/PBI files (e.g. i-th record)
+    std::size_t numReads_ = 0;    ///< number of reads in this block
     int64_t virtualOffset_ = -1;  ///< virtual offset of first record in this block
 };
 
@@ -54,7 +55,7 @@ using IndexResultBlocks = std::deque<IndexResultBlock>;
 /// and then be merged down into IndexResultBlocks for actual data file
 /// random-access.
 ///
-using IndexList = std::vector<size_t>;
+using IndexList = std::vector<std::size_t>;
 
 /// \brief pair representing a range of PBI indices: where interval
 ///        is [first, second)
@@ -63,7 +64,7 @@ using IndexList = std::vector<size_t>;
 ///
 /// \sa PbiReferenceEntry, PbiRawReferenceData, & ReferenceLookupData
 ///
-using IndexRange = std::pair<size_t, size_t>;
+using IndexRange = std::pair<std::size_t, std::size_t>;
 
 }  // namespace BAM
 }  // namespace PacBio

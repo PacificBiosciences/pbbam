@@ -27,7 +27,7 @@ namespace {
 
 void ClipAndGapify(std::string& subseq, const Data::Cigar& cigar, bool exciseSoftClips)
 {
-    size_t seqIndex = 0;
+    std::size_t seqIndex = 0;
     for (const auto& op : cigar) {
         const auto type = op.Type();
         const auto opLength = op.Length();
@@ -192,7 +192,7 @@ std::vector<std::string> IndexedFastaReader::Names() const
     return names;
 }
 
-std::string IndexedFastaReader::Name(const size_t idx) const
+std::string IndexedFastaReader::Name(const std::size_t idx) const
 {
     if (static_cast<int>(idx) >= NumSequences()) {
         std::ostringstream s;

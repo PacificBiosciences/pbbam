@@ -99,7 +99,7 @@ struct PbiFile
     static void CreateFrom(
         const BamFile& bamFile,
         PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
-        size_t numThreads = 4);
+        std::size_t numThreads = 4);
 };
 
 }  // namespace BAM

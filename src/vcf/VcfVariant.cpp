@@ -72,7 +72,7 @@ VcfVariant& VcfVariant::GenotypeIds(std::vector<std::string> ids)
     genotypeDataLookup_.clear();
 
     format_ = std::move(ids);
-    for (size_t i = 0; i < format_.size(); ++i) {
+    for (std::size_t i = 0; i < format_.size(); ++i) {
         genotypeDataLookup_.emplace(format_.at(i), i);
     }
     return *this;
@@ -86,7 +86,7 @@ VcfVariant& VcfVariant::Genotypes(std::vector<GenotypeField> genotypes)
     return *this;
 }
 
-const std::optional<std::string>& VcfVariant::GenotypeValue(const size_t sampleIndex,
+const std::optional<std::string>& VcfVariant::GenotypeValue(const std::size_t sampleIndex,
                                                             const std::string& id) const
 {
     const auto& genotypeField = sampleGenotypes_.at(sampleIndex);
@@ -95,7 +95,7 @@ const std::optional<std::string>& VcfVariant::GenotypeValue(const size_t sampleI
     return genotypeData.value;
 }
 
-VcfVariant& VcfVariant::GenotypeValue(const size_t sampleIndex, const std::string& id,
+VcfVariant& VcfVariant::GenotypeValue(const std::size_t sampleIndex, const std::string& id,
                                       std::optional<std::string> value)
 {
     auto& genotypeField = sampleGenotypes_.at(sampleIndex);
@@ -106,7 +106,7 @@ VcfVariant& VcfVariant::GenotypeValue(const size_t sampleIndex, const std::strin
 }
 
 const std::optional<std::vector<std::string>>& VcfVariant::GenotypeValues(
-    const size_t sampleIndex, const std::string& id) const
+    const std::size_t sampleIndex, const std::string& id) const
 {
     const auto& genotypeField = sampleGenotypes_.at(sampleIndex);
     const auto genotypeDataIndex = genotypeDataLookup_.at(id);
@@ -114,7 +114,7 @@ const std::optional<std::vector<std::string>>& VcfVariant::GenotypeValues(
     return genotypeData.values;
 }
 
-VcfVariant& VcfVariant::GenotypeValues(const size_t sampleIndex, const std::string& id,
+VcfVariant& VcfVariant::GenotypeValues(const std::size_t sampleIndex, const std::string& id,
                                        std::optional<std::vector<std::string>> values)
 {
     auto& genotypeField = sampleGenotypes_.at(sampleIndex);
@@ -179,7 +179,7 @@ bool VcfVariant::IsInsertion() const { return refAllele_.size() < altAllele_.siz
 
 bool VcfVariant::IsQualityMissing() const { return std::isnan(qual_); }
 
-bool VcfVariant::IsSampleHeterozygous(const size_t sampleIndex) const
+bool VcfVariant::IsSampleHeterozygous(const std::size_t sampleIndex) const
 {
     const auto data = GenotypeValue(sampleIndex, "GT");
     auto fields = BAM::Split(*data, '/');
@@ -194,7 +194,7 @@ bool VcfVariant::IsSampleHeterozygous(const size_t sampleIndex) const
     }
 }
 
-bool VcfVariant::IsSamplePhased(const size_t sampleIndex) const
+bool VcfVariant::IsSamplePhased(const std::size_t sampleIndex) const
 {
     const auto data = GenotypeValue(sampleIndex, "GT");
     const auto phaseFound = data->find('|') != std::string::npos;

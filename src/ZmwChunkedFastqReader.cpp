@@ -26,7 +26,7 @@ namespace BAM {
 namespace {
 
 std::unique_ptr<ZmwChunkedFastxReaderImpl> MakeFastqReaderImpl(std::string filename,
-                                                               const size_t numChunks)
+                                                               const std::size_t numChunks)
 {
     // validate extension
     if (!FormatUtils::IsFastqFilename(filename)) {
@@ -74,14 +74,14 @@ std::unique_ptr<ZmwChunkedFastxReaderImpl> MakeFastqReaderImpl(std::string filen
 class ZmwChunkedFastqReader::ZmwChunkedFastqReaderPrivate
 {
 public:
-    explicit ZmwChunkedFastqReaderPrivate(const std::string& fn, const size_t numChunks)
+    explicit ZmwChunkedFastqReaderPrivate(const std::string& fn, const std::size_t numChunks)
         : reader_{MakeFastqReaderImpl(std::move(fn), numChunks)}
     {
         assert(reader_->chunker_.NumChunks() != 0);
         Chunk(0);
     }
 
-    void Chunk(size_t chunkId)
+    void Chunk(std::size_t chunkId)
     {
         const auto& chunk = reader_->chunker_.Chunk(chunkId);
         remaining = chunk.NumRecords;
@@ -106,12 +106,12 @@ public:
 
     // reader
     std::unique_ptr<ZmwChunkedFastxReaderImpl> reader_;
-    size_t currentChunkId_ = 0;
+    std::size_t currentChunkId_ = 0;
     bool firstRecord;
-    size_t remaining;
+    std::size_t remaining;
 };
 
-ZmwChunkedFastqReader::ZmwChunkedFastqReader(const std::string& fn, const size_t numChunks)
+ZmwChunkedFastqReader::ZmwChunkedFastqReader(const std::string& fn, const std::size_t numChunks)
     : internal::QueryBase<FastqSequence>{}
     , d_{std::make_unique<ZmwChunkedFastqReaderPrivate>(fn, numChunks)}
 {}
@@ -124,7 +124,7 @@ ZmwChunkedFastqReader::~ZmwChunkedFastqReader() = default;
 
 size_t ZmwChunkedFastqReader::NumChunks() const { return d_->reader_->chunker_.NumChunks(); }
 
-ZmwChunkedFastqReader& ZmwChunkedFastqReader::Chunk(size_t chunkId)
+ZmwChunkedFastqReader& ZmwChunkedFastqReader::Chunk(std::size_t chunkId)
 {
     d_->Chunk(chunkId);
     return *this;

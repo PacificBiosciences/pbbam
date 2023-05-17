@@ -109,7 +109,7 @@ public:
     bool HasSequence(const std::string& name) const;
 
     /// \returns the names of the sequence at a specific index in the FASTA file
-    std::string Name(size_t idx) const;
+    std::string Name(std::size_t idx) const;
 
     /// \returns the names of all sequences stored in the FASTA file
     std::vector<std::string> Names() const;

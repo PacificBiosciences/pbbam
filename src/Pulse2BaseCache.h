@@ -32,7 +32,7 @@ public:
         // squashed pulse   -> data[i] == 0
         //
         const auto numPulses = pulseCalls.size();
-        for (size_t i = 0; i < numPulses; ++i) {
+        for (std::size_t i = 0; i < numPulses; ++i) {
             data_[i] = std::isupper(pulseCalls.at(i));
         }
     }
@@ -50,29 +50,29 @@ public:
     /// \brief FindFirst
     /// \return
     ///
-    size_t FindFirst() const { return data_.find_first(); }
+    std::size_t FindFirst() const { return data_.find_first(); }
 
     ///
     /// \brief FindNext
     /// \param from
     /// \return
     ///
-    size_t FindNext(size_t from) const { return data_.find_next(from); }
+    std::size_t FindNext(std::size_t from) const { return data_.find_next(from); }
 
     ///
     /// \brief IsBasecallAt
     /// \param pos
     /// \return
     ///
-    bool IsBasecallAt(const size_t pos) const { return data_[pos]; }
+    bool IsBasecallAt(const std::size_t pos) const { return data_[pos]; }
 
     /// \returns the total number of pulses (basecalled & squashed)
     ///
-    size_t NumPulses() const { return data_.size(); }
+    std::size_t NumPulses() const { return data_.size(); }
 
     /// \returns the total number of basecalled pulses
     ///
-    size_t NumBases() const { return data_.count(); }
+    std::size_t NumBases() const { return data_.count(); }
 
     /// \brief Removes squashed pulse positions from input data.
     ///
@@ -94,8 +94,8 @@ public:
 
         // Only include data at positions that match our cached pulse data.
         //
-        size_t inputIndex = 0;
-        for (size_t i = 0; i < numPulses; ++i) {
+        std::size_t inputIndex = 0;
+        for (std::size_t i = 0; i < numPulses; ++i) {
             if (data_[i]) {
                 result.push_back(pulseData.at(inputIndex));
             }

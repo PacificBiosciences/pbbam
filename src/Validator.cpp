@@ -314,7 +314,7 @@ void ValidateRecordRequiredTags(const BamRecord& b, std::unique_ptr<ValidationEr
 void ValidateRecordTagLengths(const BamRecord& b, std::unique_ptr<ValidationErrors>& errors)
 {
     const auto name = b.FullName();
-    const size_t expectedLength =
+    const std::size_t expectedLength =
         (IsCcsOrTranscript(b.Type()) ? b.Sequence().size() : (b.QueryEnd() - b.QueryStart()));
 
     // check "per-base"-type data lengths are compatible
@@ -436,7 +436,7 @@ bool Validator::IsValid(const ReadGroupInfo& rg)
     }
 }
 
-void Validator::Validate(const BamHeader& header, const size_t maxErrors)
+void Validator::Validate(const BamHeader& header, const std::size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
     ValidateHeader(header, "unknown", errors);
@@ -445,7 +445,7 @@ void Validator::Validate(const BamHeader& header, const size_t maxErrors)
     }
 }
 
-void Validator::Validate(const ReadGroupInfo& rg, const size_t maxErrors)
+void Validator::Validate(const ReadGroupInfo& rg, const std::size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
     ValidateReadGroup(rg, errors);
@@ -454,7 +454,7 @@ void Validator::Validate(const ReadGroupInfo& rg, const size_t maxErrors)
     }
 }
 
-void Validator::Validate(const BamRecord& b, const size_t maxErrors)
+void Validator::Validate(const BamRecord& b, const std::size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
     ValidateRecord(b, errors);
@@ -463,7 +463,7 @@ void Validator::Validate(const BamRecord& b, const size_t maxErrors)
     }
 }
 
-void Validator::ValidateEntireFile(const BamFile& file, const size_t maxErrors)
+void Validator::ValidateEntireFile(const BamFile& file, const std::size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
     ValidateMetadata(file, errors);
@@ -478,7 +478,7 @@ void Validator::ValidateEntireFile(const BamFile& file, const size_t maxErrors)
     }
 }
 
-void Validator::ValidateFileMetadata(const BamFile& file, const size_t maxErrors)
+void Validator::ValidateFileMetadata(const BamFile& file, const std::size_t maxErrors)
 {
     auto errors = std::make_unique<ValidationErrors>(maxErrors);
     ValidateMetadata(file, errors);

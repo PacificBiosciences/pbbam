@@ -279,7 +279,7 @@ public:
     /// \returns the record's DNA sequence.
     std::string Sequence() const;
 
-    size_t SequenceLength() const;
+    std::size_t SequenceLength() const;
 
     /// \brief Sets the record's DNA sequence and quality values
     ///
@@ -297,7 +297,7 @@ public:
     /// \returns reference to this record.
     ///
     /// \sa SetSequenceAndQualities(const char* sequence,
-    ///     const size_t sequenceLength, const char* qualities)
+    ///     const std::size_t sequenceLength, const char* qualities)
     ///
     BamRecordImpl& SetSequenceAndQualities(const std::string& sequence,
                                            const std::string& qualities = std::string());
@@ -319,7 +319,7 @@ public:
     ///
     /// \returns reference to this record.
     ///
-    BamRecordImpl& SetSequenceAndQualities(const char* sequence, size_t sequenceLength,
+    BamRecordImpl& SetSequenceAndQualities(const char* sequence, std::size_t sequenceLength,
                                            const char* qualities = nullptr);
 
     /// \brief Sets the record's DNA sequence and quality values.
@@ -343,10 +343,10 @@ public:
     /// \returns reference to this record.
     ///
     /// \sa SetSequenceAndQualities(const char* sequence,
-    ///     const size_t sequenceLength, const char* qualities)
+    ///     const std::size_t sequenceLength, const char* qualities)
     ///
     BamRecordImpl& SetPreencodedSequenceAndQualities(const char* encodedSequence,
-                                                     size_t rawSequenceLength,
+                                                     std::size_t rawSequenceLength,
                                                      const char* qualities = nullptr);
 
     /// \}
@@ -588,7 +588,7 @@ private:
     void SetCigarData(const Data::Cigar& cigar);
 
     // core seq/qual logic shared by the public API
-    BamRecordImpl& SetSequenceAndQualitiesInternal(const char* sequence, size_t sequenceLength,
+    BamRecordImpl& SetSequenceAndQualitiesInternal(const char* sequence, std::size_t sequenceLength,
                                                    const char* qualities, bool isPreencoded);
 
 private:

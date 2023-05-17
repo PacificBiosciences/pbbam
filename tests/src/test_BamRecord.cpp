@@ -62,7 +62,7 @@ void CheckRawData(const BamRecordImpl& bam)
     const uint32_t expectedNameLength = expectedNameBytes + expectedNameNulls;
     const uint32_t expectedNumCigarOps = bam.CigarData().size();
     const int32_t expectedSeqLength = bam.Sequence().length();
-    const size_t expectedTagsLength = BamTagCodec::Encode(bam.Tags()).size();
+    const std::size_t expectedTagsLength = BamTagCodec::Encode(bam.Tags()).size();
 
     //  Name        CIGAR         Sequence       Quals      Tags
     // l_qname + (n_cigar * 4) + (l_qseq+1)/2 + l_qseq + <encoded length>
@@ -2702,7 +2702,7 @@ TEST(BAM_BamRecord, num_deleted_bases_excludes_ref_skips)
 
     // Buggy version had (numDel:4882) due to miscounting of ref-skip CIGAR ops.
 
-    const size_t expectedNumDel = 73;
+    const std::size_t expectedNumDel = 73;
     EXPECT_EQ(expectedNumDel, record.NumDeletedBases());
 }
 

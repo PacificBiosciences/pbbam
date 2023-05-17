@@ -202,7 +202,7 @@ size_t VcfHeader::NumLines() const
            filterDefinitions_.size() + formatDefinitions_.size() + 1;
 }
 
-const Sample& VcfHeader::SampleAt(size_t index) const { return samples_.at(index); }
+const Sample& VcfHeader::SampleAt(std::size_t index) const { return samples_.at(index); }
 
 size_t VcfHeader::IndexOfSample(const Sample& sample) const { return sampleLookup_.at(sample); }
 

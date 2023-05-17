@@ -280,7 +280,7 @@ public:
     /// \throws std::runtime_error if barcode data not set.
     ///         Check HasBarcodeData if this data may be absent.
     ///
-    size_t BarcodeCount() const;
+    std::size_t BarcodeCount() const;
 
     /// \returns name of FASTA file containing barcode sequences, as stored in
     ///          the description tag (\@RG:DS)
@@ -503,7 +503,7 @@ public:
     /// \returns reference to this object
     ///
     ReadGroupInfo& BarcodeData(std::string barcodeFile, std::string barcodeHash,
-                               size_t barcodeCount, BarcodeModeType barcodeMode,
+                               std::size_t barcodeCount, BarcodeModeType barcodeMode,
                                BarcodeQualityType barcodeQuality);
 
     /// \brief Sets the value for \@RG:BC
@@ -815,7 +815,7 @@ private:
     bool hasBarcodeData_ = false;
     std::string barcodeFile_;
     std::string barcodeHash_;
-    size_t barcodeCount_ = 0;
+    std::size_t barcodeCount_ = 0;
     BarcodeModeType barcodeMode_ = BarcodeModeType::NONE;
     BarcodeQualityType barcodeQuality_ = BarcodeQualityType::NONE;
     std::map<BaseFeature, std::string> features_;

@@ -50,7 +50,7 @@ TEST(BAM_IndexedFastqReader, can_query_index_for_metadata)
 
     const auto& names = r.Names();
     ASSERT_EQ(FastxTests::ExpectedFastq.size(), names.size());
-    for (size_t i = 0; i < names.size(); ++i) {
+    for (std::size_t i = 0; i < names.size(); ++i) {
         EXPECT_EQ(FastxTests::ExpectedFastq.at(i).Name(), names.at(i));
     }
 }

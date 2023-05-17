@@ -101,18 +101,18 @@ public:
     std::vector<GenotypeField> Genotypes() const;
     VcfVariant& Genotypes(std::vector<GenotypeField> genotypes);
 
-    const std::optional<std::string>& GenotypeValue(size_t sampleIndex,
+    const std::optional<std::string>& GenotypeValue(std::size_t sampleIndex,
                                                     const std::string& id) const;
-    VcfVariant& GenotypeValue(size_t sampleIndex, const std::string& id,
+    VcfVariant& GenotypeValue(std::size_t sampleIndex, const std::string& id,
                               std::optional<std::string> value);
 
-    const std::optional<std::vector<std::string>>& GenotypeValues(size_t sampleIndex,
+    const std::optional<std::vector<std::string>>& GenotypeValues(std::size_t sampleIndex,
                                                                   const std::string& id) const;
-    VcfVariant& GenotypeValues(size_t sampleIndex, const std::string& id,
+    VcfVariant& GenotypeValues(std::size_t sampleIndex, const std::string& id,
                                std::optional<std::vector<std::string>> values);
 
-    bool IsSampleHeterozygous(size_t sampleIndex) const;
-    bool IsSamplePhased(size_t sampleIndex) const;
+    bool IsSampleHeterozygous(std::size_t sampleIndex) const;
+    bool IsSamplePhased(std::size_t sampleIndex) const;
 
 private:
     // FIXED data
@@ -126,11 +126,11 @@ private:
 
     // INFO data
     std::vector<InfoField> infoFields_;
-    std::unordered_map<std::string, size_t> infoLookup_;
+    std::unordered_map<std::string, std::size_t> infoLookup_;
 
     // SAMPLE GENOTYPE data
     std::vector<std::string> format_;  // order matches FORMAT string
-    std::unordered_map<std::string, size_t>
+    std::unordered_map<std::string, std::size_t>
         genotypeDataLookup_;                      // genotype ID -> genotypeField.data index
     std::vector<GenotypeField> sampleGenotypes_;  // index matches sample order
 };

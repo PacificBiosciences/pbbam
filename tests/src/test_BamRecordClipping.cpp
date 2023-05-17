@@ -2202,8 +2202,8 @@ TEST(BAM_BamRecordClipping, clipping_flanking_inserts_is_ignored_on_clip_to_quer
         EXPECT_EQ(100, s.ReferenceStart());
         EXPECT_EQ(105, s.ReferenceEnd());
 
-        const size_t clipStart = 502;
-        const size_t clipEnd = 512;
+        const std::size_t clipStart = 502;
+        const std::size_t clipEnd = 512;
         const bool exciseFlankingInserts = true;
 
         s.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd, exciseFlankingInserts);
@@ -2231,8 +2231,8 @@ TEST(BAM_BamRecordClipping, clipping_flanking_inserts_is_ignored_on_clip_to_quer
         EXPECT_EQ(100, s.ReferenceStart());
         EXPECT_EQ(105, s.ReferenceEnd());
 
-        const size_t clipStart = 502;
-        const size_t clipEnd = 512;
+        const std::size_t clipStart = 502;
+        const std::size_t clipEnd = 512;
         const bool exciseFlankingInserts = true;
 
         s.Clip(ClipType::CLIP_TO_QUERY, clipStart, clipEnd, exciseFlankingInserts);
@@ -2272,8 +2272,8 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
     const uint8_t  mapQual = 80;
     const Data::Cigar cigar{"3=6I10=6I1="};
 
-    const size_t clipStart = 103;
-    const size_t clipEnd = 113;
+    const std::size_t clipStart = 103;
+    const std::size_t clipEnd = 113;
 
     // ----------------
     // keep inserts
@@ -2344,8 +2344,8 @@ TEST(BAM_BamRecordClipping, can_excise_flanking_insertsion_when_clipping_to_refe
     const uint8_t  mapQual = 80;
     const Data::Cigar cigar{"3=6I10=6I1="};
 
-    const size_t clipStart = 103;
-    const size_t clipEnd = 113;
+    const std::size_t clipStart = 103;
+    const std::size_t clipEnd = 113;
 
     // ----------------
     // keep inserts

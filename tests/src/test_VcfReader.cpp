@@ -41,7 +41,7 @@ TEST(VCF_VcfReader, throws_on_non_vcf_file)
 
 TEST(VCF_VcfReader, can_fetch_variants_from_vcf_filename)
 {
-    size_t i = 0;
+    std::size_t i = 0;
     VcfReader rdr{VcfReaderTests::VcfFn};
     VcfVariant var;
     while (rdr.GetNext(var)) {
@@ -54,7 +54,7 @@ TEST(VCF_VcfReader, can_fetch_variants_from_vcf_file_object)
 {
     const VcfFile file{VcfReaderTests::VcfFn};
 
-    size_t i = 0;
+    std::size_t i = 0;
     VcfReader rdr{file};
     VcfVariant var;
     while (rdr.GetNext(var)) {

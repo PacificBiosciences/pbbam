@@ -189,7 +189,7 @@ TEST(BAM_RunMetadata, can_load_single_collection_from_xml_file)
     EXPECT_EQ("360", automationParameters.GetParameter("MovieLength"));
 
     // iterable parameters
-    size_t count = 0;
+    std::size_t count = 0;
     for (const auto& p : automationParameters) {
         ++count;
         ASSERT_TRUE(automationParameters.HasParameter(p.Name()));

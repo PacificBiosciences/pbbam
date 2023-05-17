@@ -82,10 +82,11 @@ void Compare(const BamRecord& b1, const BamRecord& b2)
     EXPECT_EQ(b1.PulseMergeQV(), b2.PulseMergeQV());
 }
 
-static size_t NumVirtualRecords(const std::string& primaryBamFn, const std::string& scrapsBamFn)
+static std::size_t NumVirtualRecords(const std::string& primaryBamFn,
+                                     const std::string& scrapsBamFn)
 {
     ZmwReadStitcher stitcher{primaryBamFn, scrapsBamFn};
-    size_t count = 0;
+    std::size_t count = 0;
     while (stitcher.HasNext()) {
         std::ignore = stitcher.Next();
         ++count;
@@ -99,7 +100,7 @@ TEST(BAM_ZmwReadStitcher, can_stitch_from_unfiltered_bams)
 {
     ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
                              PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
-    size_t count = 0;
+    std::size_t count = 0;
     while (stitcher.HasNext()) {
         std::ignore = stitcher.Next();
         ++count;
@@ -113,7 +114,7 @@ TEST(BAM_ZmwReadStitcher, can_stitch_from_filtered_bams)
     ZmwReadStitcher stitcher{PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
                              PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam",
                              filter};
-    size_t count = 0;
+    std::size_t count = 0;
     while (stitcher.HasNext()) {
         const auto record = stitcher.Next();
         EXPECT_EQ(100000, record.HoleNumber());
@@ -132,7 +133,7 @@ TEST(BAM_ZmwReadStitcher, can_stitch_from_unfiltered_dataset)
         PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.hqregion.bam";
     const std::string scrapsFn2 =
         PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.scraps.bam";
-    const size_t numExpectedRecords =
+    const std::size_t numExpectedRecords =
         ZmwReadStitcherTests::NumVirtualRecords(primaryFn1, scrapsFn1) +
         ZmwReadStitcherTests::NumVirtualRecords(primaryFn2, scrapsFn2);
 
@@ -141,7 +142,7 @@ TEST(BAM_ZmwReadStitcher, can_stitch_from_unfiltered_dataset)
 
     DataSet ds{datasetFn};
     ZmwReadStitcher stitcher{ds};
-    size_t numObservedRecords = 0;
+    std::size_t numObservedRecords = 0;
     while (stitcher.HasNext()) {
         std::ignore = stitcher.Next();
         ++numObservedRecords;
@@ -161,9 +162,10 @@ TEST(BAM_ZmwReadStitcher, can_stitch_from_filtered_dataset)
         PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.hqregion.bam";
     const std::string scrapsFn3 =
         PbbamTestsConfig::Data_Dir + "/polymerase/production_hq.scraps.bam";
-    const size_t totalRecords = ZmwReadStitcherTests::NumVirtualRecords(primaryFn1, scrapsFn1) +
-                                ZmwReadStitcherTests::NumVirtualRecords(primaryFn2, scrapsFn2) +
-                                ZmwReadStitcherTests::NumVirtualRecords(primaryFn3, scrapsFn3);
+    const std::size_t totalRecords =
+        ZmwReadStitcherTests::NumVirtualRecords(primaryFn1, scrapsFn1) +
+        ZmwReadStitcherTests::NumVirtualRecords(primaryFn2, scrapsFn2) +
+        ZmwReadStitcherTests::NumVirtualRecords(primaryFn3, scrapsFn3);
     EXPECT_EQ(5, totalRecords);
 
     // our filter will remove the 2 "production" BAM pairs
@@ -173,7 +175,7 @@ TEST(BAM_ZmwReadStitcher, can_stitch_from_filtered_dataset)
 
     DataSet ds{datasetFn};
     ZmwReadStitcher stitcher{ds};
-    size_t numObservedRecords = 0;
+    std::size_t numObservedRecords = 0;
     while (stitcher.HasNext()) {
         std::ignore = stitcher.Next();
         ++numObservedRecords;
@@ -455,7 +457,7 @@ TEST(BAM_ZmwReadStitcher, can_work_via_legacy_vpr_typedef)
         VirtualPolymeraseReader reader{
             PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
             PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
-        size_t count = 0;
+        std::size_t count = 0;
         while (reader.HasNext()) {
             std::ignore = reader.Next();
             ++count;

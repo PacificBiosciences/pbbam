@@ -72,7 +72,7 @@ public:
     ///
     PbiBuilder(const std::string& pbiFilename,
                PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
-               size_t numThreads = 4);
+               std::size_t numThreads = 4);
 
     /// \brief Initializes builder to write data to \p pbiFilename.
     ///
@@ -92,9 +92,9 @@ public:
     ///
     /// \throws std::runtime_error if PBI file cannot be opened for writing
     ///
-    PbiBuilder(const std::string& pbiFilename, size_t numReferenceSequences,
+    PbiBuilder(const std::string& pbiFilename, std::size_t numReferenceSequences,
                PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
-               size_t numThreads = 4);
+               std::size_t numThreads = 4);
 
     /// \brief Initializes builder to write data to \p pbiFilename.
     ///
@@ -116,10 +116,10 @@ public:
     ///
     /// \throws std::runtime_error if PBI file cannot be opened for writing
     ///
-    PbiBuilder(const std::string& pbiFilename, size_t numReferenceSequences,
+    PbiBuilder(const std::string& pbiFilename, std::size_t numReferenceSequences,
                bool isCoordinateSorted,
                PbiBuilder::CompressionLevel compressionLevel = PbiBuilder::DefaultCompression,
-               size_t numThreads = 4);
+               std::size_t numThreads = 4);
 
     PbiBuilder(PbiBuilder&&) noexcept;
     PbiBuilder& operator=(PbiBuilder&&) noexcept;

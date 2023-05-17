@@ -43,9 +43,9 @@ public:
 
 private:
     std::string qualifiedName_;
-    size_t prefixSize_;
-    size_t localNameOffset_;
-    size_t localNameSize_;
+    std::size_t prefixSize_;
+    std::size_t localNameOffset_;
+    std::size_t localNameSize_;
     bool verbatim_;
 };
 
@@ -92,9 +92,9 @@ public:
     void Text(const std::string& text);
 
 public:
-    size_t NumAttributes() const;
-    size_t NumChildren() const;
-    size_t Size() const;
+    std::size_t NumAttributes() const;
+    std::size_t NumChildren() const;
+    std::size_t Size() const;
 
 public:
     template <typename T>
@@ -105,10 +105,10 @@ public:
     void RemoveChild(const DataSetElement& e);
 
     template <typename T>
-    const T& Child(size_t index) const;
+    const T& Child(std::size_t index) const;
 
     template <typename T>
-    T& Child(size_t index);
+    T& Child(std::size_t index);
 
     template <typename T>
     const T& Child(const std::string& label) const;
@@ -117,10 +117,10 @@ public:
     T& Child(const std::string& label);
 
     template <typename T>
-    const T& operator[](size_t index) const;
+    const T& operator[](std::size_t index) const;
 
     template <typename T>
-    T& operator[](size_t index);
+    T& operator[](std::size_t index);
 
     template <typename T = DataSetElement>
     const T& operator[](const std::string& label) const;
@@ -154,19 +154,19 @@ public:
     bool operator!=(const DataSetElementIteratorBase& other) const noexcept;
 
 protected:
-    DataSetElementIteratorBase(const DataSetElement* parent, size_t i);
+    DataSetElementIteratorBase(const DataSetElement* parent, std::size_t i);
     void Advance();
 
 protected:
     const DataSetElement* parent_;
-    size_t index_;
+    std::size_t index_;
 };
 
 template <typename T>
 class DataSetElementIterator : public DataSetElementIteratorBase
 {
 public:
-    DataSetElementIterator(const DataSetElement* parent, size_t i);
+    DataSetElementIterator(const DataSetElement* parent, std::size_t i);
 
     T& operator*() noexcept;
     T* operator->() noexcept;
@@ -179,7 +179,7 @@ template <typename T>
 class DataSetElementConstIterator : public DataSetElementIteratorBase
 {
 public:
-    DataSetElementConstIterator(const DataSetElement* parent, size_t i);
+    DataSetElementConstIterator(const DataSetElement* parent, std::size_t i);
 
     const T& operator*() const noexcept;
     const T* operator->() const noexcept;

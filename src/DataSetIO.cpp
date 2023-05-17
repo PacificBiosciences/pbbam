@@ -159,7 +159,7 @@ std::unique_ptr<DataSetBase> DataSetIO::FromUris(const std::vector<std::string>&
         // else merge
     } else {
         auto& result = datasets.at(0);
-        for (size_t i = 1; i < datasets.size(); ++i) {
+        for (std::size_t i = 1; i < datasets.size(); ++i) {
             const auto& next = datasets.at(i);
             *result += *next;
         }

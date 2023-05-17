@@ -13,7 +13,8 @@
 namespace PacBio {
 namespace BAM {
 
-ZmwChunkedFastxBgzfReader::ZmwChunkedFastxBgzfReader(std::string filename, const size_t numChunks)
+ZmwChunkedFastxBgzfReader::ZmwChunkedFastxBgzfReader(std::string filename,
+                                                     const std::size_t numChunks)
     : ZmwChunkedFastxReaderImpl{std::move(filename), numChunks}
     , file_{bgzf_open(fastxFilename_.c_str(), "r")}
     , seq_{kseq_init(file_.get())}

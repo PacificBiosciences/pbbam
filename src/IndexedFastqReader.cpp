@@ -31,7 +31,7 @@ void ClipAndGapify(std::pair<std::string, Data::QualityValues>& seqQual, const D
 
     const char nullQual = Data::QualityValue{0}.Fastq();
 
-    size_t seqIndex = 0;
+    std::size_t seqIndex = 0;
     for (const auto& op : cigar) {
         const auto type = op.Type();
         const auto opLength = op.Length();
@@ -151,7 +151,10 @@ bool IndexedFastqReader::HasSequence(const std::string& name) const
 
 std::vector<std::string> IndexedFastqReader::Names() const { return d_->index_.Names(); }
 
-std::string IndexedFastqReader::Name(const size_t idx) const { return d_->index_.Names().at(idx); }
+std::string IndexedFastqReader::Name(const std::size_t idx) const
+{
+    return d_->index_.Names().at(idx);
+}
 
 int IndexedFastqReader::NumSequences() const { return d_->index_.Names().size(); }
 

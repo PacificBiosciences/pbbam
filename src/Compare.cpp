@@ -29,7 +29,7 @@ struct TypeAlias
 
 struct CompareTypeHash
 {
-    size_t operator()(const Compare::Type& t) const noexcept
+    std::size_t operator()(const Compare::Type& t) const noexcept
     {
         return std::hash<int>()(static_cast<int>(t));
     }

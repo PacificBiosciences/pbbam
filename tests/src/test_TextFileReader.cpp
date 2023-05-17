@@ -16,9 +16,9 @@ namespace TextFileReaderTests {
 void CheckManualIteration(const std::string& fn)
 {
     // FASTA header + seq
-    const size_t expectedNumLines = FastxTests::ExpectedFasta.size() * 2;
+    const std::size_t expectedNumLines = FastxTests::ExpectedFasta.size() * 2;
 
-    size_t count = 0;
+    std::size_t count = 0;
     std::string line;
     TextFileReader reader{fn};
     while (reader.GetNext(line)) {
@@ -30,9 +30,9 @@ void CheckManualIteration(const std::string& fn)
 void CheckRangeFor(const std::string& fn)
 {
     // FASTA header + seq
-    const size_t expectedNumLines = FastxTests::ExpectedFasta.size() * 2;
+    const std::size_t expectedNumLines = FastxTests::ExpectedFasta.size() * 2;
 
-    size_t count = 0;
+    std::size_t count = 0;
     TextFileReader reader{fn};
     for (const auto& line : reader) {
         std::ignore = line;
@@ -44,9 +44,9 @@ void CheckRangeFor(const std::string& fn)
 void CheckReadAll(const std::string& fn)
 {
     // FASTA header + seq
-    const size_t expectedNumLines = FastxTests::ExpectedFasta.size() * 2;
+    const std::size_t expectedNumLines = FastxTests::ExpectedFasta.size() * 2;
 
-    size_t count = 0;
+    std::size_t count = 0;
     for (const auto& line : TextFileReader::ReadAll(fn)) {
         std::ignore = line;
         ++count;

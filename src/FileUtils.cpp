@@ -143,8 +143,8 @@ static std::string native_resolvedFilePath(const std::string& filePath, const st
 // see http://stackoverflow.com/questions/2869594/how-return-a-stdstring-from-cs-getcwd-function
 std::string FileUtils::CurrentWorkingDirectory()
 {
-    const size_t chunkSize = 1024;
-    const size_t maxNumChunks = 20;
+    const std::size_t chunkSize = 1024;
+    const std::size_t maxNumChunks = 20;
 
     // stack-based buffer for 'normal' case
     char buffer[chunkSize];
@@ -159,7 +159,7 @@ std::string FileUtils::CurrentWorkingDirectory()
     }
 
     // long path - use heap, trying progressively longer buffers
-    for (size_t chunks = 2; chunks < maxNumChunks; ++chunks) {
+    for (std::size_t chunks = 2; chunks < maxNumChunks; ++chunks) {
         auto cwd = std::make_unique<char[]>(chunkSize * chunks);
         if (getcwd(cwd.get(), chunkSize * chunks) != nullptr) {
             return std::string(cwd.get());

@@ -102,7 +102,7 @@ public:
     /// \param[in] recordIndex  i-th record
     /// \returns number of deleted bases
     ///
-    uint32_t NumDeletedBasesAt(size_t recordIndex) const;
+    uint32_t NumDeletedBasesAt(std::size_t recordIndex) const;
 
     /// \brief Calculates the number of inserted bases for a particular record.
     ///
@@ -114,7 +114,7 @@ public:
     /// \param[in] recordIndex  i-th record
     /// \returns number of inserted bases
     ///
-    uint32_t NumInsertedBasesAt(size_t recordIndex) const;
+    uint32_t NumInsertedBasesAt(std::size_t recordIndex) const;
 
     /// \brief Calculates the number of deleted & inserted bases for a
     ///        particular record.
@@ -122,7 +122,7 @@ public:
     /// \param[in] recordIndex  i-th record in the data set
     /// \returns a pair consisting of (numDeletions,numInsertions)
     ///
-    std::pair<uint32_t, uint32_t> NumDeletedAndInsertedBasesAt(size_t recordIndex) const;
+    std::pair<uint32_t, uint32_t> NumDeletedAndInsertedBasesAt(std::size_t recordIndex) const;
 
     /// \}
 

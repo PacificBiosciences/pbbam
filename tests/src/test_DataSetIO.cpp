@@ -498,7 +498,7 @@ static void TestAli1Xml()
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
-    for (size_t i = 0; i < resources.Size(); ++i) {
+    for (std::size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
             EXPECT_EQ(std::string("First Alignments BAM"), resource.Name());
@@ -530,7 +530,7 @@ static void TestAli1Xml()
 
     const SubDataSets& subdatasets = dataset.SubDataSets();
     ASSERT_EQ(2, subdatasets.Size());
-    for (size_t i = 0; i < subdatasets.Size(); ++i) {
+    for (std::size_t i = 0; i < subdatasets.Size(); ++i) {
         const DataSetBase& subdataset = subdatasets[i];
         if (i == 0) {
             EXPECT_EQ(std::string(""), subdataset.CreatedAt());
@@ -591,7 +591,7 @@ static void TestAli2Xml()
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
-    for (size_t i = 0; i < resources.Size(); ++i) {
+    for (std::size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
             EXPECT_EQ(std::string("First Alignments BAM"), resource.Name());
@@ -623,7 +623,7 @@ static void TestAli2Xml()
 
     const SubDataSets& subdatasets = dataset.SubDataSets();
     ASSERT_EQ(2, subdatasets.Size());
-    for (size_t i = 0; i < subdatasets.Size(); ++i) {
+    for (std::size_t i = 0; i < subdatasets.Size(); ++i) {
         const DataSetBase& subdataset = subdatasets[i];
         if (i == 0) {
             EXPECT_EQ(std::string(""), subdataset.CreatedAt());
@@ -684,7 +684,7 @@ static void TestAli3Xml()
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
-    for (size_t i = 0; i < resources.Size(); ++i) {
+    for (std::size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
             EXPECT_EQ(std::string("First Alignments BAM"), resource.Name());
@@ -716,7 +716,7 @@ static void TestAli3Xml()
 
     const SubDataSets& subdatasets = dataset.SubDataSets();
     ASSERT_EQ(2, subdatasets.Size());
-    for (size_t i = 0; i < subdatasets.Size(); ++i) {
+    for (std::size_t i = 0; i < subdatasets.Size(); ++i) {
         const DataSetBase& subdataset = subdatasets[i];
         if (i == 0) {
             EXPECT_EQ(std::string(""), subdataset.CreatedAt());
@@ -777,7 +777,7 @@ static void TestAli4Xml()
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
-    for (size_t i = 0; i < resources.Size(); ++i) {
+    for (std::size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
             EXPECT_EQ(std::string("First Alignments BAM"), resource.Name());
@@ -809,7 +809,7 @@ static void TestAli4Xml()
 
     const SubDataSets& subdatasets = dataset.SubDataSets();
     ASSERT_EQ(2, subdatasets.Size());
-    for (size_t i = 0; i < subdatasets.Size(); ++i) {
+    for (std::size_t i = 0; i < subdatasets.Size(); ++i) {
         const DataSetBase& subdataset = subdatasets[i];
         if (i == 0) {
             EXPECT_EQ(std::string(""), subdataset.CreatedAt());
@@ -870,7 +870,7 @@ static void TestMappingStaggeredXml()
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
-    for (size_t i = 0; i < resources.Size(); ++i) {
+    for (std::size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
             EXPECT_EQ(std::string(""), resource.Name());
@@ -899,7 +899,7 @@ static void TestMappingStaggeredXml()
 
     const SubDataSets& subdatasets = dataset.SubDataSets();
     ASSERT_EQ(2, subdatasets.Size());
-    for (size_t i = 0; i < subdatasets.Size(); ++i) {
+    for (std::size_t i = 0; i < subdatasets.Size(); ++i) {
         const DataSetBase& subdataset = subdatasets[i];
         if (i == 0) {
             EXPECT_EQ(std::string("2015-05-13T10:58:26"), subdataset.CreatedAt());
@@ -996,7 +996,7 @@ static void TestCcsReadXml()
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
-    for (size_t i = 0; i < resources.Size(); ++i) {
+    for (std::size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
             EXPECT_EQ(std::string("First ConsensusRead BAM"), resource.Name());
@@ -1119,7 +1119,7 @@ static void TestReferenceXml()
     EXPECT_EQ(std::string("Example"), resource.Tags());
     const FileIndices& fileIndices = resource.FileIndices();
     ASSERT_EQ(2, fileIndices.Size());
-    for (size_t i = 0; i < fileIndices.Size(); ++i) {
+    for (std::size_t i = 0; i < fileIndices.Size(); ++i) {
         const FileIndex& index = fileIndices[i];
         if (i == 0) {
             EXPECT_EQ(std::string("PacBio.Index.SaWriterIndex"), index.MetaType());
@@ -1168,7 +1168,7 @@ static void TestSubread1Xml()
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
-    for (size_t i = 0; i < resources.Size(); ++i) {
+    for (std::size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
             EXPECT_EQ(std::string("First Subreads BAM"), resource.Name());
@@ -1199,7 +1199,7 @@ static void TestSubread1Xml()
 
     const Filters& filters = dataset.Filters();
     ASSERT_EQ(2, filters.Size());
-    for (size_t i = 0; i < filters.Size(); ++i) {
+    for (std::size_t i = 0; i < filters.Size(); ++i) {
         const Filter& filter = filters[i];
         if (i == 0) {
             const Properties& properties = filter.Properties();
@@ -1242,7 +1242,7 @@ static void TestSubread2Xml()
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
-    for (size_t i = 0; i < resources.Size(); ++i) {
+    for (std::size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
             EXPECT_EQ(std::string("First Subreads BAM"), resource.Name());
@@ -1273,7 +1273,7 @@ static void TestSubread2Xml()
 
     const Filters& filters = dataset.Filters();
     ASSERT_EQ(2, filters.Size());
-    for (size_t i = 0; i < filters.Size(); ++i) {
+    for (std::size_t i = 0; i < filters.Size(); ++i) {
         const Filter& filter = filters[i];
         if (i == 0) {
             const Properties& properties = filter.Properties();
@@ -1316,7 +1316,7 @@ static void TestSubread3Xml()
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(2, resources.Size());
-    for (size_t i = 0; i < resources.Size(); ++i) {
+    for (std::size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
             EXPECT_EQ(std::string("First Subreads BAM"), resource.Name());
@@ -1347,7 +1347,7 @@ static void TestSubread3Xml()
 
     const Filters& filters = dataset.Filters();
     ASSERT_EQ(2, filters.Size());
-    for (size_t i = 0; i < filters.Size(); ++i) {
+    for (std::size_t i = 0; i < filters.Size(); ++i) {
         const Filter& filter = filters[i];
         if (i == 0) {
             const Properties& properties = filter.Properties();
@@ -1392,7 +1392,7 @@ static void TestTransformedXml()
 
     const ExternalResources& resources = dataset.ExternalResources();
     ASSERT_EQ(3, resources.Size());
-    for (size_t i = 0; i < resources.Size(); ++i) {
+    for (std::size_t i = 0; i < resources.Size(); ++i) {
         const ExternalResource& resource = resources[i];
         if (i == 0) {
             EXPECT_EQ(std::string("PacBio.SubreadFile.BaxFile"), resource.MetaType());
@@ -1507,11 +1507,11 @@ TEST(BAM_DataSetIO, correctly_orders_metadata_default_children)
     dataset.SaveToStream(s);
 
     const std::string result = s.str();
-    const size_t xmlnsFound = result.find("xmlns=");
-    const size_t xmlnsXsiFound = result.find("xmlns:xsi=");
-    const size_t xsiSchemaLocationFound = result.find("xsi:schemaLocation=");
-    const size_t xmlnsPbbaseFound = result.find("xmlns:pbbase=");
-    const size_t xmlnsPbdsFound = result.find("xmlns:pbds=");
+    const std::size_t xmlnsFound = result.find("xmlns=");
+    const std::size_t xmlnsXsiFound = result.find("xmlns:xsi=");
+    const std::size_t xsiSchemaLocationFound = result.find("xsi:schemaLocation=");
+    const std::size_t xmlnsPbbaseFound = result.find("xmlns:pbbase=");
+    const std::size_t xmlnsPbdsFound = result.find("xmlns:pbds=");
 
     EXPECT_TRUE(xmlnsFound < xmlnsXsiFound);
     EXPECT_TRUE(xmlnsXsiFound < xsiSchemaLocationFound);

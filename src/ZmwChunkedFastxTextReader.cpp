@@ -16,7 +16,8 @@
 namespace PacBio {
 namespace BAM {
 
-ZmwChunkedFastxTextReader::ZmwChunkedFastxTextReader(std::string filename, const size_t numChunks)
+ZmwChunkedFastxTextReader::ZmwChunkedFastxTextReader(std::string filename,
+                                                     const std::size_t numChunks)
     : ZmwChunkedFastxReaderImpl{std::move(filename), numChunks}
     , file_{fopen(fastxFilename_.c_str(), "r")}
     , seq_{kseq_init(file_.get())}
@@ -114,7 +115,7 @@ int ZmwChunkedFastxTextReader::FetchRecord(bool skipName)
     return seq_->seq.l;
 }
 
-int ZmwChunkedFastxTextReader::ReadFromFile(FILE* fp, void* data, size_t length)
+int ZmwChunkedFastxTextReader::ReadFromFile(FILE* fp, void* data, std::size_t length)
 {
     return static_cast<int>(std::fread(data, sizeof(uint8_t), length, fp));
 }

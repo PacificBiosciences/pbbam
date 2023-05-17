@@ -162,12 +162,12 @@ BioSamples::const_iterator_type BioSamples::cend() const
     return BioSamples::const_iterator_type(this, NumChildren());
 }
 
-const BioSamples::value_type& BioSamples::operator[](size_t index) const
+const BioSamples::value_type& BioSamples::operator[](std::size_t index) const
 {
     return dynamic_cast<const BioSamples::value_type&>(*(children_.at(index).get()));
 }
 
-BioSamples::value_type& BioSamples::operator[](size_t index)
+BioSamples::value_type& BioSamples::operator[](std::size_t index)
 {
     return dynamic_cast<BioSamples::value_type&>(*(children_.at(index).get()));
 }
@@ -621,12 +621,12 @@ DNABarcodes::const_iterator_type DNABarcodes::cend() const
     return DNABarcodes::const_iterator_type(this, NumChildren());
 }
 
-const DNABarcodes::value_type& DNABarcodes::operator[](size_t index) const
+const DNABarcodes::value_type& DNABarcodes::operator[](std::size_t index) const
 {
     return dynamic_cast<const DNABarcodes::value_type&>(*(children_.at(index).get()));
 }
 
-DNABarcodes::value_type& DNABarcodes::operator[](size_t index)
+DNABarcodes::value_type& DNABarcodes::operator[](std::size_t index)
 {
     return dynamic_cast<DNABarcodes::value_type&>(*(children_.at(index).get()));
 }
@@ -673,12 +673,12 @@ Extensions::const_iterator_type Extensions::cend() const
     return Extensions::const_iterator_type(this, NumChildren());
 }
 
-const Extensions::value_type& Extensions::operator[](size_t index) const
+const Extensions::value_type& Extensions::operator[](std::size_t index) const
 {
     return dynamic_cast<const Extensions::value_type&>(*(children_.at(index).get()));
 }
 
-Extensions::value_type& Extensions::operator[](size_t index)
+Extensions::value_type& Extensions::operator[](std::size_t index)
 {
     return dynamic_cast<Extensions::value_type&>(*(children_.at(index).get()));
 }
@@ -729,14 +729,14 @@ ExternalResources& ExternalResources::operator+=(const ExternalResources& other)
 {
     // only keep unique resource ids
     std::set<std::string> myResourceIds;
-    for (size_t i = 0; i < NumChildren(); ++i) {
+    for (std::size_t i = 0; i < NumChildren(); ++i) {
         const ExternalResource& resource = this->operator[](i);
         myResourceIds.insert(resource.ResourceId());
     }
 
-    std::vector<size_t> newResourceIndices;
-    const size_t numOtherResourceIds = other.Size();
-    for (size_t i = 0; i < numOtherResourceIds; ++i) {
+    std::vector<std::size_t> newResourceIndices;
+    const std::size_t numOtherResourceIds = other.Size();
+    for (std::size_t i = 0; i < numOtherResourceIds; ++i) {
         const std::string& resourceId = other[i].ResourceId();
         auto found = myResourceIds.find(resourceId);
         if (found == myResourceIds.cend()) {
@@ -744,7 +744,7 @@ ExternalResources& ExternalResources::operator+=(const ExternalResources& other)
         }
     }
 
-    for (size_t index : newResourceIndices) {
+    for (std::size_t index : newResourceIndices) {
         Add(other[index]);
     }
     return *this;
@@ -754,7 +754,7 @@ void ExternalResources::Add(const ExternalResource& ext)
 {
     // disallow external resources w/ duplicate ResourceIds
     std::set<std::string> myResourceIds;
-    for (size_t i = 0; i < NumChildren(); ++i) {
+    for (std::size_t i = 0; i < NumChildren(); ++i) {
         const ExternalResource& resource = this->operator[](i);
         myResourceIds.insert(resource.ResourceId());
     }
@@ -802,12 +802,12 @@ ExternalResources::const_iterator_type ExternalResources::cend() const
     return ExternalResources::const_iterator_type(this, NumChildren());
 }
 
-const ExternalResources::value_type& ExternalResources::operator[](size_t index) const
+const ExternalResources::value_type& ExternalResources::operator[](std::size_t index) const
 {
     return dynamic_cast<const ExternalResources::value_type&>(*(children_.at(index).get()));
 }
 
-ExternalResources::value_type& ExternalResources::operator[](size_t index)
+ExternalResources::value_type& ExternalResources::operator[](std::size_t index)
 {
     return dynamic_cast<ExternalResources::value_type&>(*(children_.at(index).get()));
 }
@@ -862,12 +862,12 @@ FileIndices::const_iterator_type FileIndices::cend() const
     return FileIndices::const_iterator_type(this, NumChildren());
 }
 
-const FileIndices::value_type& FileIndices::operator[](size_t index) const
+const FileIndices::value_type& FileIndices::operator[](std::size_t index) const
 {
     return dynamic_cast<const FileIndices::value_type&>(*(children_.at(index).get()));
 }
 
-FileIndices::value_type& FileIndices::operator[](size_t index)
+FileIndices::value_type& FileIndices::operator[](std::size_t index)
 {
     return dynamic_cast<FileIndices::value_type&>(*(children_.at(index).get()));
 }
@@ -930,12 +930,12 @@ Filters::const_iterator_type Filters::cend() const
     return Filters::const_iterator_type(this, NumChildren());
 }
 
-const Filters::value_type& Filters::operator[](size_t index) const
+const Filters::value_type& Filters::operator[](std::size_t index) const
 {
     return dynamic_cast<const Filters::value_type&>(*(children_.at(index).get()));
 }
 
-Filters::value_type& Filters::operator[](size_t index)
+Filters::value_type& Filters::operator[](std::size_t index)
 {
     return dynamic_cast<Filters::value_type&>(*(children_.at(index).get()));
 }
@@ -997,12 +997,12 @@ Properties::const_iterator_type Properties::cend() const
     return Properties::const_iterator_type(this, NumChildren());
 }
 
-const Properties::value_type& Properties::operator[](size_t index) const
+const Properties::value_type& Properties::operator[](std::size_t index) const
 {
     return dynamic_cast<const Properties::value_type&>(*(children_.at(index).get()));
 }
 
-Properties::value_type& Properties::operator[](size_t index)
+Properties::value_type& Properties::operator[](std::size_t index)
 {
     return dynamic_cast<Properties::value_type&>(*(children_.at(index).get()));
 }
@@ -1183,12 +1183,12 @@ SubDataSets::const_iterator_type SubDataSets::cend() const
     return SubDataSets::const_iterator_type(this, NumChildren());
 }
 
-const SubDataSets::value_type& SubDataSets::operator[](size_t index) const
+const SubDataSets::value_type& SubDataSets::operator[](std::size_t index) const
 {
     return dynamic_cast<const SubDataSets::value_type&>(*(children_.at(index).get()));
 }
 
-SubDataSets::value_type& SubDataSets::operator[](size_t index)
+SubDataSets::value_type& SubDataSets::operator[](std::size_t index)
 {
     return dynamic_cast<SubDataSets::value_type&>(*(children_.at(index).get()));
 }
@@ -1220,14 +1220,14 @@ SupplementalResources& SupplementalResources::operator+=(const SupplementalResou
 {
     // only keep unique resource ids
     std::set<std::string> myResourceIds;
-    for (size_t i = 0; i < NumChildren(); ++i) {
+    for (std::size_t i = 0; i < NumChildren(); ++i) {
         const ExternalResource& resource = this->operator[](i);
         myResourceIds.insert(resource.ResourceId());
     }
 
-    std::vector<size_t> newResourceIndices;
-    const size_t numOtherResourceIds = other.Size();
-    for (size_t i = 0; i < numOtherResourceIds; ++i) {
+    std::vector<std::size_t> newResourceIndices;
+    const std::size_t numOtherResourceIds = other.Size();
+    for (std::size_t i = 0; i < numOtherResourceIds; ++i) {
         const std::string& resourceId = other[i].ResourceId();
         auto found = myResourceIds.find(resourceId);
         if (found == myResourceIds.cend()) {
@@ -1235,7 +1235,7 @@ SupplementalResources& SupplementalResources::operator+=(const SupplementalResou
         }
     }
 
-    for (size_t index : newResourceIndices) {
+    for (std::size_t index : newResourceIndices) {
         Add(other[index]);
     }
 
@@ -1246,7 +1246,7 @@ void SupplementalResources::Add(const ExternalResource& ext)
 {
     // disallow external resources w/ duplicate ResourceIds
     std::set<std::string> myResourceIds;
-    for (size_t i = 0; i < NumChildren(); ++i) {
+    for (std::size_t i = 0; i < NumChildren(); ++i) {
         const ExternalResource& resource = this->operator[](i);
         myResourceIds.insert(resource.ResourceId());
     }
@@ -1282,12 +1282,12 @@ SupplementalResources::const_iterator_type SupplementalResources::cend() const
     return SupplementalResources::const_iterator_type(this, NumChildren());
 }
 
-const SupplementalResources::value_type& SupplementalResources::operator[](size_t index) const
+const SupplementalResources::value_type& SupplementalResources::operator[](std::size_t index) const
 {
     return dynamic_cast<const SupplementalResources::value_type&>(*(children_.at(index).get()));
 }
 
-SupplementalResources::value_type& SupplementalResources::operator[](size_t index)
+SupplementalResources::value_type& SupplementalResources::operator[](std::size_t index)
 {
     return dynamic_cast<SupplementalResources::value_type&>(*(children_.at(index).get()));
 }

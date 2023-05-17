@@ -47,14 +47,14 @@ public:
     FilterWrapper& operator=(FilterWrapper&&) noexcept = default;
 
 public:
-    bool Accepts(const PbiRawData& idx, const size_t row) const;
+    bool Accepts(const PbiRawData& idx, const std::size_t row) const;
 
 private:
     struct WrapperInterface
     {
         virtual ~WrapperInterface() = default;
         virtual WrapperInterface* Clone() const = 0;
-        virtual bool Accepts(const PbiRawData& idx, size_t row) const = 0;
+        virtual bool Accepts(const PbiRawData& idx, std::size_t row) const = 0;
     };
 
     template <typename T>
@@ -63,7 +63,7 @@ private:
         WrapperImpl(T x);
         WrapperImpl(const WrapperImpl& other);
         WrapperInterface* Clone() const override;
-        bool Accepts(const PbiRawData& idx, size_t row) const override;
+        bool Accepts(const PbiRawData& idx, std::size_t row) const override;
         T data_;
     };
 
@@ -88,7 +88,7 @@ inline FilterWrapper& FilterWrapper::operator=(const FilterWrapper& other)
     return *this;
 }
 
-inline bool FilterWrapper::Accepts(const PbiRawData& idx, const size_t row) const
+inline bool FilterWrapper::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     return self_->Accepts(idx, row);
 }
@@ -117,7 +117,7 @@ FilterWrapper::WrapperInterface* FilterWrapper::WrapperImpl<T>::Clone() const
 }
 
 template <typename T>
-bool FilterWrapper::WrapperImpl<T>::Accepts(const PbiRawData& idx, const size_t row) const
+bool FilterWrapper::WrapperImpl<T>::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     return data_.Accepts(idx, row);
 }
@@ -144,7 +144,7 @@ struct PbiFilterPrivate
         return copy;
     }
 
-    bool Accepts(const PbiRawData& idx, const size_t row) const
+    bool Accepts(const PbiRawData& idx, const std::size_t row) const
     {
         // no filter -> accepts every record
         if (filters_.empty()) {
@@ -204,7 +204,7 @@ inline PbiFilter& PbiFilter::operator=(const PbiFilter& other)
     return *this;
 }
 
-inline bool PbiFilter::Accepts(const PbiRawData& idx, const size_t row) const
+inline bool PbiFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     return d_->Accepts(idx, row);
 }
@@ -232,7 +232,7 @@ inline PbiFilter& PbiFilter::Add(std::vector<PbiFilter> filters)
 
 inline bool PbiFilter::IsEmpty() const { return d_->filters_.empty(); }
 
-inline size_t PbiFilter::NumChildren() const { return d_->filters_.size(); }
+inline std::size_t PbiFilter::NumChildren() const { return d_->filters_.size(); }
 
 inline PbiFilter::CompositionType PbiFilter::Type() const { return d_->type_; }
 

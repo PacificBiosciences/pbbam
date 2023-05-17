@@ -5,7 +5,8 @@
 namespace PacBio {
 namespace BAM {
 
-ZmwChunkedFastxReaderImpl::ZmwChunkedFastxReaderImpl(std::string filename, const size_t numChunks)
+ZmwChunkedFastxReaderImpl::ZmwChunkedFastxReaderImpl(std::string filename,
+                                                     const std::size_t numChunks)
     : fastxFilename_{std::move(filename)}
     , faiFilename_{fastxFilename_ + ".fai"}
     , index_{faiFilename_}

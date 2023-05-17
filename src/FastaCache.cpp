@@ -12,7 +12,7 @@ namespace BAM {
 
 FastaCacheData::FastaCacheData(const std::string& filename) : cache_{FastaReader::ReadAll(filename)}
 {
-    for (size_t i = 0; i < cache_.size(); ++i) {
+    for (std::size_t i = 0; i < cache_.size(); ++i) {
         lookup_.emplace(cache_[i].Name(), i);
     }
 }
@@ -37,7 +37,8 @@ std::pair<bool, std::string> FastaCacheData::Check(
     return {true, ""};
 }
 
-std::string FastaCacheData::Subsequence(const std::string& name, size_t begin, size_t end) const
+std::string FastaCacheData::Subsequence(const std::string& name, std::size_t begin,
+                                        std::size_t end) const
 {
     const auto found = lookup_.find(name);
     if (found == lookup_.cend()) {
@@ -57,7 +58,7 @@ std::string FastaCacheData::Subsequence(const std::string& name, size_t begin, s
           << "  rname: " << name;
         throw std::runtime_error{s.str()};
     }
-    const size_t length = end - begin;
+    const std::size_t length = end - begin;
     return seq.substr(begin, length);
 }
 

@@ -42,8 +42,8 @@ TEST(BAM_ZmwGroupQuery, whitelist_query_returns_nothing_from_empty_whitelist)
 {
     const std::vector<int32_t> whitelist;
 
-    size_t zmwCount = 0;
-    size_t recordCount = 0;
+    std::size_t zmwCount = 0;
+    std::size_t recordCount = 0;
     PacBio::BAM::ZmwGroupQuery query{whitelist, ZmwQueryTests::input};
     for (const auto& zmw : query) {
         ++zmwCount;
@@ -61,8 +61,8 @@ TEST(BAM_ZmwGroupQuery, whitelist_query_returns_only_requested_zmws)
         109697  // 10
     };
 
-    size_t zmwCount = 0;
-    size_t recordCount = 0;
+    std::size_t zmwCount = 0;
+    std::size_t recordCount = 0;
     PacBio::BAM::ZmwGroupQuery query{whitelist, ZmwQueryTests::input};
     for (const auto& zmw : query) {
         ++zmwCount;
@@ -74,9 +74,9 @@ TEST(BAM_ZmwGroupQuery, whitelist_query_returns_only_requested_zmws)
 
 TEST(BAM_ZmwGroupQuery, round_robin_query_can_return_records_applying_dataset_filter)
 {
-    size_t zmwCount = 0;
-    size_t totalRecordCount = 0;
-    std::vector<size_t> numRecordsPerZmw;
+    std::size_t zmwCount = 0;
+    std::size_t totalRecordCount = 0;
+    std::vector<std::size_t> numRecordsPerZmw;
     PacBio::BAM::ZmwGroupQuery query{ZmwQueryTests::input,
                                      PacBio::BAM::ZmwFileIterationMode::SEQUENTIAL,
                                      PacBio::BAM::DataSetFilterMode::APPLY};
@@ -90,16 +90,16 @@ TEST(BAM_ZmwGroupQuery, round_robin_query_can_return_records_applying_dataset_fi
     EXPECT_EQ(15, zmwCount);
     EXPECT_EQ(150, totalRecordCount);
 
-    const std::vector<size_t> expectedNumRecordsPerZmw{2,  21, 13, 1, 5, 13, 1, 34,
-                                                       12, 2,  20, 5, 3, 7,  11};
+    const std::vector<std::size_t> expectedNumRecordsPerZmw{2,  21, 13, 1, 5, 13, 1, 34,
+                                                            12, 2,  20, 5, 3, 7,  11};
     EXPECT_TRUE(std::equal(numRecordsPerZmw.cbegin(), numRecordsPerZmw.cend(),
                            expectedNumRecordsPerZmw.cbegin()));
 }
 
 TEST(BAM_ZmwGroupQuery, round_robin_query_can_return_records_ignoring_dataset_filter)
 {
-    size_t zmwCount = 0;
-    size_t recordCount = 0;
+    std::size_t zmwCount = 0;
+    std::size_t recordCount = 0;
     std::vector<int32_t> holeNumbers;
     PacBio::BAM::ZmwGroupQuery query{ZmwQueryTests::input,
                                      PacBio::BAM::ZmwFileIterationMode::ROUND_ROBIN,
@@ -128,8 +128,8 @@ TEST(BAM_ZmwGroupQuery, round_robin_query_can_return_records_ignoring_dataset_fi
 
 TEST(BAM_ZmwGroupQuery, sequential_query_can_return_records_ignoring_dataset_filter)
 {
-    size_t zmwCount = 0;
-    size_t recordCount = 0;
+    std::size_t zmwCount = 0;
+    std::size_t recordCount = 0;
     std::vector<int32_t> holeNumbers;
     PacBio::BAM::ZmwGroupQuery query{ZmwQueryTests::input,
                                      PacBio::BAM::ZmwFileIterationMode::SEQUENTIAL,
@@ -152,8 +152,8 @@ TEST(BAM_ZmwGroupQuery, sequential_query_can_return_records_ignoring_dataset_fil
 
 TEST(BAM_ZmwGroupQuery, can_apply_custom_pbi_filter)
 {
-    size_t zmwCount = 0;
-    size_t recordCount = 0;
+    std::size_t zmwCount = 0;
+    std::size_t recordCount = 0;
     std::vector<int32_t> holeNumbers;
 
     PacBio::BAM::PbiFilter zmwRange{

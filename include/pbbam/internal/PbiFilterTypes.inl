@@ -127,7 +127,7 @@ BarcodeDataFilterBase<T, field>::BarcodeDataFilterBase(std::vector<T> values,
 
 template <typename T, PbiFile::BarcodeField field>
 bool BarcodeDataFilterBase<T, field>::BarcodeDataFilterBase::Accepts(const PbiRawData& idx,
-                                                                     const size_t row) const
+                                                                     const std::size_t row) const
 {
     const PbiRawBarcodeData& barcodeData = idx.BarcodeData();
     switch (field) {
@@ -159,7 +159,7 @@ BasicDataFilterBase<T, field>::BasicDataFilterBase(std::vector<T> values, const 
 
 template <typename T, PbiFile::BasicField field>
 bool BasicDataFilterBase<T, field>::BasicDataFilterBase::Accepts(const PbiRawData& idx,
-                                                                 const size_t row) const
+                                                                 const std::size_t row) const
 {
     const PbiRawBasicData& basicData = idx.BasicData();
     switch (field) {
@@ -187,7 +187,7 @@ using LocalContextFilterInternal =
 
 template <>
 inline bool LocalContextFilterInternal::BasicDataFilterBase::Accepts(const PbiRawData& idx,
-                                                               const size_t row) const
+                                                               const std::size_t row) const
 {
     const auto& basicData = idx.BasicData();
     const auto rowFlags = static_cast<Data::LocalContextFlags>(basicData.ctxtFlag_.at(row));
@@ -211,7 +211,7 @@ MappedDataFilterBase<T, field>::MappedDataFilterBase(std::vector<T> values, cons
 template <>
 inline bool
 MappedDataFilterBase<Data::Strand, PbiFile::MappedField::STRAND>::MappedDataFilterBase::Accepts(
-    const PbiRawData& idx, const size_t row) const
+    const PbiRawData& idx, const std::size_t row) const
 {
     const PbiRawMappedData& mappedData = idx.MappedData();
     const Data::Strand strand = (mappedData.revStrand_.at(row) == 1 ? Data::Strand::REVERSE : Data::Strand::FORWARD);
@@ -220,7 +220,7 @@ MappedDataFilterBase<Data::Strand, PbiFile::MappedField::STRAND>::MappedDataFilt
 
 template <typename T, PbiFile::MappedField field>
 bool MappedDataFilterBase<T, field>::MappedDataFilterBase::Accepts(const PbiRawData& idx,
-                                                                   const size_t row) const
+                                                                   const std::size_t row) const
 {
     const PbiRawMappedData& mappedData = idx.MappedData();
     switch (field) {
@@ -302,7 +302,7 @@ inline PbiBarcodeFilter::PbiBarcodeFilter(std::vector<int16_t> barcodes, const C
 {
 }
 
-inline bool PbiBarcodeFilter::Accepts(const PbiRawData& idx, const size_t row) const
+inline bool PbiBarcodeFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     return compositeFilter_.Accepts(idx, row);
 }
@@ -360,7 +360,7 @@ inline PbiBarcodesFilter::PbiBarcodesFilter(const int16_t bcForward, const int16
 {
 }
 
-inline bool PbiBarcodesFilter::Accepts(const PbiRawData& idx, const size_t row) const
+inline bool PbiBarcodesFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     return compositeFilter_.Accepts(idx, row);
 }
@@ -390,33 +390,33 @@ inline PbiMapQualityFilter::PbiMapQualityFilter(const uint8_t mapQual, const Com
 
 // PbiNumDeletedBasesFilter
 
-inline PbiNumDeletedBasesFilter::PbiNumDeletedBasesFilter(const size_t numDeletions,
+inline PbiNumDeletedBasesFilter::PbiNumDeletedBasesFilter(const std::size_t numDeletions,
                                                           const Compare::Type cmp)
-    : internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_DEL>{numDeletions, cmp}
+    : internal::MappedDataFilterBase<std::size_t, PbiFile::MappedField::N_DEL>{numDeletions, cmp}
 {
 }
 
 // PbiNumInsertedBasesFilter
 
-inline PbiNumInsertedBasesFilter::PbiNumInsertedBasesFilter(const size_t numInsertions,
+inline PbiNumInsertedBasesFilter::PbiNumInsertedBasesFilter(const std::size_t numInsertions,
                                                             const Compare::Type cmp)
-    : internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_INS>{numInsertions, cmp}
+    : internal::MappedDataFilterBase<std::size_t, PbiFile::MappedField::N_INS>{numInsertions, cmp}
 {
 }
 
 // PbiNumMatchesFilter
 
-inline PbiNumMatchesFilter::PbiNumMatchesFilter(const size_t numMatchedBases,
+inline PbiNumMatchesFilter::PbiNumMatchesFilter(const std::size_t numMatchedBases,
                                                 const Compare::Type cmp)
-    : internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_M>{numMatchedBases, cmp}
+    : internal::MappedDataFilterBase<std::size_t, PbiFile::MappedField::N_M>{numMatchedBases, cmp}
 {
 }
 
 // PbiNumMismatchesFilter
 
-inline PbiNumMismatchesFilter::PbiNumMismatchesFilter(const size_t numMismatchedBases,
+inline PbiNumMismatchesFilter::PbiNumMismatchesFilter(const std::size_t numMismatchedBases,
                                                       const Compare::Type cmp)
-    : internal::MappedDataFilterBase<size_t, PbiFile::MappedField::N_MM>{numMismatchedBases, cmp}
+    : internal::MappedDataFilterBase<std::size_t, PbiFile::MappedField::N_MM>{numMismatchedBases, cmp}
 {
 }
 
@@ -496,13 +496,13 @@ inline uint32_t BoostHashCombine(const int32_t zm)
 
     // FIXME: discrepancies with Python API. Will return to nail down.
 
-    size_t seed = 0;
+    std::size_t seed = 0;
     boost::hash_combine(seed, upper);
     boost::hash_combine(seed, lower);
     return static_cast<uint32_t>(seed);
 }
 
-inline bool PbiZmwModuloFilter::Accepts(const PbiRawData& idx, const size_t row) const
+inline bool PbiZmwModuloFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     const auto zm = idx.BasicData().holeNumber_.at(row);
 

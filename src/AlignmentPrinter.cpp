@@ -39,11 +39,11 @@ std::string AlignmentPrinter::Print(const BamRecord& record, const Data::Orienta
     Data::Position refCoord = record.ReferenceStart();
     Data::Position seqCoord = BAM::IsCcsOrTranscript(record.Type()) ? 0 : record.QueryStart();
 
-    for (size_t i = 0; i < seq.size();) {
+    for (std::size_t i = 0; i < seq.size();) {
         auto refCoordStr = std::to_string(refCoord);
         auto seqCoordStr = std::to_string(seqCoord);
 
-        size_t maxCoordLength = std::max(refCoordStr.size(), seqCoordStr.size());
+        std::size_t maxCoordLength = std::max(refCoordStr.size(), seqCoordStr.size());
         while (refCoordStr.size() < maxCoordLength) {
             refCoordStr = " " + refCoordStr;
         }

@@ -37,7 +37,7 @@ TEST(VCF_VcfWriter, correctly_copies_vcf_file)
         const VcfFile newFile{newFn};
         EXPECT_EQ(expectedHeaderText, VcfFormat::FormattedHeader(newFile.Header()));
 
-        size_t i = 0;
+        std::size_t i = 0;
         for (const auto& var : VcfQuery{newFile}) {
             EXPECT_EQ(expectedVariantsText.at(i), VcfFormat::FormattedVariant(var));
             ++i;

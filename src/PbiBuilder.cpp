@@ -35,12 +35,13 @@ namespace BAM {
 class PbiBuilderPrivate : public PacBio::BAM::PbiBuilderBase
 {
     // TODO: Make this tweak-able, a la IndexedBamWriter's buffers
-    static constexpr size_t MAX_BUFFER_SIZE = 0x10000;
+    static constexpr std::size_t MAX_BUFFER_SIZE = 0x10000;
 
 public:
-    PbiBuilderPrivate(const std::string& pbiFilename, const size_t numReferenceSequences,
+    PbiBuilderPrivate(const std::string& pbiFilename, const std::size_t numReferenceSequences,
                       const bool isCoordinateSorted,
-                      const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads)
+                      const PbiBuilder::CompressionLevel compressionLevel,
+                      const std::size_t numThreads)
         : PacBio::BAM::PbiBuilderBase{pbiFilename, compressionLevel, numThreads, MAX_BUFFER_SIZE}
     {
 
@@ -55,19 +56,19 @@ public:
 // --------------------------------------------
 
 PbiBuilder::PbiBuilder(const std::string& pbiFilename, const CompressionLevel compressionLevel,
-                       const size_t numThreads)
+                       const std::size_t numThreads)
     : PbiBuilder{pbiFilename, 0, false, compressionLevel, numThreads}
 {}
 
-PbiBuilder::PbiBuilder(const std::string& pbiFilename, const size_t numReferenceSequences,
-                       const CompressionLevel compressionLevel, const size_t numThreads)
+PbiBuilder::PbiBuilder(const std::string& pbiFilename, const std::size_t numReferenceSequences,
+                       const CompressionLevel compressionLevel, const std::size_t numThreads)
     : PbiBuilder{pbiFilename, numReferenceSequences, (numReferenceSequences > 0), compressionLevel,
                  numThreads}
 {}
 
-PbiBuilder::PbiBuilder(const std::string& pbiFilename, const size_t numReferenceSequences,
+PbiBuilder::PbiBuilder(const std::string& pbiFilename, const std::size_t numReferenceSequences,
                        const bool isCoordinateSorted, const CompressionLevel compressionLevel,
-                       const size_t numThreads)
+                       const std::size_t numThreads)
     : d_{std::make_unique<PbiBuilderPrivate>(pbiFilename, numReferenceSequences, isCoordinateSorted,
                                              compressionLevel, numThreads)}
 {}

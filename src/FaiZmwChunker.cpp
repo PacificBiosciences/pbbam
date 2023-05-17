@@ -31,7 +31,7 @@ int32_t HoleNumber(const std::string& name)
 
 }  // namespace
 
-FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
+FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const std::size_t numChunks)
 {
     // zero chunks is error
     if (numChunks == 0) {
@@ -59,19 +59,19 @@ FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
     }
 
     // no empty chunks (e.g. reduce the requested number, if small ZMW input)
-    const size_t actualNumChunks = std::min(numChunks, rawChunks.size());
+    const std::size_t actualNumChunks = std::min(numChunks, rawChunks.size());
 
     // determine how many ZMWs should land in each chunk, spread roughly evenly
     const int minimum = (rawChunks.size() / actualNumChunks);
     const int modulo = (rawChunks.size() % actualNumChunks);
-    std::vector<size_t> chunkCounts(actualNumChunks, minimum);
+    std::vector<std::size_t> chunkCounts(actualNumChunks, minimum);
     for (int i = 0; i < modulo; ++i) {
         ++chunkCounts.at(i);
     }
 
     // collate zmw data into larger chunks
-    size_t begin = 0;
-    size_t end = 0;
+    std::size_t begin = 0;
+    std::size_t end = 0;
     for (const auto n : chunkCounts) {
 
         // shift end down for this chunk
@@ -81,7 +81,7 @@ FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
         // add data for this chunk
         FaiZmwChunk result = rawChunks.at(begin);
         result.NumZmws = n;
-        for (size_t j = begin + 1; j < end; ++j) {
+        for (std::size_t j = begin + 1; j < end; ++j) {
             result.NumRecords += rawChunks.at(j).NumRecords;
         }
         chunks_.emplace_back(std::move(result));
@@ -91,7 +91,7 @@ FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const size_t numChunks)
     }
 }
 
-FaiZmwChunker::FaiZmwChunker(const std::string& filename, const size_t numChunks)
+FaiZmwChunker::FaiZmwChunker(const std::string& filename, const std::size_t numChunks)
     : FaiZmwChunker{FaiIndex{filename}, numChunks}
 {}
 
@@ -105,7 +105,7 @@ FaiZmwChunker& FaiZmwChunker::operator=(FaiZmwChunker&&) noexcept = default;
 
 FaiZmwChunker::~FaiZmwChunker() = default;
 
-const FaiZmwChunk& FaiZmwChunker::Chunk(size_t chunk) const { return chunks_.at(chunk); }
+const FaiZmwChunk& FaiZmwChunker::Chunk(std::size_t chunk) const { return chunks_.at(chunk); }
 
 size_t FaiZmwChunker::NumChunks() const { return chunks_.size(); }
 

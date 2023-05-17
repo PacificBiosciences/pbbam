@@ -35,7 +35,7 @@ void appendBamMultiValue(const std::vector<T>& container, kstring_t* str)
 }
 
 template <typename T>
-T readBamValue(const uint8_t* src, size_t& offset)
+T readBamValue(const uint8_t* src, std::size_t& offset)
 {
     T value;
     memcpy(&value, &src[offset], sizeof(value));
@@ -44,7 +44,7 @@ T readBamValue(const uint8_t* src, size_t& offset)
 }
 
 template <typename T>
-std::vector<T> readBamMultiValue(const uint8_t* src, size_t& offset)
+std::vector<T> readBamMultiValue(const uint8_t* src, std::size_t& offset)
 {
     uint32_t numElements;
     memcpy(&numElements, &src[offset], sizeof(uint32_t));
@@ -52,7 +52,7 @@ std::vector<T> readBamMultiValue(const uint8_t* src, size_t& offset)
 
     std::vector<T> result;
     result.reserve(numElements);
-    for (size_t i = 0; i < numElements; ++i) {
+    for (std::size_t i = 0; i < numElements; ++i) {
         const T value = readBamValue<T>(src, offset);
         result.push_back(value);
     }
@@ -68,8 +68,8 @@ TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
     // NOTE: not completely safe - no real bounds-checking yet on input data
 
     const uint8_t* pData = data.data();
-    const size_t numBytes = data.size();
-    size_t i = 0;
+    const std::size_t numBytes = data.size();
+    std::size_t i = 0;
     while (i < numBytes) {
 
         std::string tagName;
@@ -110,7 +110,7 @@ TagCollection BamTagCodec::Decode(const std::vector<uint8_t>& data)
 
             case 'Z':
             case 'H': {
-                const size_t dataLength = strlen(reinterpret_cast<const char*>(&pData[i]));
+                const std::size_t dataLength = strlen(reinterpret_cast<const char*>(&pData[i]));
                 const std::string value(reinterpret_cast<const char*>(&pData[i]), dataLength);
                 tags[tagName] = value;
                 if (tagType == 'H') {
@@ -309,7 +309,7 @@ std::vector<uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 
 Tag BamTagCodec::FromRawData(uint8_t* rawData)
 {
-    size_t offset = 0;
+    std::size_t offset = 0;
     const auto tagType = static_cast<char>(*rawData++);
     switch (tagType) {
         case 'A':
@@ -336,7 +336,7 @@ Tag BamTagCodec::FromRawData(uint8_t* rawData)
 
         case 'Z':
         case 'H': {
-            const size_t dataLength = strlen(reinterpret_cast<const char*>(&rawData[0]));
+            const std::size_t dataLength = strlen(reinterpret_cast<const char*>(&rawData[0]));
             const std::string value(reinterpret_cast<const char*>(&rawData[0]), dataLength);
             Tag t{value};
             if (tagType == 'H') {

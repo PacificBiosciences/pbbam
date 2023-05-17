@@ -101,11 +101,11 @@ std::pair<int32_t, int32_t> AlignedOffsets(const BamRecord& record, const int se
 
     const auto& b = BamRecordMemory::GetRawData(record);
     uint32_t* cigarData = bam_get_cigar(b.get());
-    const size_t numCigarOps = b->core.n_cigar;
+    const std::size_t numCigarOps = b->core.n_cigar;
     if (numCigarOps > 0) {
 
         // start offset
-        for (size_t i = 0; i < numCigarOps; ++i) {
+        for (std::size_t i = 0; i < numCigarOps; ++i) {
             const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(cigarData[i]));
             if (type == Data::CigarOperationType::HARD_CLIP) {
                 if (startOffset != 0 && startOffset != seqLength) {
@@ -148,7 +148,7 @@ OutputIt Move_N(InputIt first, Size count, OutputIt result)
 }
 
 template <typename T>
-T ClipSeqQV(const T& input, const size_t pos, const size_t len)
+T ClipSeqQV(const T& input, const std::size_t pos, const std::size_t len)
 {
     if (input.empty()) {
         return {};
@@ -157,7 +157,7 @@ T ClipSeqQV(const T& input, const size_t pos, const size_t len)
 }
 
 template <typename T>
-T ClipPulse(const T& input, Pulse2BaseCache* p2bCache, const size_t pos, const size_t len)
+T ClipPulse(const T& input, Pulse2BaseCache* p2bCache, const std::size_t pos, const std::size_t len)
 {
     assert(p2bCache);
     if (input.empty()) {
@@ -165,16 +165,16 @@ T ClipPulse(const T& input, Pulse2BaseCache* p2bCache, const size_t pos, const s
     }
 
     // find start
-    size_t start = p2bCache->FindFirst();
-    size_t basesSeen = 0;
+    std::size_t start = p2bCache->FindFirst();
+    std::size_t basesSeen = 0;
     while (basesSeen < pos) {
         start = p2bCache->FindNext(start);
         ++basesSeen;
     }
 
     // find end
-    size_t end = start;
-    size_t seen = 1;
+    std::size_t end = start;
+    std::size_t seen = 1;
     while (seen < len) {
         end = p2bCache->FindNext(end);
         ++seen;
@@ -208,7 +208,7 @@ void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const bool exc
             }
         };
 
-        size_t outputLength = 0;
+        std::size_t outputLength = 0;
         const auto cigar = impl.CigarData();
         for (const auto& op : cigar) {
             if (incrementsOutputLength(op.Type(), aligned, exciseSoftClips)) {
@@ -221,8 +221,8 @@ void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const bool exc
         seq->resize(outputLength);
 
         // apply CIGAR ops
-        size_t srcIndex = 0;
-        size_t dstIndex = 0;
+        std::size_t srcIndex = 0;
+        std::size_t dstIndex = 0;
         for (const auto& op : cigar) {
             const auto opType = op.Type();
             const auto opLength = op.Length();
@@ -248,14 +248,14 @@ void ClipAndGapify(const BamRecordImpl& impl, const bool aligned, const bool exc
             // either way, srcIndex is not incremented
             else if (opType == Data::CigarOperationType::DELETION) {
                 if (aligned) {
-                    for (size_t i = 0; i < opLength; ++i) {
+                    for (std::size_t i = 0; i < opLength; ++i) {
                         (*seq)[dstIndex] = deletionNullValue;
                         ++dstIndex;
                     }
                 }
             } else if (opType == Data::CigarOperationType::PADDING) {
                 if (aligned) {
-                    for (size_t i = 0; i < opLength; ++i) {
+                    for (std::size_t i = 0; i < opLength; ++i) {
                         (*seq)[dstIndex] = paddingNullValue;
                         ++dstIndex;
                     }
@@ -593,7 +593,7 @@ BamRecord BamRecord::Clipped(const ClipType clipType, const Data::Position start
     return result;
 }
 
-void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
+void BamRecord::ClipTags(const std::size_t clipFrom, const std::size_t clipLength)
 {
     TagCollection tags = impl_.Tags();
 
@@ -641,9 +641,9 @@ void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
                 return;
             }
 
-            const size_t originalClipEnd = clipFrom + clipLength;
+            const std::size_t originalClipEnd = clipFrom + clipLength;
             assert(originalClipEnd <= frames.size());
-            const size_t reverseClipFrom = frames.size() - originalClipEnd;
+            const std::size_t reverseClipFrom = frames.size() - originalClipEnd;
             if (codec == Data::FrameCodec::RAW) {
                 tags[Label(tag)] = ClipSeqQV(frames, reverseClipFrom, clipLength);
             } else {
@@ -742,7 +742,7 @@ void BamRecord::ClipTags(const size_t clipFrom, const size_t clipLength)
     impl_.Tags(tags);
 }
 
-void BamRecord::ClipFields(const size_t clipFrom, const size_t clipLength)
+void BamRecord::ClipFields(const std::size_t clipFrom, const std::size_t clipLength)
 {
     const bool isForwardStrand = (AlignedStrand() == Data::Strand::FORWARD);
 
@@ -765,7 +765,7 @@ void BamRecord::ClipFields(const size_t clipFrom, const size_t clipLength)
 BamRecord& BamRecord::ClipToQuery(const Data::Position start, const Data::Position end)
 {
     // cache original coords, skip out if clip not needed
-    const size_t seqLength = impl_.SequenceLength();
+    const std::size_t seqLength = impl_.SequenceLength();
     const bool isCcsOrTranscript = IsCcsOrTranscript(Type());
     const Data::Position origQStart = isCcsOrTranscript ? 0 : QueryStart();
     const Data::Position origQEnd = isCcsOrTranscript ? seqLength : QueryEnd();
@@ -839,8 +839,8 @@ BamRecord& BamRecord::ClipToReference(const Data::Position start, const Data::Po
     // clip SEQ, QUAL, tags
     const Data::Position qStart = result.qStart_;
     const Data::Position qEnd = result.qEnd_;
-    const size_t clipFrom = result.clipOffset_;
-    const size_t clipLength = qEnd - qStart;
+    const std::size_t clipFrom = result.clipOffset_;
+    const std::size_t clipLength = qEnd - qStart;
     ClipFields(clipFrom, clipLength);
 
     // update query start/end
@@ -1692,7 +1692,8 @@ BamRecord BamRecord::Mapped(const int32_t referenceId, const Data::Position refS
 BamRecord::SplitBasemods BamRecord::ClipBasemodsTag(const std::string& seq,
                                                     const std::string& basemodsStr,
                                                     const std::vector<uint8_t>& basemodsQVs,
-                                                    const size_t clipFrom, const size_t clipLength)
+                                                    const std::size_t clipFrom,
+                                                    const std::size_t clipLength)
 {
     assert(clipFrom <= seq.size());
     const int32_t numClippedC = std::count(std::cbegin(seq), std::cbegin(seq) + clipFrom, 'C');
@@ -1832,10 +1833,10 @@ size_t BamRecord::NumDeletionOperations() const
     return NumInsertionAndDeletionOperations().second;
 }
 
-std::pair<size_t, size_t> BamRecord::NumInsertedAndDeletedBases() const
+std::pair<std::size_t, std::size_t> BamRecord::NumInsertedAndDeletedBases() const
 {
-    size_t nInsBases = 0;
-    size_t nDelBases = 0;
+    std::size_t nInsBases = 0;
+    std::size_t nDelBases = 0;
 
     auto& b = BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
@@ -1852,10 +1853,10 @@ std::pair<size_t, size_t> BamRecord::NumInsertedAndDeletedBases() const
 
 size_t BamRecord::NumInsertedBases() const { return NumInsertedAndDeletedBases().first; }
 
-std::pair<size_t, size_t> BamRecord::NumInsertionAndDeletionOperations() const
+std::pair<std::size_t, std::size_t> BamRecord::NumInsertionAndDeletionOperations() const
 {
-    size_t nInsOps = 0;
-    size_t nDelOps = 0;
+    std::size_t nInsOps = 0;
+    std::size_t nDelOps = 0;
 
     auto& b = BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());
@@ -1877,9 +1878,9 @@ size_t BamRecord::NumInsertionOperations() const
 
 size_t BamRecord::NumMatches() const { return NumMatchesAndMismatches().first; }
 
-std::pair<size_t, size_t> BamRecord::NumMatchesAndMismatches() const
+std::pair<std::size_t, std::size_t> BamRecord::NumMatchesAndMismatches() const
 {
-    std::pair<size_t, size_t> result = std::make_pair(0, 0);
+    std::pair<std::size_t, std::size_t> result = std::make_pair(0, 0);
 
     auto& b = BamRecordMemory::GetRawData(this);
     uint32_t* cigarData = bam_get_cigar(b.get());

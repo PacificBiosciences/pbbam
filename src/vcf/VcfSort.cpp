@@ -19,9 +19,9 @@ void SortFile(const VcfFile& file, const std::string& outputFilename)
     const auto& header = file.Header();
 
     // configure contig sort order
-    std::unordered_map<std::string, size_t> contigLookup;
+    std::unordered_map<std::string, std::size_t> contigLookup;
     const auto& contigDefs = header.ContigDefinitions();
-    for (size_t i = 0; i < contigDefs.size(); ++i) {
+    for (std::size_t i = 0; i < contigDefs.size(); ++i) {
         auto contigId = contigDefs.at(i).Id();
         contigLookup.emplace(contigId, i);
     }

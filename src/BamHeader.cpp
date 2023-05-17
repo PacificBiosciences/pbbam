@@ -169,7 +169,7 @@ BamHeader::BamHeader(const std::vector<std::string>& bamFilenames) : BamHeader{}
     }
 
     *this = headers.at(0);
-    for (size_t i = 1; i < headers.size(); ++i) {
+    for (std::size_t i = 1; i < headers.size(); ++i) {
         *this += headers.at(i);
     }
 }
@@ -181,7 +181,7 @@ BamHeader::BamHeader(const std::vector<BamHeader>& headers) : BamHeader()
     }
 
     *this = headers.at(0);
-    for (size_t i = 1; i < headers.size(); ++i) {
+    for (std::size_t i = 1; i < headers.size(); ++i) {
         *this += headers.at(i);
     }
 }
@@ -415,7 +415,7 @@ ReadGroupInfo BamHeader::ReadGroup(const std::string& id) const
     }
 
     // verbatim ID not found, see if we are mixing correct & legacy IDs
-    const size_t slashFound = id.find('/');
+    const std::size_t slashFound = id.find('/');
     if (slashFound != std::string::npos) {
         const std::string trimmedId = id.substr(0, slashFound);
         found = d_->readGroups_.find(trimmedId);
@@ -468,7 +468,7 @@ SequenceInfo BamHeader::Sequence(const std::string& name) const
         return SequenceInfo();
     }
     const auto index = iter->second;
-    assert(index >= 0 && static_cast<size_t>(index) < d_->sequences_.size());
+    assert(index >= 0 && static_cast<std::size_t>(index) < d_->sequences_.size());
     return d_->sequences_.at(index);
 }
 

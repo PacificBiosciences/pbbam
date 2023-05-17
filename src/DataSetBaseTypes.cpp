@@ -268,10 +268,10 @@ StrictEntityType::StrictEntityType(const std::string& metatype, const std::strin
     MetaType(metatype);
 
     // TimeStampedName
-    const size_t numChars = metatype.size();
+    const std::size_t numChars = metatype.size();
     std::string transformedMetatype;
     transformedMetatype.resize(numChars);
-    for (size_t i = 0; i < numChars; ++i) {
+    for (std::size_t i = 0; i < numChars; ++i) {
         const char c = metatype.at(i);
         transformedMetatype[i] = ((c == '.') ? '_' : tolower(c));
     }

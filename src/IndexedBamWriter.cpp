@@ -57,9 +57,9 @@ class PbiBuilder2 : public PacBio::BAM::PbiBuilderBase
 {
 public:
     PbiBuilder2(const std::string& bamFilename, const std::string& pbiFilename,
-                const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads,
-                const size_t fileBufferSize)
-        //                const size_t numReferenceSequences = 0
+                const PbiBuilder::CompressionLevel compressionLevel, const std::size_t numThreads,
+                const std::size_t fileBufferSize)
+        //                const std::size_t numReferenceSequences = 0
         //                const bool isCoordinateSorted = false
         : PacBio::BAM::PbiBuilderBase{pbiFilename, compressionLevel, numThreads, fileBufferSize}
         , bamFilename_{bamFilename}
@@ -120,12 +120,12 @@ public:
                       return lhs.uAddress < rhs.uAddress;
                   });
 
-        size_t k = 0;
+        std::size_t k = 0;
         for (const auto& block : fileOffsetField_.blocks_) {
             LoadFieldBlockFromTempFile(fileOffsetField_, block);
 
             // transform offsets from GZI
-            for (size_t j = 0; j < fileOffsetField_.buffer_.size(); ++j) {
+            for (std::size_t j = 0; j < fileOffsetField_.buffer_.size(); ++j) {
                 while ((k < index.size() - 1) && (static_cast<uint64_t>(index.at(k + 1).uAddress) <=
                                                   fileOffsetField_.buffer_[j])) {
                     ++k;
@@ -151,10 +151,10 @@ class IndexedBamWriter::IndexedBamWriterPrivate2  //: public internal::FileProdu
 public:
     IndexedBamWriterPrivate2(const std::string& outputFilename, std::shared_ptr<bam_hdr_t> header,
                              const BamWriter::CompressionLevel bamCompressionLevel,
-                             const size_t numBamThreads,
+                             const std::size_t numBamThreads,
                              const PbiBuilder::CompressionLevel pbiCompressionLevel,
-                             const size_t numPbiThreads, const size_t /*numGziThreads*/,
-                             const size_t tempFileBufferSize)
+                             const std::size_t numPbiThreads, const std::size_t /*numGziThreads*/,
+                             const std::size_t tempFileBufferSize)
         : bamFilename_{outputFilename}, header_{header}
     {
         OpenBam(bamCompressionLevel, numBamThreads);
@@ -202,7 +202,7 @@ public:
 
     void ClosePbi() { builder_->Close(); }
 
-    void OpenBam(const BamWriter::CompressionLevel compressionLevel, const size_t numThreads)
+    void OpenBam(const BamWriter::CompressionLevel compressionLevel, const std::size_t numThreads)
     {
         //
         // TODO: Compression level & numThreads are hardcoded here. Ok for
@@ -228,7 +228,7 @@ public:
         }
 
         // maybe set multithreaded writing
-        size_t actualNumThreads = numThreads;
+        std::size_t actualNumThreads = numThreads;
         if (actualNumThreads == 0) {
             actualNumThreads = std::thread::hardware_concurrency();
 
@@ -249,9 +249,9 @@ public:
         ret = bgzf_flush(bam_.get()->fp.bgzf);
 
         // store file positions after header
-        auto headerLength = [](const bam_hdr_t* hdr) -> size_t {
-            const size_t textHeader = 12 + hdr->l_text;
-            size_t refHeader = 0;
+        auto headerLength = [](const bam_hdr_t* hdr) -> std::size_t {
+            const std::size_t textHeader = 12 + hdr->l_text;
+            std::size_t refHeader = 0;
             for (int i = 0; i < hdr->n_targets; ++i) {
                 char* n = hdr->target_name[i];
                 refHeader += (8 + (strlen(n) + 1));
@@ -261,8 +261,8 @@ public:
         uncompressedFilePos_ = headerLength(header_.get());
     }
 
-    void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads,
-                 const size_t fileBufferSize)
+    void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, const std::size_t numThreads,
+                 const std::size_t fileBufferSize)
     {
         builder_ = std::make_unique<PbiBuilder2>(bamFilename_, bamFilename_ + ".pbi",
                                                  compressionLevel, numThreads, fileBufferSize);
@@ -298,16 +298,17 @@ public:
         auto recordLength = [](bam1_t* b) {
             auto* c = &b->core;
 
-            constexpr size_t FIXED_LENGTH = 36;
-            const size_t qnameLength = (c->l_qname - c->l_extranul);
+            constexpr std::size_t FIXED_LENGTH = 36;
+            const std::size_t qnameLength = (c->l_qname - c->l_extranul);
 
             // TODO: long CIGAR handling... sigh...
 
-            size_t remainingLength = 0;
+            std::size_t remainingLength = 0;
             if (c->n_cigar <= 0xffff) {
                 remainingLength = (b->l_data - c->l_qname);
             } else {
-                const size_t cigarEnd = ((uint8_t*)bam_get_cigar(b) - b->data) + (c->n_cigar * 4);
+                const std::size_t cigarEnd =
+                    ((uint8_t*)bam_get_cigar(b) - b->data) + (c->n_cigar * 4);
                 remainingLength = 8 + (b->l_data - cigarEnd) + 4 + (4 * c->n_cigar);
             }
 
@@ -333,10 +334,10 @@ class IndexedBamWriter::IndexedBamWriterPrivate2  //: public internal::FileProdu
 public:
     IndexedBamWriterPrivate2(const std::string& outputFilename, std::shared_ptr<bam_hdr_t> header,
                              const BamWriter::CompressionLevel bamCompressionLevel,
-                             const size_t numBamThreads,
+                             const std::size_t numBamThreads,
                              const PbiBuilder::CompressionLevel pbiCompressionLevel,
-                             const size_t numPbiThreads, const size_t numGziThreads,
-                             const size_t tempFileBufferSize)
+                             const std::size_t numPbiThreads, const std::size_t numGziThreads,
+                             const std::size_t tempFileBufferSize)
         : bamFilename_{outputFilename}, header_{header}
     {
         OpenBam(bamCompressionLevel, numBamThreads);
@@ -382,7 +383,7 @@ public:
 
     void ClosePbi() { builder_->Close(); }
 
-    void OpenBam(const BamWriter::CompressionLevel compressionLevel, const size_t numThreads)
+    void OpenBam(const BamWriter::CompressionLevel compressionLevel, const std::size_t numThreads)
     {
         //
         // TODO: Compression level & numThreads are hardcoded here. Ok for
@@ -397,7 +398,7 @@ public:
             throw IndexedBamWriterException{usingFilename, "could not open file for writing"};
 
         // maybe set multithreaded writing
-        size_t actualNumThreads = numThreads;
+        std::size_t actualNumThreads = numThreads;
         if (actualNumThreads == 0) {
             actualNumThreads = std::thread::hardware_concurrency();
 
@@ -419,9 +420,9 @@ public:
         ret = bgzf_flush(bam_.get()->fp.bgzf);
 
         // store file positions after header
-        auto headerLength = [](const bam_hdr_t* hdr) -> size_t {
-            const size_t textHeader = 12 + hdr->l_text;
-            size_t refHeader = 0;
+        auto headerLength = [](const bam_hdr_t* hdr) -> std::size_t {
+            const std::size_t textHeader = 12 + hdr->l_text;
+            std::size_t refHeader = 0;
             for (int i = 0; i < hdr->n_targets; ++i) {
                 char* n = hdr->target_name[i];
                 refHeader += (8 + (strlen(n) + 1));
@@ -431,9 +432,9 @@ public:
         uncompressedFilePos_ = headerLength(header_.get());
     }
 
-    void OpenGzi(size_t numThreads)
+    void OpenGzi(std::size_t numThreads)
     {
-        size_t actualNumThreads = numThreads;
+        std::size_t actualNumThreads = numThreads;
         if (actualNumThreads == 0) {
             actualNumThreads = std::thread::hardware_concurrency();
 
@@ -443,14 +444,14 @@ public:
         gziThread_ = std::thread{&IndexedBamWriterPrivate2::RunGziThread, this, actualNumThreads};
     }
 
-    void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, const size_t numThreads,
-                 const size_t fileBufferSize)
+    void OpenPbi(const PbiBuilder::CompressionLevel compressionLevel, const std::size_t numThreads,
+                 const std::size_t fileBufferSize)
     {
         builder_ = std::make_unique<PbiBuilder2>(bamFilename_, bamFilename_ + ".pbi",
                                                  compressionLevel, numThreads, fileBufferSize);
     }
 
-    void RunGziThread(size_t numThreads)
+    void RunGziThread(std::size_t numThreads)
     {
         //
         // This thread is the GZI index-enabled reader that trails the writer
@@ -571,16 +572,17 @@ public:
         auto recordLength = [](bam1_t* b) {
             auto* c = &b->core;
 
-            constexpr size_t FIXED_LENGTH = 36;
-            const size_t qnameLength = (c->l_qname - c->l_extranul);
+            constexpr std::size_t FIXED_LENGTH = 36;
+            const std::size_t qnameLength = (c->l_qname - c->l_extranul);
 
             // TODO: long CIGAR handling... sigh...
 
-            size_t remainingLength = 0;
+            std::size_t remainingLength = 0;
             if (c->n_cigar <= 0xffff)
                 remainingLength = (b->l_data - c->l_qname);
             else {
-                const size_t cigarEnd = ((uint8_t*)bam_get_cigar(b) - b->data) + (c->n_cigar * 4);
+                const std::size_t cigarEnd =
+                    ((uint8_t*)bam_get_cigar(b) - b->data) + (c->n_cigar * 4);
                 remainingLength = 8 + (b->l_data - cigarEnd) + 4 + (4 * c->n_cigar);
             }
 
@@ -634,7 +636,7 @@ private:
     bool isOpen_ = false;
 
     std::atomic<bool> done_{false};
-    std::atomic<size_t> maxTrailingDistance_{0};
+    std::atomic<std::size_t> maxTrailingDistance_{0};
 
     int64_t uncompressedFilePos_ = 0;
 };
@@ -643,10 +645,10 @@ private:
 
 IndexedBamWriter::IndexedBamWriter(const std::string& outputFilename, const BamHeader& header,
                                    const BamWriter::CompressionLevel bamCompressionLevel,
-                                   const size_t numBamThreads,
+                                   const std::size_t numBamThreads,
                                    const PbiBuilder::CompressionLevel pbiCompressionLevel,
-                                   const size_t numPbiThreads, const size_t numGziThreads,
-                                   const size_t tempFileBufferSize)
+                                   const std::size_t numPbiThreads, const std::size_t numGziThreads,
+                                   const std::size_t tempFileBufferSize)
     : IRecordWriter(), d_{nullptr}
 {
     if (tempFileBufferSize % 8 != 0) {

@@ -20,7 +20,7 @@ using namespace PacBio::BAM;
 
 namespace FastaReaderTests {
 
-void CheckFastaSequence(const size_t index, const FastaSequence& seq)
+void CheckFastaSequence(const std::size_t index, const FastaSequence& seq)
 {
     SCOPED_TRACE("checking FASTA seq:" + std::to_string(index));
     const auto& expected = FastxTests::ExpectedFasta.at(index);
@@ -32,7 +32,7 @@ void CheckManualIteration(const std::string& fn)
 {
     FastaReader reader{fn};
 
-    size_t count = 0;
+    std::size_t count = 0;
     FastaSequence seq;
     while (reader.GetNext(seq)) {
         CheckFastaSequence(count, seq);
@@ -43,7 +43,7 @@ void CheckManualIteration(const std::string& fn)
 
 void CheckRangeFor(const std::string& fn)
 {
-    size_t count = 0;
+    std::size_t count = 0;
     FastaReader reader{fn};
     for (const auto& seq : reader) {
         CheckFastaSequence(count, seq);
@@ -54,7 +54,7 @@ void CheckRangeFor(const std::string& fn)
 
 void CheckReadAll(const std::string& fn)
 {
-    size_t count = 0;
+    std::size_t count = 0;
     for (const auto& seq : FastaReader::ReadAll(fn)) {
         CheckFastaSequence(count, seq);
         ++count;
@@ -144,7 +144,7 @@ TEST(BAM_FastaReader, can_read_all_from_bgzf_fasta)
 
 TEST(BAM_FastaReader, can_handle_windows_style_newlines)
 {
-    size_t count = 0;
+    std::size_t count = 0;
     FastaReader reader{FastxTests::fastxDataDir + "/windows_formatted.fasta"};
     FastaSequence seq;
     while (reader.GetNext(seq)) {

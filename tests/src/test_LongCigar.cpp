@@ -27,7 +27,7 @@ const std::string LongCigarBam = PacBio::BAM::PbbamTestsConfig::Data_Dir + "/lon
 const std::string LongCigarOut =
     PacBio::BAM::PbbamTestsConfig::GeneratedData_Dir + "/long-cigar-generated.bam";
 
-const size_t numOps = 72091;
+const std::size_t numOps = 72091;
 
 BamRecord ReadLongCigarRecord(const std::string& fn)
 {

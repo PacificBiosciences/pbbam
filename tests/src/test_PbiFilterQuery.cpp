@@ -485,10 +485,10 @@ TEST(BAM_PbiFilterQuery, can_filter_zmws_from_xml)
         </pbds:SubreadSet>
         )_XML_";
 
-    size_t count_30422 = 0;
-    size_t count_648 = 0;
-    size_t count_17299 = 0;
-    size_t count_whitelist = 0;
+    std::size_t count_30422 = 0;
+    std::size_t count_648 = 0;
+    std::size_t count_17299 = 0;
+    std::size_t count_whitelist = 0;
 
     {  // 30422
         const std::string xmlProperty =
@@ -713,7 +713,7 @@ TEST(BAM_PbiFilterQuery, can_filter_on_qname_whitelist_and_blacklist)
         PbiFilterQuery query{filter, fn};
         EXPECT_EQ(4, query.NumReads());
 
-        size_t i = 0;
+        std::size_t i = 0;
         for (const auto& b : query) {
             EXPECT_EQ(recordNames.at(i), b.FullName());
             ++i;
@@ -725,7 +725,7 @@ TEST(BAM_PbiFilterQuery, can_filter_on_qname_whitelist_and_blacklist)
         PbiFilterQuery query{filter, fn};
         EXPECT_EQ(2, query.NumReads());
 
-        size_t i = 0;
+        std::size_t i = 0;
         for (const auto& b : query) {
             if (i == 0) {
                 EXPECT_EQ(recordNames.at(0), b.FullName());
@@ -741,7 +741,7 @@ TEST(BAM_PbiFilterQuery, can_filter_on_qname_whitelist_and_blacklist)
         PbiFilterQuery query{filter, fn};
         EXPECT_EQ(2, query.NumReads());
 
-        size_t i = 0;
+        std::size_t i = 0;
         for (const auto& b : query) {
             if (i == 0) {
                 EXPECT_EQ(recordNames.at(1), b.FullName());
@@ -757,7 +757,7 @@ TEST(BAM_PbiFilterQuery, can_filter_on_qname_whitelist_and_blacklist)
         PbiFilterQuery query{filter, fn};
         EXPECT_EQ(2, query.NumReads());
 
-        size_t i = 0;
+        std::size_t i = 0;
         for (const auto& b : query) {
             if (i == 0) {
                 EXPECT_EQ(recordNames.at(0), b.FullName());

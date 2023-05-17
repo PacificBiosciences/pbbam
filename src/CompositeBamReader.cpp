@@ -73,7 +73,7 @@ GenomicIntervalCompositeBamReader& GenomicIntervalCompositeBamReader::Interval(
     // create readers for files
     container_type updatedMergeItems;
     std::vector<std::string> missingBai;
-    for (size_t i = 0; i < bamFiles_.size(); ++i) {
+    for (std::size_t i = 0; i < bamFiles_.size(); ++i) {
         const auto& bamFile = bamFiles_.at(i);
         if (bamFile.StandardIndexExists()) {
             internal::CompositeMergeItem item{std::unique_ptr<BamReader>{

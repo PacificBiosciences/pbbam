@@ -14,7 +14,7 @@ namespace BAM {
 
 void PbiFile::CreateFrom(const BamFile& bamFile,
                          const PbiBuilder::CompressionLevel compressionLevel,
-                         const size_t numThreads)
+                         const std::size_t numThreads)
 {
     PbiBuilder builder{bamFile.PacBioIndexFilename(), bamFile.Header().Sequences().size(),
                        compressionLevel, numThreads};

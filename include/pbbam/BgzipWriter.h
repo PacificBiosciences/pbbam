@@ -17,7 +17,7 @@ struct BgzipWriterConfig
     /// Nnumber of threads for compression. If set to 0, the writer will attempt
     /// to determine a reasonable estimate. If set to 1, this will force
     /// single-threaded execution. No checks are made against an upper limit.
-    const size_t NumThreads = 4;
+    const std::size_t NumThreads = 4;
 
     /// If true, write to <filename>.tmp, and rename to <filename> on closing.
     /// This provides for downstream checks to see if the file may be truncated
@@ -53,7 +53,7 @@ public:
     ///
     /// \returns number of bytes written
     ///
-    size_t Write(const void* data, size_t numBytes);
+    std::size_t Write(const void* data, std::size_t numBytes);
 
     ///
     /// \brief Writes string data to BGZF file.
@@ -62,7 +62,7 @@ public:
     ///
     /// \returns number of bytes written
     ///
-    size_t Write(const std::string& data);
+    std::size_t Write(const std::string& data);
 
 private:
     class BgzipWriterPrivate;

@@ -10,7 +10,7 @@
 namespace PacBio {
 namespace BAM {
 
-inline IndexResultBlock::IndexResultBlock(size_t idx, size_t numReads)
+inline IndexResultBlock::IndexResultBlock(std::size_t idx, std::size_t numReads)
     : firstIndex_{idx}, numReads_{numReads}
 {
 }

@@ -52,7 +52,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to fetch sequence
     ///
-    std::string Subsequence(const std::string& name, size_t begin, size_t end) const;
+    std::string Subsequence(const std::string& name, std::size_t begin, std::size_t end) const;
 
     /// \returns the names of all sequences stored in the FASTA file
     std::vector<std::string> Names() const;
@@ -61,11 +61,11 @@ public:
     ///
     /// \throws std::runtime_error if name is unknown
     ///
-    size_t SequenceLength(const std::string& name) const;
+    std::size_t SequenceLength(const std::string& name) const;
 
 private:
     std::vector<FastaSequence> cache_;
-    std::unordered_map<std::string, size_t> lookup_;
+    std::unordered_map<std::string, std::size_t> lookup_;
 };
 
 using FastaCache = std::shared_ptr<FastaCacheData>;

@@ -40,7 +40,7 @@ public:
 
         if (header.HasSequence(interval.Name())) {
             auto id = header.SequenceId(interval.Name());
-            if (id >= 0 && static_cast<size_t>(id) < header.NumSequences()) {
+            if (id >= 0 && static_cast<std::size_t>(id) < header.NumSequences()) {
                 htsIterator_.reset(
                     index_->IteratorForInterval(id, interval.Start(), interval.Stop()));
             }

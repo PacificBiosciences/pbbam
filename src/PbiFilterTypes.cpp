@@ -28,7 +28,7 @@ IndexList readLengthHelper(const std::vector<T>& start, const std::vector<T>& en
 
     auto result = IndexList{};
     const auto numElements = start.size();
-    for (size_t i = 0; i < numElements; ++i) {
+    for (std::size_t i = 0; i < numElements; ++i) {
         const auto readLength = end[i] - start[i];
         bool keep = false;
         switch (cmp) {
@@ -69,7 +69,7 @@ IndexList readLengthHelper(const std::vector<T>& start, const std::vector<T>& en
 
 // PbiAlignedLengthFilter
 
-bool PbiAlignedLengthFilter::Accepts(const PbiRawData& idx, const size_t row) const
+bool PbiAlignedLengthFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     const auto& mappedData = idx.MappedData();
     const auto& aEnd = mappedData.aEnd_.at(row);
@@ -80,7 +80,7 @@ bool PbiAlignedLengthFilter::Accepts(const PbiRawData& idx, const size_t row) co
 
 // PbiIdentityFilter
 
-bool PbiIdentityFilter::Accepts(const PbiRawData& idx, const size_t row) const
+bool PbiIdentityFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     const auto& mappedData = idx.MappedData();
     const auto& nMM = mappedData.nMM_.at(row);
@@ -147,9 +147,9 @@ PbiMovieNameFilter::PbiMovieNameFilter(const std::vector<std::string>& movieName
     // clang-format on
 }
 
-bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
+bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
-    const auto accepted = [this](const PbiRawData& index, const size_t i) {
+    const auto accepted = [this](const PbiRawData& index, const std::size_t i) {
         // straightforward lookup
         const auto& rgId = index.BasicData().rgId_.at(i);
         const auto foundAt = candidateRgIds_.find(rgId);
@@ -239,7 +239,7 @@ struct PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate
         }
     }
 
-    bool Accepts(const PbiRawData& idx, const size_t row) const
+    bool Accepts(const PbiRawData& idx, const std::size_t row) const
     {
         // lazy-load
         if (!lookup_) {
@@ -296,14 +296,14 @@ PbiNumSubreadsFilter& PbiNumSubreadsFilter::operator=(PbiNumSubreadsFilter&&) no
 
 PbiNumSubreadsFilter::~PbiNumSubreadsFilter() = default;
 
-bool PbiNumSubreadsFilter::Accepts(const PbiRawData& idx, const size_t row) const
+bool PbiNumSubreadsFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     return d_->Accepts(idx, row);
 }
 
 // PbiQueryLengthFilter
 
-bool PbiQueryLengthFilter::Accepts(const PbiRawData& idx, const size_t row) const
+bool PbiQueryLengthFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     const auto& basicData = idx.BasicData();
     const auto& qStart = basicData.qStart_.at(row);
@@ -355,7 +355,7 @@ public:
         }
     }
 
-    bool Accepts(const PbiRawData& idx, const size_t row) const
+    bool Accepts(const PbiRawData& idx, const std::size_t row) const
     {
         const auto& basicData = idx.BasicData();
 
@@ -538,7 +538,7 @@ PbiQueryNameFilter& PbiQueryNameFilter::operator=(PbiQueryNameFilter&&) noexcept
 
 PbiQueryNameFilter::~PbiQueryNameFilter() = default;
 
-bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
+bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     return d_->Accepts(idx, row);
 }
@@ -584,7 +584,7 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::string& rgId,
     : PbiReadGroupFilter{std::vector<std::string>{rgId}, cmp}
 {}
 
-bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const size_t row) const
+bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     const auto DoFiltersMatch = [&](const int32_t rowRgId) {
         const auto foundInFilterList = readGroups_.find(rowRgId);
@@ -679,7 +679,7 @@ PbiReferenceNameFilter::PbiReferenceNameFilter(std::vector<std::string> rnames,
     Validate();
 }
 
-bool PbiReferenceNameFilter::Accepts(const PbiRawData& idx, const size_t row) const
+bool PbiReferenceNameFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     if (!initialized_) {
         Initialize(idx);
@@ -761,7 +761,7 @@ PbiZmwFilter::PbiZmwFilter(std::vector<int32_t> whitelist, const Compare::Type c
     }
 }
 
-bool PbiZmwFilter::Accepts(const PbiRawData& idx, const size_t row) const
+bool PbiZmwFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     const auto zmw = idx.BasicData().holeNumber_.at(row);
     if (cmp_ == Compare::CONTAINS) {

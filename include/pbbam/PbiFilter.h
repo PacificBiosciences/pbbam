@@ -33,7 +33,7 @@ struct PbiFilterConcept
         // All PBI filters (built-in or client-define) need only provide this
         // interface:
         //
-        //    bool Accepts(const PbiRawData& index, const size_t row) const;
+        //    bool Accepts(const PbiRawData& index, const std::size_t row) const;
         //
         PbiRawData index;
         std::ignore = filter.Accepts(index, 0);
@@ -206,7 +206,7 @@ public:
     bool IsEmpty() const;
 
     /// \returns number of child filters
-    size_t NumChildren() const;
+    std::size_t NumChildren() const;
 
     /// \returns filter type (intersect, union)
     CompositionType Type() const;
@@ -226,7 +226,7 @@ public:
     /// \returns true if record at \p row passes this filter criteria,
     ///          including children (if any)
     ///
-    bool Accepts(const PbiRawData& idx, size_t row) const;
+    bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
     /// \}
 

@@ -29,23 +29,23 @@ public:
     typedef std::vector<std::string> ErrorList;
     typedef std::map<std::string, ErrorList> ErrorMap;
 
-    static const size_t MAX = std::numeric_limits<size_t>::max();
+    static const std::size_t MAX = std::numeric_limits<std::size_t>::max();
 
-    explicit ValidationErrors(size_t maxNumErrors = ValidationErrors::MAX);
+    explicit ValidationErrors(std::size_t maxNumErrors = ValidationErrors::MAX);
 
     void AddFileError(const std::string& fn, std::string details);
     void AddReadGroupError(const std::string& rg, std::string details);
     void AddRecordError(const std::string& name, std::string details);
     void AddTagLengthError(const std::string& name, const std::string& tagLabel,
-                           const std::string& tagName, size_t observed, size_t expected);
+                           const std::string& tagName, std::size_t observed, std::size_t expected);
 
     bool IsEmpty() const;
-    size_t MaxNumErrors() const;
+    std::size_t MaxNumErrors() const;
     void ThrowErrors();
 
 private:
-    size_t maxNumErrors_;
-    size_t currentNumErrors_;
+    std::size_t maxNumErrors_;
+    std::size_t currentNumErrors_;
     ErrorMap fileErrors_;
     ErrorMap readGroupErrors_;
     ErrorMap recordErrors_;

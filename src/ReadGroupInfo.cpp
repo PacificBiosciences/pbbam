@@ -384,7 +384,7 @@ size_t ReadGroupInfo::BarcodeCount() const
 }
 
 ReadGroupInfo& ReadGroupInfo::BarcodeData(std::string barcodeFile, std::string barcodeHash,
-                                          size_t barcodeCount, BarcodeModeType barcodeMode,
+                                          std::size_t barcodeCount, BarcodeModeType barcodeMode,
                                           BarcodeQualityType barcodeQuality)
 {
     barcodeFile_ = std::move(barcodeFile);

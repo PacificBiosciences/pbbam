@@ -118,7 +118,7 @@ TEST(BAM_GenomicIntervalQuery, can_reuse_bai_cache)
     const auto indexCache = MakeBaiIndexCache(ds);
 
     auto checkInterval = [](GenomicIntervalQuery& query, const Data::GenomicInterval& interval,
-                            const size_t expectedCount) {
+                            const std::size_t expectedCount) {
         // update query
         query.Interval(interval);
 
@@ -138,24 +138,24 @@ TEST(BAM_GenomicIntervalQuery, can_reuse_bai_cache)
     GenomicIntervalQuery query{ds, indexCache};
     {
         const Data::GenomicInterval interval{refName, 5000, 8000};
-        const size_t expectedCount = 7;
+        const std::size_t expectedCount = 7;
         checkInterval(query, interval, expectedCount);
     }
     {
         const Data::GenomicInterval interval{refName, 0, 100};
-        const size_t expectedCount = 1;
+        const std::size_t expectedCount = 1;
         checkInterval(query, interval, expectedCount);
     }
     {
         const Data::GenomicInterval interval{refName, 9300, 9400};
-        const size_t expectedCount = 2;
+        const std::size_t expectedCount = 2;
         checkInterval(query, interval, expectedCount);
     }
 
     // reuse cache in independent query
     GenomicIntervalQuery query2{ds, indexCache};
     const Data::GenomicInterval interval{refName, 5000, 8000};
-    const size_t expectedCount = 7;
+    const std::size_t expectedCount = 7;
     checkInterval(query2, interval, expectedCount);
 }
 

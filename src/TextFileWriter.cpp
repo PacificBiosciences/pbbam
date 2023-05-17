@@ -49,7 +49,7 @@ public:
     void Write(const std::string& line)
     {
         if (isZipped_) {
-            const size_t length = line.size();
+            const std::size_t length = line.size();
             ssize_t written = bgzf_write(bgzf_.get(), line.c_str(), length);
             written += bgzf_write(bgzf_.get(), "\n", 1);
             if (written != static_cast<ssize_t>(length + 1)) {

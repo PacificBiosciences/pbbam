@@ -177,7 +177,7 @@ TEST(BAM_DataSetCore, can_add_external_resources)
     EXPECT_EQ("file2", resources[1].Name());
 
     // iterable
-    size_t i = 0;
+    std::size_t i = 0;
     for (auto r : resources) {
         if (i == 0) {
             EXPECT_EQ("file1", r.Name());
@@ -244,7 +244,7 @@ TEST(BAM_DataSetCore, can_remove_external_resources)
     EXPECT_EQ("file2", resources[0].Name());
 
     // iterable
-    size_t i = 0;
+    std::size_t i = 0;
     for (auto r : resources) {
         if (i == 0) {
             EXPECT_EQ("file2", r.Name());
@@ -298,8 +298,8 @@ TEST(BAM_DataSetCore, can_add_filters)
     EXPECT_EQ("!=", p3.Operator());
 
     // iteratable
-    size_t i = 0;
-    size_t j = 0;
+    std::size_t i = 0;
+    std::size_t j = 0;
     for (const Filter& f : filters) {
         if (i == 0) {
             const Properties& properties = f.Properties();
@@ -431,7 +431,7 @@ TEST(BAM_DataSetCore, can_add_subdatasets)
     EXPECT_EQ("subset_2", subdatasets[1].Name());
 
     // iterable
-    size_t i = 0;
+    std::size_t i = 0;
     for (const DataSetBase& ds : subdatasets) {
         if (i == 0) {
             EXPECT_EQ("subset_1", ds.Name());
@@ -466,7 +466,7 @@ TEST(BAM_DataSetCore, can_edit_subdatasets)
     EXPECT_EQ("subset_2", subdatasets[1].Name());
 
     // iterable
-    size_t i = 0;
+    std::size_t i = 0;
     for (const DataSetBase& ds : subdatasets) {
         if (i == 0) {
             EXPECT_EQ("subset_1_edited", ds.Name());
@@ -592,7 +592,7 @@ TEST(BAM_DataSetCore, can_add_supplemental_resources)
     EXPECT_EQ("file2", resources[1].Name());
 
     // iterable
-    size_t i = 0;
+    std::size_t i = 0;
     for (auto r : resources) {
         if (i == 0) {
             EXPECT_EQ("file1", r.Name());
@@ -645,7 +645,7 @@ TEST(BAM_DataSetCore, can_remove_supplemental_resources)
     EXPECT_EQ("file2", resources[0].Name());
 
     // iterable
-    size_t i = 0;
+    std::size_t i = 0;
     for (auto r : resources) {
         if (i == 0) {
             EXPECT_EQ("file2", r.Name());

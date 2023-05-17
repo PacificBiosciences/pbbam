@@ -74,23 +74,23 @@ struct IndexedBamWriterException : public std::exception
 template <typename T>
 void SwapEndianness(std::vector<T>& data)
 {
-    const size_t elementSize = sizeof(T);
-    const size_t numReads = data.size();
+    const std::size_t elementSize = sizeof(T);
+    const std::size_t numReads = data.size();
     switch (elementSize) {
         case 1:
             break;  // no swapping necessary
         case 2:
-            for (size_t i = 0; i < numReads; ++i) {
+            for (std::size_t i = 0; i < numReads; ++i) {
                 ed_swap_2p(&data[i]);
             }
             break;
         case 4:
-            for (size_t i = 0; i < numReads; ++i) {
+            for (std::size_t i = 0; i < numReads; ++i) {
                 ed_swap_4p(&data[i]);
             }
             break;
         case 8:
-            for (size_t i = 0; i < numReads; ++i) {
+            for (std::size_t i = 0; i < numReads; ++i) {
                 ed_swap_8p(&data[i]);
             }
             break;
@@ -100,7 +100,7 @@ void SwapEndianness(std::vector<T>& data)
     }
 }
 
-inline void bgzf_write_safe(BGZF* fp, const void* data, size_t length)
+inline void bgzf_write_safe(BGZF* fp, const void* data, std::size_t length)
 {
     const auto ret = bgzf_write(fp, data, length);
     if (ret < 0L) {
@@ -123,18 +123,18 @@ void WriteBgzfVector(BGZF* fp, std::vector<T>& data)
 
 struct PbiFieldBlock
 {
-    int64_t pos_;  // file position of block start
-    size_t n_;     // number of entries in block
+    int64_t pos_;    // file position of block start
+    std::size_t n_;  // number of entries in block
 };
 
 template <typename T>
 class PbiField
 {
-    static constexpr size_t ELEMENT_SIZE = sizeof(T);
+    static constexpr std::size_t ELEMENT_SIZE = sizeof(T);
     static_assert(ELEMENT_SIZE > 0);
 
 public:
-    PbiField(size_t maxBufferSize = 0) : maxElementCount_{maxBufferSize / ELEMENT_SIZE}
+    PbiField(std::size_t maxBufferSize = 0) : maxElementCount_{maxBufferSize / ELEMENT_SIZE}
     {
         buffer_.reserve(maxElementCount_);
     }
@@ -142,7 +142,7 @@ public:
     void Add(T value) { buffer_.push_back(value); }
     bool IsFull() const { return buffer_.size() == maxElementCount_; }
 
-    size_t maxElementCount_;
+    std::size_t maxElementCount_;
     std::vector<T> buffer_;
     std::vector<PbiFieldBlock> blocks_;
 };
@@ -152,7 +152,7 @@ class PbiReferenceDataBuilder
 public:
     using ReferenceRows = std::pair<int32_t, int32_t>;  // [startRow, endRow)
 
-    explicit PbiReferenceDataBuilder(size_t numReferenceSequences);
+    explicit PbiReferenceDataBuilder(std::size_t numReferenceSequences);
 
     bool AddRecord(const BamRecord& record, int32_t rowNumber);
     PbiRawReferenceData Result() const;
@@ -168,8 +168,8 @@ struct PbiBuilderBase
 {
     PbiBuilderBase() = delete;
     explicit PbiBuilderBase(const std::string& pbiFilename,
-                            PbiBuilder::CompressionLevel compressionLevel, size_t numThreads,
-                            size_t bufferSize);
+                            PbiBuilder::CompressionLevel compressionLevel, std::size_t numThreads,
+                            std::size_t bufferSize);
     virtual ~PbiBuilderBase() noexcept;
 
     void AddBarcodeData(const BamRecord& b);
@@ -254,7 +254,7 @@ struct PbiBuilderBase
     std::unique_ptr<FILE, Utility::FileDeleter> tempFile_;
     std::unique_ptr<BGZF, HtslibBgzfDeleter> pbiFile_;
     PbiBuilder::CompressionLevel compressionLevel_;
-    size_t numThreads_;
+    std::size_t numThreads_;
 
     // PBI field buffers
     PbiField<int32_t> rgIdField_;

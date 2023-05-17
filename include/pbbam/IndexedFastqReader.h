@@ -106,7 +106,7 @@ public:
     bool HasSequence(const std::string& name) const;
 
     /// \returns the names of the sequence at a specific index in the FASTQ file
-    std::string Name(size_t idx) const;
+    std::string Name(std::size_t idx) const;
 
     /// \returns the names of all sequences stored in the FASTQ file
     std::vector<std::string> Names() const;

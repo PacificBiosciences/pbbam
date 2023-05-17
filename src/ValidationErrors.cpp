@@ -12,9 +12,9 @@
 namespace PacBio {
 namespace BAM {
 
-const size_t ValidationErrors::MAX;
+const std::size_t ValidationErrors::MAX;
 
-ValidationErrors::ValidationErrors(const size_t maxNumErrors)
+ValidationErrors::ValidationErrors(const std::size_t maxNumErrors)
     : maxNumErrors_{maxNumErrors}, currentNumErrors_{0}
 {
     if (maxNumErrors_ == 0) {
@@ -41,8 +41,8 @@ void ValidationErrors::AddRecordError(const std::string& name, std::string detai
 }
 
 void ValidationErrors::AddTagLengthError(const std::string& name, const std::string& tagLabel,
-                                         const std::string& tagName, const size_t observed,
-                                         const size_t expected)
+                                         const std::string& tagName, const std::size_t observed,
+                                         const std::size_t expected)
 {
     // format
     std::ostringstream s;

@@ -95,13 +95,13 @@ void PbiRawMappedData::AddRecord(const BamRecord& b)
     nDelOps_.push_back(insertionAndDeletionOps.second);
 }
 
-uint32_t PbiRawMappedData::NumDeletedBasesAt(size_t recordIndex) const
+uint32_t PbiRawMappedData::NumDeletedBasesAt(std::size_t recordIndex) const
 {
     return NumDeletedAndInsertedBasesAt(recordIndex).first;
 }
 
 std::pair<uint32_t, uint32_t> PbiRawMappedData::NumDeletedAndInsertedBasesAt(
-    size_t recordIndex) const
+    std::size_t recordIndex) const
 {
     const auto aStart = aStart_.at(recordIndex);
     const auto aEnd = aEnd_.at(recordIndex);
@@ -115,7 +115,7 @@ std::pair<uint32_t, uint32_t> PbiRawMappedData::NumDeletedAndInsertedBasesAt(
     return {numDel, numIns};
 }
 
-uint32_t PbiRawMappedData::NumInsertedBasesAt(size_t recordIndex) const
+uint32_t PbiRawMappedData::NumInsertedBasesAt(std::size_t recordIndex) const
 {
     return NumDeletedAndInsertedBasesAt(recordIndex).second;
 }

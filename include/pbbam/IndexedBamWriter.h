@@ -22,15 +22,15 @@ struct IndexedBamWriterConfig
     PbiBuilder::CompressionLevel pbiCompressionLevel = PbiBuilder::DefaultCompression;
 
     // Number of threads used while writing to BAM file
-    size_t numBamThreads = 4;
+    std::size_t numBamThreads = 4;
     // Number of threads used while writing to pbi file
-    size_t numPbiThreads = 4;
+    std::size_t numPbiThreads = 4;
     // Number of threads used while doing a trailing read of the BaM file being
     // written (to help compute indexes)
-    size_t numGziThreads = 4;
+    std::size_t numGziThreads = 4;
 
     // Max size in memory for temporary files before flushing to disk.
-    size_t tempFileBufferSize = 0x10000;
+    std::size_t tempFileBufferSize = 0x10000;
 };
 ///
 /// \brief The IndexedBamWriter class
@@ -81,9 +81,10 @@ public:
     IndexedBamWriter(
         const std::string& outputFilename, const BamHeader& header,
         BamWriter::CompressionLevel bamCompressionLevel = BamWriter::DefaultCompression,
-        size_t numBamThreads = 4,
+        std::size_t numBamThreads = 4,
         PbiBuilder::CompressionLevel pbiCompressionLevel = PbiBuilder::DefaultCompression,
-        size_t numPbiThreads = 4, size_t numGziThreads = 4, size_t tempFileBufferSize = 0x10000);
+        std::size_t numPbiThreads = 4, std::size_t numGziThreads = 4,
+        std::size_t tempFileBufferSize = 0x10000);
 
     /// \brief IndexedBamWRiter
     ///

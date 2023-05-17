@@ -43,13 +43,13 @@ inline bool DataSetElement::operator!=(const DataSetElement& other) const noexce
 }
 
 template <typename T>
-const T& DataSetElement::operator[](size_t index) const
+const T& DataSetElement::operator[](std::size_t index) const
 {
     return Child<T>(index);
 }
 
 template <typename T>
-T& DataSetElement::operator[](size_t index)
+T& DataSetElement::operator[](std::size_t index)
 {
     return Child<T>(index);
 }
@@ -103,7 +103,7 @@ inline const std::map<std::string, std::string>& DataSetElement::Attributes() co
 inline std::map<std::string, std::string>& DataSetElement::Attributes() { return attributes_; }
 
 template <typename T>
-const T& DataSetElement::Child(size_t index) const
+const T& DataSetElement::Child(std::size_t index) const
 {
     DataSetElement* child = children_.at(index).get();
     if (child == nullptr) {
@@ -116,7 +116,7 @@ const T& DataSetElement::Child(size_t index) const
 }
 
 template <typename T>
-T& DataSetElement::Child(size_t index)
+T& DataSetElement::Child(std::size_t index)
 {
     DataSetElement* child = children_.at(index).get();
     if (child == nullptr) {
@@ -140,7 +140,7 @@ T& DataSetElement::Child(const std::string& label)
 {
     const int i = IndexOf(label);
     if (i >= 0) {
-        assert(static_cast<size_t>(i) < NumChildren());
+        assert(static_cast<std::size_t>(i) < NumChildren());
         return Child<T>(i);
     } else {
         AddChild(T());
@@ -153,7 +153,7 @@ inline DataSetElement& DataSetElement::Child<DataSetElement>(const std::string& 
 {
     const int i = IndexOf(label);
     if (i >= 0) {
-        assert(static_cast<size_t>(i) < NumChildren());
+        assert(static_cast<std::size_t>(i) < NumChildren());
         return Child<DataSetElement>(i);
     } else {
         AddChild(DataSetElement{label});
@@ -199,8 +199,8 @@ inline bool DataSetElement::HasChild(const std::string& label) const
 
 inline int DataSetElement::IndexOf(const std::string& label) const
 {
-    const size_t count = NumChildren();
-    for (size_t i = 0; i < count; ++i) {
+    const std::size_t count = NumChildren();
+    for (std::size_t i = 0; i < count; ++i) {
         const DataSetElement& child = *(children_.at(i).get());
         if (child.LocalNameLabel() == label || child.QualifiedNameLabel() == label ||
             child.label_ == label) {
@@ -221,11 +221,11 @@ inline const std::string& DataSetElement::QualifiedNameLabel() const
 
 inline void DataSetElement::Label(const std::string& label) { label_ = XmlName(label, true); }
 
-inline size_t DataSetElement::NumAttributes() const { return attributes_.size(); }
+inline std::size_t DataSetElement::NumAttributes() const { return attributes_.size(); }
 
-inline size_t DataSetElement::NumChildren() const { return children_.size(); }
+inline std::size_t DataSetElement::NumChildren() const { return children_.size(); }
 
-inline size_t DataSetElement::Size() const { return children_.size(); }
+inline std::size_t DataSetElement::Size() const { return children_.size(); }
 
 inline void DataSetElement::RemoveChild(const DataSetElement& e)
 {
@@ -264,7 +264,7 @@ inline const XsdType& DataSetElement::Xsd() const { return xsd_; }
 // ----------------------------
 
 inline DataSetElementIteratorBase::DataSetElementIteratorBase(const DataSetElement* parent,
-                                                              size_t i)
+                                                              std::size_t i)
     : parent_(parent), index_(i)
 {
 }
@@ -295,7 +295,7 @@ inline void DataSetElementIteratorBase::Advance()
 // ------------------------
 
 template <typename T>
-DataSetElementIterator<T>::DataSetElementIterator(const DataSetElement* parent, size_t i)
+DataSetElementIterator<T>::DataSetElementIterator(const DataSetElement* parent, std::size_t i)
     : DataSetElementIteratorBase(parent, i)
 {
 }
@@ -332,7 +332,7 @@ DataSetElementIterator<T> DataSetElementIterator<T>::operator++(int)
 // -----------------------------
 
 template <typename T>
-DataSetElementConstIterator<T>::DataSetElementConstIterator(const DataSetElement* parent, size_t i)
+DataSetElementConstIterator<T>::DataSetElementConstIterator(const DataSetElement* parent, std::size_t i)
     : DataSetElementIteratorBase(parent, i)
 {
 }
@@ -375,7 +375,7 @@ inline XmlName::XmlName(std::string fullName, bool verbatim)
     , localNameSize_(0)
     , verbatim_(verbatim)
 {
-    const size_t colonFound = qualifiedName_.find(':');
+    const std::size_t colonFound = qualifiedName_.find(':');
     if (colonFound == std::string::npos || colonFound == 0) {
         localNameSize_ = qualifiedName_.size();
     } else {

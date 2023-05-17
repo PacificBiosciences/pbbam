@@ -267,7 +267,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct NumDeletedBases : public MemberFunctionBase<size_t, &BamRecord::NumDeletedBases>
+    struct NumDeletedBases : public MemberFunctionBase<std::size_t, &BamRecord::NumDeletedBases>
     {};
 
     /// \brief Compares on BamRecord::NumInsertedBases.
@@ -278,7 +278,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct NumInsertedBases : public MemberFunctionBase<size_t, &BamRecord::NumInsertedBases>
+    struct NumInsertedBases : public MemberFunctionBase<std::size_t, &BamRecord::NumInsertedBases>
     {};
 
     /// \brief Compares on BamRecord::NumMatches.
@@ -289,7 +289,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct NumMatches : public MemberFunctionBase<size_t, &BamRecord::NumMatches>
+    struct NumMatches : public MemberFunctionBase<std::size_t, &BamRecord::NumMatches>
     {};
 
     /// \brief Compares on BamRecord::NumMismatches.
@@ -300,7 +300,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct NumMismatches : public MemberFunctionBase<size_t, &BamRecord::NumMismatches>
+    struct NumMismatches : public MemberFunctionBase<std::size_t, &BamRecord::NumMismatches>
     {};
 
     /// \brief Compares BamRecords' QNAMEs, via PacBio BAM spec-aware

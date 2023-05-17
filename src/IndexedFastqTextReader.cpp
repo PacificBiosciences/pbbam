@@ -93,7 +93,7 @@ int IndexedFastqTextReader::FetchRecord()
     return seq_->seq.l;
 }
 
-int IndexedFastqTextReader::ReadFromFile(FILE* fp, void* data, size_t length)
+int IndexedFastqTextReader::ReadFromFile(FILE* fp, void* data, std::size_t length)
 {
     return static_cast<int>(std::fread(data, sizeof(uint8_t), length, fp));
 }

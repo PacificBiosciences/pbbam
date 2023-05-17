@@ -222,7 +222,7 @@ TEST(BAM_PacBioIndex, can_create_inline_with_bam_writer)
                                                           33874621, 1392836608};
         BamRecord r;
         BamReader reader{PacBioIndexTests::test2BamFn};
-        for (size_t i = 0; i < originalFileOffsets.size(); ++i) {
+        for (std::size_t i = 0; i < originalFileOffsets.size(); ++i) {
             reader.VirtualSeek(originalFileOffsets.at(i));
             EXPECT_TRUE(CanRead(reader, r, i));
         }
@@ -232,11 +232,11 @@ TEST(BAM_PacBioIndex, can_create_inline_with_bam_writer)
     {
         BamRecord r;
         BamReader reader{tempBamFn};
-        for (size_t i = 0; i < expectedNewOffsets.size(); ++i) {
+        for (std::size_t i = 0; i < expectedNewOffsets.size(); ++i) {
             reader.VirtualSeek(expectedNewOffsets.at(i));
             EXPECT_TRUE(CanRead(reader, r, i));
         }
-        for (size_t i = 0; i < observedOffsets.size(); ++i) {
+        for (std::size_t i = 0; i < observedOffsets.size(); ++i) {
             reader.VirtualSeek(observedOffsets.at(i));
             EXPECT_TRUE(CanRead(reader, r, i));
         }
