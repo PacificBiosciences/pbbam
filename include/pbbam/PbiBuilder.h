@@ -142,7 +142,7 @@ public:
     /// \note \p vOffset is a BGZF \b virtual offset into the %BAM file. To get
     ///          this value, you should use one of the following: \n
     ///        - while reading existing %BAM: BamReader::VirtualTell \n
-    ///        - while writing new %BAM:      BamWriter::Write(const BamRecord& record, int64_t* vOffset) \n
+    ///        - while writing new %BAM:      BamWriter::Write(const BamRecord& record, std::int64_t* vOffset) \n
     ///
     ///
     /// To build a PBI index while generating a %BAM file:
@@ -154,7 +154,7 @@ public:
     /// \param[in] record   input BamRecord to pull index data from
     /// \param[in] vOffset  \b virtual offset into %BAM file where record begins
     ///
-    void AddRecord(const BamRecord& record, int64_t vOffset);
+    void AddRecord(const BamRecord& record, std::int64_t vOffset);
 
     /// \brief Writes data out to PBI file & closes builder.
     ///

@@ -41,12 +41,12 @@ public:
     AutomationParameters(const internal::FromInputXml& fromInputXml);
 
 public:
-    int32_t CellNFCIndex() const;
-    AutomationParameters& CellNFCIndex(int32_t i);
+    std::int32_t CellNFCIndex() const;
+    AutomationParameters& CellNFCIndex(std::int32_t i);
     bool HasCellNFCIndex() const;
 
-    int32_t CollectionNumber() const;
-    AutomationParameters& CollectionNumber(int32_t i);
+    std::int32_t CollectionNumber() const;
+    AutomationParameters& CollectionNumber(std::int32_t i);
     bool HasCollectionNumber() const;
 
     double Exposure() const;
@@ -61,8 +61,8 @@ public:
     AutomationParameters& ExtensionTime(double d);
     bool HasExtensionTime() const;
 
-    int32_t ExtraIMWashes() const;
-    AutomationParameters& ExtraIMWashes(int32_t i);
+    std::int32_t ExtraIMWashes() const;
+    AutomationParameters& ExtraIMWashes(std::int32_t i);
     bool HasExtraIMWashes() const;
 
     bool HasN2Switch() const;
@@ -77,8 +77,8 @@ public:
     AutomationParameters& ImmobilizationTime(double d);
     bool HasImmobilizationTime() const;
 
-    int32_t InsertSize() const;
-    AutomationParameters& InsertSize(int32_t i);
+    std::int32_t InsertSize() const;
+    AutomationParameters& InsertSize(std::int32_t i);
     bool HasInsertSize() const;
 
     double MovieLength() const;
@@ -97,8 +97,8 @@ public:
     AutomationParameters& SNRCut(double d);
     bool HasSNRCut() const;
 
-    int32_t TipSearchMaxDuration() const;
-    AutomationParameters& TipSearchMaxDuration(int32_t i);
+    std::int32_t TipSearchMaxDuration() const;
+    AutomationParameters& TipSearchMaxDuration(std::int32_t i);
     bool HasTipSearchMaxDuration() const;
 
     bool UseStageHotStart() const;

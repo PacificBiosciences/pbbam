@@ -63,7 +63,7 @@ public:
 
     /// \brief Return number of records that pass the provided filter
     ///
-    uint32_t NumReads() const;
+    std::uint32_t NumReads() const;
 
 private:
     class PbiFilterQueryPrivate;

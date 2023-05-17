@@ -29,14 +29,14 @@ public:
     /// \param[in] data     BAM-formatted (binary) tag data
     /// \returns TagCollection containing tag data
     ///
-    static TagCollection Decode(const std::vector<uint8_t>& data);
+    static TagCollection Decode(const std::vector<std::uint8_t>& data);
 
     /// \brief Creates binary BAM data from a TagCollection.
     ///
     /// \param[in] tags     TagCollection containing tag data
     /// \returns vector of bytes (encoded BAM data)
     ///
-    static std::vector<uint8_t> Encode(const TagCollection& tags);
+    static std::vector<std::uint8_t> Encode(const TagCollection& tags);
 
     /// \}
 
@@ -52,8 +52,8 @@ public:
     ///
     /// \returns the SAM/BAM single char code for tag type
     ///
-    static uint8_t TagTypeCode(const Tag& tag,
-                               const TagModifier& additionalModifier = TagModifier::NONE);
+    static std::uint8_t TagTypeCode(const Tag& tag,
+                                    const TagModifier& additionalModifier = TagModifier::NONE);
 
     /// \brief Encodes a single Tag's contents in %BAM binary
     ///
@@ -66,7 +66,7 @@ public:
     ///
     /// \returns vector of bytes (encoded BAM data)
     ///
-    static std::vector<uint8_t> ToRawData(
+    static std::vector<std::uint8_t> ToRawData(
         const Tag& tag, const TagModifier& additionalModifier = TagModifier::NONE);
 
     /// \brief Creates a Tag object from binary BAM data.
@@ -76,7 +76,7 @@ public:
     ///
     /// \returns resulting Tag object
     ///
-    static Tag FromRawData(uint8_t* rawData);
+    static Tag FromRawData(std::uint8_t* rawData);
 
     /// \}
 };

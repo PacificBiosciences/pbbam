@@ -85,7 +85,7 @@ void Compare(const BamRecord& b1, const BamRecord& b2)
 
 TEST(BAM_WhitelistedZmwReadStitcher, returns_no_records_from_unknown_zmw)
 {
-    const std::vector<int32_t> whitelist{42};  // ZMW not in our files
+    const std::vector<std::int32_t> whitelist{42};  // ZMW not in our files
     WhitelistedZmwReadStitcher stitcher{
         whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
         PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
@@ -96,7 +96,7 @@ TEST(BAM_WhitelistedZmwReadStitcher, returns_no_records_from_unknown_zmw)
 
 TEST(BAM_WhitelistedZmwReadStitcher, returns_no_records_from_empty_whitelist)
 {
-    const std::vector<int32_t> whitelist;
+    const std::vector<std::int32_t> whitelist;
     WhitelistedZmwReadStitcher stitcher{
         whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
         PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
@@ -106,7 +106,7 @@ TEST(BAM_WhitelistedZmwReadStitcher, returns_no_records_from_empty_whitelist)
 
 TEST(BAM_WhitelistedZmwReadStitcher, can_process_single_value_whitelist)
 {
-    const std::vector<int32_t> whitelist{200000};
+    const std::vector<std::int32_t> whitelist{200000};
     WhitelistedZmwReadStitcher stitcher{
         whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
         PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
@@ -133,7 +133,7 @@ TEST(BAM_WhitelistedZmwReadStitcher, can_process_single_value_whitelist)
 
 TEST(BAM_WhitelistedZmwReadStitcher, can_process_multiple_value_whitelist)
 {
-    const std::vector<int32_t> whitelist{100000, 300000};
+    const std::vector<std::int32_t> whitelist{100000, 300000};
     WhitelistedZmwReadStitcher stitcher{
         whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
         PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
@@ -169,7 +169,7 @@ TEST(BAM_WhitelistedZmwReadStitcher, can_process_multiple_value_whitelist)
 TEST(BAM_WhitelistedZmwReadStitcher,
      can_process_multiple_value_whitelist_with_mixed_known_unknown_zmws)
 {
-    const std::vector<int32_t> whitelist{42, 200000, 24};
+    const std::vector<std::int32_t> whitelist{42, 200000, 24};
     WhitelistedZmwReadStitcher stitcher{
         whitelist, PbbamTestsConfig::Data_Dir + "/polymerase/internal.subreads.bam",
         PbbamTestsConfig::Data_Dir + "/polymerase/internal.scraps.bam"};
@@ -199,7 +199,7 @@ TEST(BAM_WhitelistedZmwReadStitcher,
 
 TEST(BAM_WhitelistedZmwReadStitcher, EmptyScrapsFileOk)
 {
-    const std::vector<int32_t> whitelist{10944689, 10944690};
+    const std::vector<std::int32_t> whitelist{10944689, 10944690};
     const std::string primaryBamFn =
         PbbamTestsConfig::Data_Dir + "/polymerase/scrapless.subreads.bam";
     const std::string scrapsBamFn = PbbamTestsConfig::Data_Dir + "/polymerase/scrapless.scraps.bam";

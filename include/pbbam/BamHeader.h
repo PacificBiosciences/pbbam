@@ -190,20 +190,20 @@ public:
     /// \sa BamReader::ReferenceId, PbiReferenceIdFilter,
     ///     PbiRawMappedData::tId_
     ///
-    int32_t SequenceId(const std::string& name) const;
+    std::int32_t SequenceId(const std::string& name) const;
 
     /// \returns the length of the sequence (\@SQ:LN, e.g. chromosome length) at
     ///          index \p id
     ///
     /// \sa SequenceInfo::Length, BamHeader::SequenceId
     ///
-    std::string SequenceLength(int32_t id) const;
+    std::string SequenceLength(std::int32_t id) const;
 
     /// \returns the name of the sequence (\@SQ:SN) at index \p id
     ///
     /// \sa SequenceInfo::Name, BamHeader::SequenceId
     ///
-    std::string SequenceName(int32_t id) const;
+    std::string SequenceName(std::int32_t id) const;
 
     /// \returns vector of sequence names (\@SQ:SN) stored in this header
     ///
@@ -216,7 +216,7 @@ public:
     /// \throws std::out_of_range if \p is an invalid or unknown index
     /// \sa BamHeader::SequenceId
     ///
-    SequenceInfo Sequence(int32_t id) const;
+    SequenceInfo Sequence(std::int32_t id) const;
 
     /// \returns SequenceInfo for the sequence matching \p name
     SequenceInfo Sequence(const std::string& name) const;

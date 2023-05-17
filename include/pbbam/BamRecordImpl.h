@@ -76,56 +76,56 @@ public:
     /// \{
 
     /// \returns this record's assigned (BAI) index bin ID.
-    uint32_t Bin() const;
+    std::uint32_t Bin() const;
 
     /// \returns this record's alignment flag, in raw integer form.
-    uint32_t Flag() const;
+    std::uint32_t Flag() const;
 
     /// \returns this record's insert size
-    int32_t InsertSize() const;
+    std::int32_t InsertSize() const;
 
     /// \returns this record's mapping quality. A value of 255 indicates "unknown"
-    uint8_t MapQuality() const;
+    std::uint8_t MapQuality() const;
 
     /// \returns this record's mate's mapped position, or -1 if unmapped
     Data::Position MatePosition() const;
 
     /// \returns this record's mate's mapped reference ID, or -1 if unmapped
-    int32_t MateReferenceId() const;
+    std::int32_t MateReferenceId() const;
 
     /// \returns this record's mapped position, or -1 if unmapped
     Data::Position Position() const;
 
     /// \returns this record's mate's mapped reference ID, or -1 if unmapped
-    int32_t ReferenceId() const;
+    std::int32_t ReferenceId() const;
 
     /// Sets the record's (BAI) index bin ID.
     ///
     /// \param[in] bin BAI index bin ID.
     /// \returns reference to this record
     ///
-    BamRecordImpl& Bin(uint32_t bin);
+    BamRecordImpl& Bin(std::uint32_t bin);
 
     /// Sets this record's alignment flag, using a raw integer.
     ///
     /// \param[in] flag raw alignment flag
     /// \returns reference to this record
     ///
-    BamRecordImpl& Flag(uint32_t flag);
+    BamRecordImpl& Flag(std::uint32_t flag);
 
     /// Sets this record's insert size.
     ///
     /// \param[in] iSize insert size
     /// \returns reference to this record
     ///
-    BamRecordImpl& InsertSize(int32_t iSize);
+    BamRecordImpl& InsertSize(std::int32_t iSize);
 
     /// Sets this record's map quality.
     ///
     /// \param[in] mapQual mapping quality - value of 255 indicates "unknown"
     /// \returns reference to this record
     ///
-    BamRecordImpl& MapQuality(uint8_t mapQual);
+    BamRecordImpl& MapQuality(std::uint8_t mapQual);
 
     /// Sets this record's mate's mapped position.
     ///
@@ -139,7 +139,7 @@ public:
     /// \param[in] id reference ID. A value of -1 indicates unmapped.
     /// \returns reference to this record
     ///
-    BamRecordImpl& MateReferenceId(int32_t id);
+    BamRecordImpl& MateReferenceId(std::int32_t id);
 
     /// Sets this record's mapped position.
     ///
@@ -153,7 +153,7 @@ public:
     /// \param[in] id reference ID. A value of -1 indicates unmapped.
     /// \returns reference to this record
     ///
-    BamRecordImpl& ReferenceId(int32_t id);
+    BamRecordImpl& ReferenceId(std::int32_t id);
 
     /// \}
 
@@ -371,7 +371,7 @@ public:
     /// \note Any value that can be used to implicitly construct a Tag is valid.
     /// \code
     ///     string s;
-    ///     vector<uint32_t> v;
+    ///     vector<std::uint32_t> v;
     ///     record.AddTag("XX", s); // will add a string-type tag
     ///     record.AddTag("YY", v); // will add a uint32-array-type tag
     /// \endcode
@@ -435,7 +435,7 @@ public:
     /// \note Any value that can be used to implicitly construct a Tag is valid.
     /// \code
     ///     string s;
-    ///     vector<uint32_t> v;
+    ///     vector<std::uint32_t> v;
     ///     record.EditTag("XX", s); // will overwrite tag XX with a string-type tag
     ///     record.EditTag("YY", v); // will overwrite tag YY with a uint32-array-type tag
     /// \endcode
@@ -596,7 +596,7 @@ private:
     std::unique_ptr<bam1_t, HtslibRecordDeleter> d_;
     struct TagOffsetEntry
     {
-        uint16_t Code = 0;
+        std::uint16_t Code = 0;
         int Offset = -1;
     };
     mutable std::vector<TagOffsetEntry> tagOffsets_;

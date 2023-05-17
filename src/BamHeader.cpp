@@ -120,7 +120,7 @@ public:
 
     // we need to preserve insertion order, use lookup for access by name
     std::vector<SequenceInfo> sequences_;
-    std::map<std::string, int32_t> sequenceIdLookup_;
+    std::map<std::string, std::int32_t> sequenceIdLookup_;
 
     std::set<std::string> uniqueProgramIds_;
     void AddProgram(ProgramInfo pg, const AddProgramMode mode)
@@ -457,7 +457,7 @@ BamHeader& BamHeader::ReadGroups(std::vector<ReadGroupInfo> readGroups)
     return *this;
 }
 
-SequenceInfo BamHeader::Sequence(const int32_t id) const { return d_->sequences_.at(id); }
+SequenceInfo BamHeader::Sequence(const std::int32_t id) const { return d_->sequences_.at(id); }
 
 SequenceInfo BamHeader::Sequence(const std::string& name) const
 {
@@ -481,9 +481,9 @@ int32_t BamHeader::SequenceId(const std::string& name) const
     return iter->second;
 }
 
-std::string BamHeader::SequenceLength(const int32_t id) const { return Sequence(id).Length(); }
+std::string BamHeader::SequenceLength(const std::int32_t id) const { return Sequence(id).Length(); }
 
-std::string BamHeader::SequenceName(const int32_t id) const { return Sequence(id).Name(); }
+std::string BamHeader::SequenceName(const std::int32_t id) const { return Sequence(id).Name(); }
 
 std::vector<std::string> BamHeader::SequenceNames() const
 {

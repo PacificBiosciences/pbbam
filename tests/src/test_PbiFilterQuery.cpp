@@ -121,7 +121,7 @@ TEST(BAM_PbiFilterQuery, can_iterate_zmw_range_from_dataset_input)
 
     {  // min ZMW
 
-        const int32_t zmw = 54;
+        const std::int32_t zmw = 54;
         PbiFilterQuery query{PbiZmwFilter{zmw, Compare::GREATER_THAN}, ds};
         EXPECT_EQ(1220, query.NumReads());
         const auto count = std::count_if(query.begin(), query.end(),
@@ -133,7 +133,7 @@ TEST(BAM_PbiFilterQuery, can_iterate_zmw_range_from_dataset_input)
 
     {  // max ZMW
 
-        const int32_t zmw = 1816;
+        const std::int32_t zmw = 1816;
         PbiFilterQuery query{PbiZmwFilter{1816, Compare::LESS_THAN}, ds};
         EXPECT_EQ(150, query.NumReads());
         const auto count = std::count_if(query.begin(), query.end(),
@@ -256,7 +256,7 @@ TEST(BAM_PbiFilterQuery, can_filter_on_barcoded_data)
 
     // bc_forward == [0,2]
     {
-        const auto ids = std::vector<int16_t>{0, 2};
+        const auto ids = std::vector<std::int16_t>{0, 2};
         PbiFilterQuery query{PbiBarcodeForwardFilter{ids}, file};
         EXPECT_EQ(80, query.NumReads());
         EXPECT_EQ(80, std::distance(query.begin(), query.end()));
@@ -544,9 +544,9 @@ TEST(BAM_PbiFilterQuery, can_handle_transcript_records)
     }
 
     {  // zmw whitelist
-        const std::vector<int32_t> whitelist = {1, 3};
+        const std::vector<std::int32_t> whitelist = {1, 3};
 
-        std::vector<int32_t> observed;
+        std::vector<std::int32_t> observed;
 
         PbiFilter filter{PbiZmwFilter{whitelist}};
         PbiFilterQuery queryData{filter, transcriptFn};
@@ -562,7 +562,7 @@ TEST(BAM_PbiFilterQuery, can_handle_transcript_records)
         const PbiFilter filter{
             {PbiZmwFilter{2, Compare::GREATER_THAN_EQUAL}, PbiZmwFilter{4, Compare::LESS_THAN}}};
 
-        std::vector<int32_t> observed;
+        std::vector<std::int32_t> observed;
 
         PbiFilterQuery queryData{filter, transcriptFn};
         for (const auto& b : queryData) {
@@ -575,7 +575,7 @@ TEST(BAM_PbiFilterQuery, can_handle_transcript_records)
     }
     {  // QNAME
 
-        std::vector<int32_t> observed;
+        std::vector<std::int32_t> observed;
 
         PbiFilter filter{PbiQueryNameFilter{"transcript/2"}};
         PbiFilterQuery queryData{filter, transcriptFn};
@@ -590,7 +590,7 @@ TEST(BAM_PbiFilterQuery, can_handle_transcript_records)
 
         const std::vector<std::string> whitelist = {"transcript/1", "transcript/4"};
 
-        std::vector<int32_t> observed;
+        std::vector<std::int32_t> observed;
 
         PbiFilter filter{PbiQueryNameFilter{whitelist}};
         PbiFilterQuery queryData{filter, transcriptFn};
@@ -604,7 +604,7 @@ TEST(BAM_PbiFilterQuery, can_handle_transcript_records)
     }
 
     {  // movie name
-        std::vector<int32_t> observed;
+        std::vector<std::int32_t> observed;
 
         PbiFilter filter{PbiMovieNameFilter{"transcript"}};
         PbiFilterQuery queryData{filter, transcriptFn};
@@ -619,7 +619,7 @@ TEST(BAM_PbiFilterQuery, can_handle_transcript_records)
 
         const std::string datasetFn = PbbamTestsConfig::Data_Dir + "/transcriptset.xml";
 
-        std::vector<int32_t> observed;
+        std::vector<std::int32_t> observed;
 
         PacBio::BAM::DataSet ds(datasetFn);
         PacBio::BAM::PbiFilter filter = PacBio::BAM::PbiFilter::FromDataSet(ds);
@@ -674,7 +674,7 @@ TEST(BAM_PbiFilterQuery, can_reuse_pbi_index_cache)
 
     {
         // min ZMW
-        const int32_t zmw = 54;
+        const std::int32_t zmw = 54;
 
         PbiFilterQuery query{PbiZmwFilter{zmw, Compare::GREATER_THAN}, ds, indexCache};
         EXPECT_EQ(1220, query.NumReads());
@@ -686,7 +686,7 @@ TEST(BAM_PbiFilterQuery, can_reuse_pbi_index_cache)
     }
 
     {  // max ZMW
-        const int32_t zmw = 1816;
+        const std::int32_t zmw = 1816;
 
         PbiFilterQuery query{PbiZmwFilter{zmw, Compare::LESS_THAN}, ds, indexCache};
         EXPECT_EQ(150, query.NumReads());

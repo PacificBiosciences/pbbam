@@ -106,7 +106,7 @@ TEST(BAM_PbiFilterCompositeBamReader, can_handle_normal_filters)
         BamFile{PbbamTestsConfig::Data_Dir + "/group/test2.bam"}}; // duplicated on purpose
 
     {
-        const int32_t minQLen = 500;
+        const std::int32_t minQLen = 500;
         PbiFilterCompositeBamReader<> reader{PbiQueryLengthFilter{minQLen, Compare::GREATER_THAN_EQUAL},
                                              bamFiles};
         EXPECT_EQ(6, reader.NumReads());
@@ -121,7 +121,7 @@ TEST(BAM_PbiFilterCompositeBamReader, can_handle_normal_filters)
         // all records aligned to reverse strand && pos >= 9200
         const std::string queryName{"m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/5615_6237"};
         const PacBio::Data::Strand strand = PacBio::Data::Strand::REVERSE;
-        const uint32_t minPos = 9200;
+        const std::uint32_t minPos = 9200;
         const auto filter = PbiFilter::Intersection({
             PbiAlignedStrandFilter{strand},
             PbiReferenceStartFilter{minPos, Compare::GREATER_THAN_EQUAL}});
@@ -140,7 +140,7 @@ TEST(BAM_PbiFilterCompositeBamReader, can_handle_normal_filters)
         // all records aligned to forward strand && pos >= 9200
         const std::string queryName{"m140905_042212_sidney_c100564852550000001823085912221377_s1_X0/14743/2114_2531"};
         const PacBio::Data::Strand strand = PacBio::Data::Strand::FORWARD;
-        const uint32_t minPos = 9200;
+        const std::uint32_t minPos = 9200;
         const auto filter = PbiFilter::Intersection({
             PbiAlignedStrandFilter{strand},
             PbiReferenceStartFilter{minPos, Compare::GREATER_THAN_EQUAL}});

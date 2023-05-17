@@ -117,7 +117,7 @@ int ZmwChunkedFastxTextReader::FetchRecord(bool skipName)
 
 int ZmwChunkedFastxTextReader::ReadFromFile(FILE* fp, void* data, std::size_t length)
 {
-    return static_cast<int>(std::fread(data, sizeof(uint8_t), length, fp));
+    return static_cast<int>(std::fread(data, sizeof(std::uint8_t), length, fp));
 }
 
 FastaSequence ZmwChunkedFastxTextReader::ReadNextFasta(bool skipName)
@@ -157,7 +157,7 @@ FastqSequence ZmwChunkedFastxTextReader::ReadNextFastq(bool skipName)
     return FastqSequence{std::move(name), std::move(bases), std::move(quals)};
 }
 
-void ZmwChunkedFastxTextReader::Seek(uint64_t pos)
+void ZmwChunkedFastxTextReader::Seek(std::uint64_t pos)
 {
     // seek to sequence 'id' & reset kseq handle
     auto result = fseek(file_.get(), pos, SEEK_SET);

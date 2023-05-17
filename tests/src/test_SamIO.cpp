@@ -111,10 +111,10 @@ TEST(BAM_SamWriter, can_roundtrip_single_record)
     record.Impl().SetMapped(false);
 
     TagCollection tags;
-    tags["zm"] = int32_t{100};
-    tags["qs"] = int32_t{0};
-    tags["qe"] = int32_t{5};
-    tags["np"] = int32_t{1};
+    tags["zm"] = std::int32_t{100};
+    tags["qs"] = std::int32_t{0};
+    tags["qe"] = std::int32_t{5};
+    tags["np"] = std::int32_t{1};
     tags["rq"] = static_cast<float>(0.6);
     tags["RG"] = std::string{"6002b307"};
     tags["sn"] = std::vector<float>{0.2f, 0.2f, 0.2f, 0.2f};

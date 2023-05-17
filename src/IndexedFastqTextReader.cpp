@@ -95,7 +95,7 @@ int IndexedFastqTextReader::FetchRecord()
 
 int IndexedFastqTextReader::ReadFromFile(FILE* fp, void* data, std::size_t length)
 {
-    return static_cast<int>(std::fread(data, sizeof(uint8_t), length, fp));
+    return static_cast<int>(std::fread(data, sizeof(std::uint8_t), length, fp));
 }
 
 std::pair<std::string, Data::QualityValues> IndexedFastqTextReader::Subsequence(
@@ -103,9 +103,9 @@ std::pair<std::string, Data::QualityValues> IndexedFastqTextReader::Subsequence(
 {
     // check requested region is valid
     const auto& entry = index_.Entry(id);
-    const int64_t available = static_cast<int64_t>(entry.Length) - start;
-    const int64_t requested = end - start;
-    const int64_t length = std::min(available, requested);
+    const std::int64_t available = static_cast<std::int64_t>(entry.Length) - start;
+    const std::int64_t requested = end - start;
+    const std::int64_t length = std::min(available, requested);
     if ((start < 0) || (end < 0) || (length < 0)) {
         std::ostringstream msg;
         msg << "[pbbam] FASTQ reader ERROR: invalid subsequence region requested:\n"

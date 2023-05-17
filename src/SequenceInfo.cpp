@@ -111,9 +111,9 @@ bool SequenceInfo::IsValid() const
         return false;
     }
 
-    // use long instead of int32_t, just to make sure we can catch overflow
+    // use long instead of std::int32_t, just to make sure we can catch overflow
     const long l = atol(length_.c_str());
-    return l >= 0 && l <= std::numeric_limits<int32_t>::max();
+    return l >= 0 && l <= std::numeric_limits<std::int32_t>::max();
 }
 
 std::string SequenceInfo::Length() const { return length_; }

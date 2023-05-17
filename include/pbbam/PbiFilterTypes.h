@@ -100,7 +100,7 @@ protected:
 /// \sa BamRecord::AlignedEnd
 ///
 class PbiAlignedEndFilter
-    : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::A_END>
+    : public internal::MappedDataFilterBase<std::uint32_t, PbiFile::MappedField::A_END>
 {
 public:
     /// \brief Creates a filter on aligned end.
@@ -108,7 +108,7 @@ public:
     /// \param[in] position value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiAlignedEndFilter(uint32_t position, Compare::Type cmp = Compare::EQUAL);
+    PbiAlignedEndFilter(std::uint32_t position, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiAlignedLengthFilter class provides a PbiFilter-compatible
@@ -118,7 +118,7 @@ public:
 ///
 /// \sa BamRecord::AlignedEnd, BamRecord::AlignedStart
 ///
-class PbiAlignedLengthFilter : public internal::FilterBase<uint32_t>
+class PbiAlignedLengthFilter : public internal::FilterBase<std::uint32_t>
 {
 public:
     /// \brief Creates a filter on aligned length.
@@ -126,7 +126,7 @@ public:
     /// \param[in] length value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiAlignedLengthFilter(uint32_t length, Compare::Type cmp = Compare::EQUAL);
+    PbiAlignedLengthFilter(std::uint32_t length, Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Performs the actual index lookup.
     ///
@@ -143,7 +143,7 @@ public:
 /// \sa BamRecord::AlignedStart
 ///
 class PbiAlignedStartFilter
-    : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::A_START>
+    : public internal::MappedDataFilterBase<std::uint32_t, PbiFile::MappedField::A_START>
 {
 public:
     /// \brief Creates a filter on aligned start.
@@ -151,7 +151,7 @@ public:
     /// \param[in] position value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiAlignedStartFilter(uint32_t position, Compare::Type cmp = Compare::EQUAL);
+    PbiAlignedStartFilter(std::uint32_t position, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiAlignedStrandFilter class provides a PbiFilter-compatible
@@ -190,7 +190,7 @@ public:
     /// \param[in] barcode  barcode ID to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeFilter(int16_t barcode, Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodeFilter(std::int16_t barcode, Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a whitelisted or blacklisted barcode filter.
     ///
@@ -202,7 +202,7 @@ public:
     /// \param[in] barcodes barcode IDs
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeFilter(std::vector<int16_t> barcodes, Compare::Type cmp = Compare::CONTAINS);
+    PbiBarcodeFilter(std::vector<std::int16_t> barcodes, Compare::Type cmp = Compare::CONTAINS);
 
     /// \brief Performs the actual index lookup.
     ///
@@ -222,7 +222,7 @@ private:
 /// \sa BamRecord::BarcodeForward
 ///
 class PbiBarcodeForwardFilter
-    : public internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_FORWARD>
+    : public internal::BarcodeDataFilterBase<std::int16_t, PbiFile::BarcodeField::BC_FORWARD>
 {
 public:
     /// \brief Creates a single-value forward barcode filter.
@@ -230,7 +230,7 @@ public:
     /// \param[in] bcFwdId  (forward) barcode ID to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeForwardFilter(int16_t bcFwdId, Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodeForwardFilter(std::int16_t bcFwdId, Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a whitelisted or blacklisted forward barcode filter.
     ///
@@ -242,7 +242,8 @@ public:
     /// \param[in] barcodes barcode IDs
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeForwardFilter(std::vector<int16_t> barcodes, Compare::Type cmp = Compare::CONTAINS);
+    PbiBarcodeForwardFilter(std::vector<std::int16_t> barcodes,
+                            Compare::Type cmp = Compare::CONTAINS);
 };
 
 /// \brief The PbiBarcodeQualityFilter class provides a PbiFilter-compatible
@@ -253,7 +254,7 @@ public:
 /// \sa BamRecord::BarcodeQuality
 ///
 class PbiBarcodeQualityFilter
-    : public internal::BarcodeDataFilterBase<uint8_t, PbiFile::BarcodeField::BC_QUALITY>
+    : public internal::BarcodeDataFilterBase<std::uint8_t, PbiFile::BarcodeField::BC_QUALITY>
 {
 public:
     /// \brief Creates a single-value barcode quality filter.
@@ -261,7 +262,7 @@ public:
     /// \param[in] bcQuality    barcode quality to compare on
     /// \param[in] cmp          compare type
     ///
-    PbiBarcodeQualityFilter(uint8_t bcQuality, Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodeQualityFilter(std::uint8_t bcQuality, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiBarcodeReverseFilter class provides a PbiFilter-compatible
@@ -272,7 +273,7 @@ public:
 /// \sa BamRecord::BarcodeReverse
 ///
 class PbiBarcodeReverseFilter
-    : public internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_REVERSE>
+    : public internal::BarcodeDataFilterBase<std::int16_t, PbiFile::BarcodeField::BC_REVERSE>
 {
 public:
     /// \brief Creates a single-value reverse barcode filter.
@@ -280,7 +281,7 @@ public:
     /// \param[in] bcRevId  (reverse) barcode ID to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeReverseFilter(int16_t bcRevId, Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodeReverseFilter(std::int16_t bcRevId, Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a whitelisted or blacklisted reverse barcode filter.
     ///
@@ -292,7 +293,8 @@ public:
     /// \param[in] barcodes barcode IDs
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodeReverseFilter(std::vector<int16_t> barcodes, Compare::Type cmp = Compare::CONTAINS);
+    PbiBarcodeReverseFilter(std::vector<std::int16_t> barcodes,
+                            Compare::Type cmp = Compare::CONTAINS);
 };
 
 /// \brief The PbiBarcodesFilter class provides a PbiFilter-compatible filter on
@@ -315,7 +317,8 @@ public:
     /// \param[in] barcodes barcode IDs to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiBarcodesFilter(std::pair<int16_t, int16_t> barcodes, Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodesFilter(std::pair<std::int16_t, std::int16_t> barcodes,
+                      Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a barcodes filter from forward & reverse IDs.
     ///
@@ -323,7 +326,8 @@ public:
     /// \param[in] bcReverse    reverse barcode ID to compare on
     /// \param[in] cmp          compare type
     ///
-    PbiBarcodesFilter(int16_t bcForward, int16_t bcReverse, Compare::Type cmp = Compare::EQUAL);
+    PbiBarcodesFilter(std::int16_t bcForward, std::int16_t bcReverse,
+                      Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Performs the actual index lookup.
     ///
@@ -384,7 +388,7 @@ public:
 /// \sa BamRecord::MapQuality
 ///
 class PbiMapQualityFilter
-    : public internal::MappedDataFilterBase<uint8_t, PbiFile::MappedField::MAP_QUALITY>
+    : public internal::MappedDataFilterBase<std::uint8_t, PbiFile::MappedField::MAP_QUALITY>
 {
 public:
     /// \brief Creates a map quality filter.
@@ -392,7 +396,7 @@ public:
     /// \param[in] mapQual  value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiMapQualityFilter(uint8_t mapQual, Compare::Type cmp = Compare::EQUAL);
+    PbiMapQualityFilter(std::uint8_t mapQual, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiMovieNameFilter class provides a PbiFilter-compatible filter
@@ -435,7 +439,7 @@ public:
 
 private:
     std::set<std::string> movieNames_;
-    mutable std::set<int32_t> candidateRgIds_;
+    mutable std::set<std::int32_t> candidateRgIds_;
     Compare::Type cmp_;
 };
 
@@ -552,7 +556,8 @@ private:
 ///
 /// \sa BamRecord::QueryEnd
 ///
-class PbiQueryEndFilter : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::Q_END>
+class PbiQueryEndFilter
+    : public internal::BasicDataFilterBase<std::int32_t, PbiFile::BasicField::Q_END>
 {
 public:
     /// \brief Creates a filter on query end position.
@@ -560,7 +565,7 @@ public:
     /// \param[in] position value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiQueryEndFilter(int32_t position, Compare::Type cmp = Compare::EQUAL);
+    PbiQueryEndFilter(std::int32_t position, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiQueryLengthFilter class provides a PbiFilter-compatible filter
@@ -572,7 +577,7 @@ public:
 ///
 /// \sa BamRecord::QueryEnd, BamRecord::QueryStart
 ///
-class PbiQueryLengthFilter : public internal::FilterBase<int32_t>
+class PbiQueryLengthFilter : public internal::FilterBase<std::int32_t>
 {
 public:
     /// \brief Creates a filter on query length
@@ -580,7 +585,7 @@ public:
     /// \param[in] length   value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiQueryLengthFilter(int32_t length, Compare::Type cmp = Compare::EQUAL);
+    PbiQueryLengthFilter(std::int32_t length, Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Performs the actual index lookup.
     ///
@@ -646,7 +651,7 @@ private:
 /// \sa BamRecord::QueryStart
 ///
 class PbiQueryStartFilter
-    : public internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::Q_START>
+    : public internal::BasicDataFilterBase<std::int32_t, PbiFile::BasicField::Q_START>
 {
 public:
     /// \brief Creates a filter on query start position.
@@ -654,7 +659,7 @@ public:
     /// \param[in] position value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiQueryStartFilter(int32_t position, Compare::Type cmp = Compare::EQUAL);
+    PbiQueryStartFilter(std::int32_t position, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiReadAccuracyFilter class provides a PbiFilter-compatible filter
@@ -695,7 +700,7 @@ public:
     ///
     /// \sa BamRecord::ReadGroupNumericId
     ///
-    PbiReadGroupFilter(int32_t rgId, Compare::Type cmp = Compare::EQUAL);
+    PbiReadGroupFilter(std::int32_t rgId, Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a filter on printable read group ID value
     ///
@@ -725,7 +730,8 @@ public:
     /// \param[in] rgIds    numeric read group IDs
     /// \param[in] cmp      compare type
     ///
-    PbiReadGroupFilter(const std::vector<int32_t>& rgIds, Compare::Type cmp = Compare::CONTAINS);
+    PbiReadGroupFilter(const std::vector<std::int32_t>& rgIds,
+                       Compare::Type cmp = Compare::CONTAINS);
 
     /// \brief Creates a whitelisted or blacklisted filter on read group string IDs.
     ///
@@ -762,7 +768,7 @@ public:
 private:
     void AddReadGroups(const std::vector<ReadGroupInfo>& readGroups);
 
-    std::unordered_map<int32_t, std::vector<ReadGroupInfo>> readGroups_;
+    std::unordered_map<std::int32_t, std::vector<ReadGroupInfo>> readGroups_;
     Compare::Type cmp_;
 };
 
@@ -774,7 +780,7 @@ private:
 /// \sa BamRecord::ReferenceEnd
 ///
 class PbiReferenceEndFilter
-    : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::T_END>
+    : public internal::MappedDataFilterBase<std::uint32_t, PbiFile::MappedField::T_END>
 {
 public:
     /// \brief Creates a filter on reference end.
@@ -782,7 +788,7 @@ public:
     /// \param[in] tEnd     value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiReferenceEndFilter(uint32_t tEnd, Compare::Type cmp = Compare::EQUAL);
+    PbiReferenceEndFilter(std::uint32_t tEnd, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiReferenceIdFilter class provides a PbiFilter-compatible
@@ -793,7 +799,7 @@ public:
 /// \sa BamRecord::ReferenceId
 ///
 class PbiReferenceIdFilter
-    : public internal::MappedDataFilterBase<int32_t, PbiFile::MappedField::T_ID>
+    : public internal::MappedDataFilterBase<std::int32_t, PbiFile::MappedField::T_ID>
 {
 public:
     /// \brief Creates a single-value reference ID filter.
@@ -801,7 +807,7 @@ public:
     /// \param[in] tId  reference ID to compare on
     /// \param[in] cmp  compare type
     ///
-    PbiReferenceIdFilter(int32_t tId, Compare::Type cmp = Compare::EQUAL);
+    PbiReferenceIdFilter(std::int32_t tId, Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a whitelisted or blacklisted reference ID filter.
     ///
@@ -813,7 +819,7 @@ public:
     /// \param[in] tIds reference IDs
     /// \param[in] cmp  compare type
     ///
-    PbiReferenceIdFilter(std::vector<int32_t> tIds, Compare::Type cmp = Compare::CONTAINS);
+    PbiReferenceIdFilter(std::vector<std::int32_t> tIds, Compare::Type cmp = Compare::CONTAINS);
 };
 
 /// \brief The PbiReferenceNameFilter class provides a PbiFilter-compatible
@@ -873,7 +879,7 @@ private:
 /// \sa BamRecord::ReferenceStart
 ///
 class PbiReferenceStartFilter
-    : public internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::T_START>
+    : public internal::MappedDataFilterBase<std::uint32_t, PbiFile::MappedField::T_START>
 {
 public:
     /// \brief Creates a filter on reference start.
@@ -881,7 +887,7 @@ public:
     /// \param[in] tStart   value to compare on
     /// \param[in] cmp      compare type
     ///
-    PbiReferenceStartFilter(uint32_t tStart, Compare::Type cmp = Compare::EQUAL);
+    PbiReferenceStartFilter(std::uint32_t tStart, Compare::Type cmp = Compare::EQUAL);
 };
 
 /// \brief The PbiZmwFilter class provides a PbiFilter-compatible filter on
@@ -899,7 +905,7 @@ public:
     /// \param[in] zmw  value to compare on
     /// \param[in] cmp  compare type
     ///
-    PbiZmwFilter(int32_t zmw, Compare::Type cmp = Compare::EQUAL);
+    PbiZmwFilter(std::int32_t zmw, Compare::Type cmp = Compare::EQUAL);
 
     /// \brief Creates a whitelisted or blacklisted ZMW hole number filter.
     ///
@@ -911,7 +917,7 @@ public:
     /// \param[in] zmws ZMW hole numbers
     /// \param[in] cmp  compare type
     ///
-    PbiZmwFilter(std::vector<int32_t> zmws, Compare::Type cmp = Compare::CONTAINS);
+    PbiZmwFilter(std::vector<std::int32_t> zmws, Compare::Type cmp = Compare::CONTAINS);
 
     /// \brief Performs the actual index lookup.
     ///
@@ -921,8 +927,8 @@ public:
 
 private:
     Compare::Type cmp_;
-    int32_t singleZmw_;
-    std::set<int32_t> zmwLookup_;
+    std::int32_t singleZmw_;
+    std::set<std::int32_t> zmwLookup_;
 };
 
 // ----------------------------------------------
@@ -941,7 +947,7 @@ enum class FilterHash
 class PbiZmwModuloFilter
 {
 public:
-    PbiZmwModuloFilter(uint32_t denominator, uint32_t value,
+    PbiZmwModuloFilter(std::uint32_t denominator, std::uint32_t value,
                        FilterHash hashtype = FilterHash::UNSIGNED_LONG_CAST,
                        Compare::Type = Compare::EQUAL);
 
@@ -952,8 +958,8 @@ public:
     bool Accepts(const PbiRawData& idx, std::size_t row) const;
 
 private:
-    uint32_t denominator_;
-    uint32_t value_;
+    std::uint32_t denominator_;
+    std::uint32_t value_;
     FilterHash hash_;
     Compare::Type cmp_;
 };

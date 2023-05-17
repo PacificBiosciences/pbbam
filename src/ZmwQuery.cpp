@@ -13,14 +13,14 @@ namespace BAM {
 class ZmwQuery::ZmwQueryPrivate
 {
 public:
-    ZmwQueryPrivate(std::vector<int32_t> zmwWhitelist, const DataSet& dataset)
+    ZmwQueryPrivate(std::vector<std::int32_t> zmwWhitelist, const DataSet& dataset)
         : reader_{PbiZmwFilter{std::move(zmwWhitelist)}, dataset}
     {}
 
     PbiFilterCompositeBamReader<Compare::Zmw> reader_;
 };
 
-ZmwQuery::ZmwQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset)
+ZmwQuery::ZmwQuery(std::vector<std::int32_t> zmwWhitelist, const DataSet& dataset)
     : internal::IQuery(), d_{std::make_unique<ZmwQueryPrivate>(zmwWhitelist, dataset)}
 {}
 

@@ -313,7 +313,7 @@ TEST(BAM_ReadGroupInfo, strandness_and_new_rg_ctors)
     const std::string movieName{"m64012_210628_093300"};
     const std::string readType{"CCS"};
     const PlatformModelType platform{PlatformModelType::SEQUELII};
-    const std::pair<uint16_t, uint16_t> barcodes{2,6};
+    const std::pair<std::uint16_t, std::uint16_t> barcodes{2,6};
     const PacBio::Data::Strand fwd{PacBio::Data::Strand::FORWARD};
     const PacBio::Data::Strand rev{PacBio::Data::Strand::REVERSE};
 

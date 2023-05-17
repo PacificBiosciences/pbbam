@@ -103,7 +103,7 @@ public:
     std::string Sequence() const;
 
     /// \returns BamRecord::StartFrame with this view's parameters applied
-    std::vector<uint32_t> StartFrames() const;
+    std::vector<std::uint32_t> StartFrames() const;
 
     /// \returns BamRecord::SubstitutionQV with this view's parameters applied
     Data::QualityValues SubstitutionQVs() const;

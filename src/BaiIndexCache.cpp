@@ -44,7 +44,8 @@ BaiIndexCacheData& BaiIndexCacheData::operator=(BaiIndexCacheData&&) noexcept = 
 
 BaiIndexCacheData::~BaiIndexCacheData() = default;
 
-hts_itr_t* BaiIndexCacheData::IteratorForInterval(const int32_t refId, const Data::Position start,
+hts_itr_t* BaiIndexCacheData::IteratorForInterval(const std::int32_t refId,
+                                                  const Data::Position start,
                                                   const Data::Position stop) const
 {
     return bam_itr_queryi(d_->htsIndex_.get(), refId, start, stop);

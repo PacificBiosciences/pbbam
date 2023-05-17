@@ -32,7 +32,7 @@ struct PbiFile
 
     /// \brief Helper typedef for storing multiple Section flags.
     ///
-    using Sections = uint16_t;
+    using Sections = std::uint16_t;
 
     /// \brief This enum describes the PBI file version.
     enum VersionEnum

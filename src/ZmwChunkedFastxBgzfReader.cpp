@@ -160,7 +160,7 @@ FastqSequence ZmwChunkedFastxBgzfReader::ReadNextFastq(bool skipName)
     return FastqSequence{std::move(name), std::move(bases), std::move(quals)};
 }
 
-void ZmwChunkedFastxBgzfReader::Seek(uint64_t pos)
+void ZmwChunkedFastxBgzfReader::Seek(std::uint64_t pos)
 {
     // seek to sequence 'id' & reset kseq handle
     const auto result = bgzf_useek(file_.get(), pos, SEEK_SET);

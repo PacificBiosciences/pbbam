@@ -29,12 +29,12 @@ namespace BAM {
 
 namespace {
 
-Data::Cigar FetchRawCigar(const uint32_t* const src, const uint32_t len)
+Data::Cigar FetchRawCigar(const std::uint32_t* const src, const std::uint32_t len)
 {
     Data::Cigar result;
     result.reserve(len);
-    for (uint32_t i = 0; i < len; ++i) {
-        const uint32_t length = bam_cigar_oplen(src[i]);
+    for (std::uint32_t i = 0; i < len; ++i) {
+        const std::uint32_t length = bam_cigar_oplen(src[i]);
         const auto type = static_cast<Data::CigarOperationType>(bam_cigar_op(src[i]));
         result.push_back({type, length});
     }
@@ -112,13 +112,13 @@ bool BamRecordImpl::AddTagImpl(const std::string& tagName, const Tag& value,
     }
 
     bam_aux_append(d_.get(), tagName.c_str(), BamTagCodec::TagTypeCode(value, additionalModifier),
-                   rawData.size(), const_cast<uint8_t*>(rawData.data()));
+                   rawData.size(), const_cast<std::uint8_t*>(rawData.data()));
     return true;
 }
 
 uint32_t BamRecordImpl::Bin() const { return d_->core.bin; }
 
-BamRecordImpl& BamRecordImpl::Bin(uint32_t bin)
+BamRecordImpl& BamRecordImpl::Bin(std::uint32_t bin)
 {
     d_->core.bin = bin;
     return *this;
@@ -185,7 +185,7 @@ int BamRecordImpl::EstimatedBytesUsed() const noexcept
     if (d_) {
         bam1_t* b = d_.get();
         result += sizeof(bam1_t);
-        result += b->m_data * sizeof(uint8_t);  // allocated data block
+        result += b->m_data * sizeof(std::uint8_t);  // allocated data block
     }
 
     // tag offsets cache
@@ -196,7 +196,7 @@ int BamRecordImpl::EstimatedBytesUsed() const noexcept
 
 uint32_t BamRecordImpl::Flag() const { return d_->core.flag; }
 
-BamRecordImpl& BamRecordImpl::Flag(uint32_t flag)
+BamRecordImpl& BamRecordImpl::Flag(std::uint32_t flag)
 {
     d_->core.flag = flag;
     return *this;
@@ -246,7 +246,7 @@ void BamRecordImpl::InitializeData()
 
 int32_t BamRecordImpl::InsertSize() const { return d_->core.isize; }
 
-BamRecordImpl& BamRecordImpl::InsertSize(int32_t iSize)
+BamRecordImpl& BamRecordImpl::InsertSize(std::int32_t iSize)
 {
     d_->core.isize = iSize;
     return *this;
@@ -296,7 +296,7 @@ bool BamRecordImpl::IsSupplementaryAlignment() const
 
 uint8_t BamRecordImpl::MapQuality() const { return d_->core.qual; }
 
-BamRecordImpl& BamRecordImpl::MapQuality(uint8_t mapQual)
+BamRecordImpl& BamRecordImpl::MapQuality(std::uint8_t mapQual)
 {
     d_->core.qual = mapQual;
     return *this;
@@ -312,7 +312,7 @@ BamRecordImpl& BamRecordImpl::MatePosition(Data::Position pos)
 
 int32_t BamRecordImpl::MateReferenceId() const { return d_->core.mtid; }
 
-BamRecordImpl& BamRecordImpl::MateReferenceId(int32_t id)
+BamRecordImpl& BamRecordImpl::MateReferenceId(std::int32_t id)
 {
     d_->core.mtid = id;
     return *this;
@@ -328,7 +328,7 @@ BamRecordImpl& BamRecordImpl::Position(Data::Position pos)
 
 int32_t BamRecordImpl::ReferenceId() const { return d_->core.tid; }
 
-BamRecordImpl& BamRecordImpl::ReferenceId(int32_t id)
+BamRecordImpl& BamRecordImpl::ReferenceId(std::int32_t id)
 {
     d_->core.tid = id;
     return *this;
@@ -352,10 +352,10 @@ void BamRecordImpl::MaybeReallocData()
     // from sam.h:
     //   decltype(m_data) = uint32_t
     //   decltype(l_data) = int
-    if (d_->m_data < static_cast<uint32_t>(d_->l_data)) {
+    if (d_->m_data < static_cast<std::uint32_t>(d_->l_data)) {
         d_->m_data = d_->l_data;
         kroundup32(d_->m_data);
-        d_->data = static_cast<uint8_t*>(realloc(d_->data, d_->m_data));
+        d_->data = static_cast<std::uint8_t*>(realloc(d_->data, d_->m_data));
     }
 }
 
@@ -375,13 +375,13 @@ BamRecordImpl& BamRecordImpl::Name(const std::string& name)
     MaybeReallocData();
 
     // shift trailing data (cigar, seq, qual, tags) as needed
-    const uint32_t* oldCigarStart = bam_get_cigar(d_);
+    const std::uint32_t* oldCigarStart = bam_get_cigar(d_);
     const std::size_t trailingDataLength =
         oldLengthData - (reinterpret_cast<const unsigned char*>(oldCigarStart) -
                          reinterpret_cast<const unsigned char*>(d_->data));
     d_->core.l_qname = totalNameSize;
     d_->core.l_extranul = numExtraNulls;
-    uint32_t* newCigarStart = bam_get_cigar(d_);
+    std::uint32_t* newCigarStart = bam_get_cigar(d_);
     memmove(newCigarStart, oldCigarStart, trailingDataLength);
 
     // fill in new name
@@ -396,7 +396,7 @@ Data::QualityValues BamRecordImpl::Qualities() const
         return Data::QualityValues();
     }
 
-    uint8_t* qualData = bam_get_qual(d_);
+    std::uint8_t* qualData = bam_get_qual(d_);
     if (qualData[0] == 0xff) {
         return Data::QualityValues();
     }
@@ -429,7 +429,7 @@ bool BamRecordImpl::RemoveTagImpl(const std::string& tagName)
     if (tagName.size() != 2) {
         return false;
     }
-    uint8_t* data = bam_aux_get(d_.get(), tagName.c_str());
+    std::uint8_t* data = bam_aux_get(d_.get(), tagName.c_str());
     if (data == nullptr) {
         return false;
     }
@@ -442,7 +442,7 @@ std::string BamRecordImpl::Sequence() const
     std::string result(d_->core.l_qseq, '\0');
     constexpr std::array<char, 16> DNA_LOOKUP{
         {'=', 'A', 'C', 'M', 'G', 'R', 'S', 'V', 'T', 'W', 'Y', 'H', 'K', 'D', 'B', 'N'}};
-    const uint8_t* seqData = bam_get_seq(d_);
+    const std::uint8_t* seqData = bam_get_seq(d_);
     for (int i = 0; i < d_->core.l_qseq; ++i) {
         result[i] = DNA_LOOKUP[bam_seqi(seqData, i)];
     }
@@ -457,20 +457,20 @@ void BamRecordImpl::SetCigarData(const Data::Cigar& cigar)
     // diffNumBytes: pos -> growing, neg -> shrinking
     const auto numCigarOps = Utility::Ssize(cigar);
     const auto diffNumCigars = numCigarOps - d_->core.n_cigar;
-    const auto diffNumBytes = diffNumCigars * static_cast<int>(sizeof(uint32_t));
+    const auto diffNumBytes = diffNumCigars * static_cast<int>(sizeof(std::uint32_t));
     const auto oldLengthData = d_->l_data;
     d_->l_data += diffNumBytes;
     MaybeReallocData();
 
     // shift trailing data (seq, qual, tags) as needed
-    const uint8_t* oldSequenceStart = bam_get_seq(d_);
+    const std::uint8_t* oldSequenceStart = bam_get_seq(d_);
     const std::size_t trailingDataLength = oldLengthData - (oldSequenceStart - d_->data);
     d_->core.n_cigar = numCigarOps;
-    uint8_t* newSequenceStart = bam_get_seq(d_);
+    std::uint8_t* newSequenceStart = bam_get_seq(d_);
     memmove(newSequenceStart, oldSequenceStart, trailingDataLength);
 
     // fill in new CIGAR data
-    uint32_t* cigarDataStart = bam_get_cigar(d_);
+    std::uint32_t* cigarDataStart = bam_get_cigar(d_);
     for (int i = 0; i < numCigarOps; ++i) {
         const Data::CigarOperation& cigarOp = cigar.at(i);
         cigarDataStart[i] = bam_cigar_gen(cigarOp.Length(), static_cast<int>(cigarOp.Type()));
@@ -627,11 +627,11 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     const std::size_t trailingDataLength =
         oldLengthData - (oldTagStart - reinterpret_cast<const unsigned char*>(d_->data));
     d_->core.l_qseq = sequenceLength;
-    uint8_t* newTagStart = bam_get_aux(d_);
+    std::uint8_t* newTagStart = bam_get_aux(d_);
     memmove(newTagStart, oldTagStart, trailingDataLength);
 
     // fill in new sequence
-    uint8_t* pEncodedSequence = bam_get_seq(d_);
+    std::uint8_t* pEncodedSequence = bam_get_seq(d_);
     if (isPreencoded) {
         memcpy(pEncodedSequence, sequence, encodedSequenceLength);
     } else {
@@ -643,7 +643,7 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
     }
 
     // fill in quality values
-    uint8_t* encodedQualities = bam_get_qual(d_);
+    std::uint8_t* encodedQualities = bam_get_qual(d_);
     if ((qualities == nullptr) || (strlen(qualities) == 0)) {
         memset(encodedQualities, 0xff, sequenceLength);
     } else {
@@ -676,7 +676,7 @@ std::optional<int> BamRecordImpl::TagLength(const std::string& tagName) const
     // fetch tag data section
     bam1_t* b = d_.get();
     assert(bam_get_aux(b));
-    uint8_t* tagData = bam_get_aux(b) + offset;
+    std::uint8_t* tagData = bam_get_aux(b) + offset;
     if (offset >= b->l_data) {
         return std::nullopt;
     }
@@ -695,8 +695,8 @@ std::optional<int> BamRecordImpl::TagLength(const std::string& tagName) const
         // array tag
         case 'B': {
             ++tagData;  // skip array's value type code
-            uint32_t numElements = 0;
-            memcpy(&numElements, &tagData[0], sizeof(uint32_t));
+            std::uint32_t numElements = 0;
+            memcpy(&numElements, &tagData[0], sizeof(std::uint32_t));
             return numElements;
         }
 
@@ -722,8 +722,8 @@ int BamRecordImpl::TagOffset(const std::string& tagName) const
         UpdateTagMap();
     }
 
-    const uint16_t tagCode =
-        (static_cast<uint8_t>(tagName.at(0)) << 8) | static_cast<uint8_t>(tagName.at(1));
+    const std::uint16_t tagCode =
+        (static_cast<std::uint8_t>(tagName.at(0)) << 8) | static_cast<std::uint8_t>(tagName.at(1));
     for (const auto& tag : tagOffsets_) {
         if (tag.Code == tagCode) {
             return tag.Offset;
@@ -735,12 +735,12 @@ int BamRecordImpl::TagOffset(const std::string& tagName) const
 BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
 {
     // convert tags to binary
-    const std::vector<uint8_t> tagData = BamTagCodec::Encode(tags);
+    const std::vector<std::uint8_t> tagData = BamTagCodec::Encode(tags);
     const int numBytes = Utility::Ssize(tagData);
-    const uint8_t* data = tagData.data();
+    const std::uint8_t* data = tagData.data();
 
     // determine change in memory needed
-    uint8_t* tagStart = bam_get_aux(d_);
+    std::uint8_t* tagStart = bam_get_aux(d_);
     const int oldNumBytes = d_->l_data - (tagStart - d_->data);
     const int diffNumBytes = numBytes - oldNumBytes;
     d_->l_data += diffNumBytes;
@@ -759,9 +759,9 @@ BamRecordImpl& BamRecordImpl::Tags(const TagCollection& tags)
 
 TagCollection BamRecordImpl::Tags() const
 {
-    const uint8_t* tagDataStart = bam_get_aux(d_);
+    const std::uint8_t* tagDataStart = bam_get_aux(d_);
     const std::size_t numBytes = d_->l_data - (tagDataStart - d_->data);
-    return BamTagCodec::Decode(std::vector<uint8_t>(tagDataStart, tagDataStart + numBytes));
+    return BamTagCodec::Decode(std::vector<std::uint8_t>(tagDataStart, tagDataStart + numBytes));
 }
 
 Tag BamRecordImpl::TagValue(const std::string& tagName) const
@@ -777,7 +777,7 @@ Tag BamRecordImpl::TagValue(const std::string& tagName) const
 
     bam1_t* b = d_.get();
     assert(bam_get_aux(b));
-    uint8_t* tagData = bam_get_aux(b) + offset;
+    std::uint8_t* tagData = bam_get_aux(b) + offset;
     if (offset >= b->l_data) {
         return {};
     }
@@ -795,7 +795,7 @@ void BamRecordImpl::UpdateTagMap() const
 {
     tagOffsets_.clear();
 
-    const uint8_t* tagStart = bam_get_aux(d_);
+    const std::uint8_t* tagStart = bam_get_aux(d_);
     if (tagStart == nullptr) {
         return;
     }
@@ -805,7 +805,7 @@ void BamRecordImpl::UpdateTagMap() const
     // a lot of string constructions & comparisons. All valid tags will be 2 chars
     // anyway, so this should be a nice lookup mechanism.
     //
-    uint16_t tagNameCode;
+    std::uint16_t tagNameCode;
     int i = 0;
     while (i < numBytes) {
 
@@ -868,8 +868,8 @@ void BamRecordImpl::UpdateTagMap() const
                             std::string{1, subTagType}};
                 }
 
-                uint32_t numElements = 0;
-                memcpy(&numElements, &tagStart[i], sizeof(uint32_t));
+                std::uint32_t numElements = 0;
+                memcpy(&numElements, &tagStart[i], sizeof(std::uint32_t));
                 i += (4 + (elementSize * numElements));
                 break;
             }

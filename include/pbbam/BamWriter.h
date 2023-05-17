@@ -191,7 +191,7 @@ public:
     ///
     /// \throws std::runtime_error on failure to write
     ///
-    void Write(const BamRecord& record, int64_t* vOffset);
+    void Write(const BamRecord& record, std::int64_t* vOffset);
 
     /// \brief Write a record to the output %BAM file.
     ///

@@ -16,7 +16,7 @@
 using namespace PacBio;
 using namespace PacBio::BAM;
 
-using f_data = std::vector<uint16_t>;
+using f_data = std::vector<std::uint16_t>;
 
 namespace BamRecordMappingTests {
 
@@ -61,7 +61,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar)
     const std::string tagBases = "AACCGTTAGC";
     const std::string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
-    const uint8_t mapQual = 80;
+    const std::uint8_t mapQual = 80;
 
     const std::string seq_rev   = "GCTAACGGTT";
     const std::string quals_rev = "*?]?]?]?]?";
@@ -339,7 +339,7 @@ TEST(BAM_BamRecordMapping, correctly_maps_records_using_cigar_with_soft_clips)
     const std::string tagBases = "TTAACCGTTAGCAAA";
     const std::string tagQuals = "--?]?]?]?]?*+++";
     const f_data frames   = { 40, 40, 10, 10, 20, 20, 30, 40, 40, 10, 30, 20, 10, 10, 10 };
-    const uint8_t mapQual = 80;
+    const std::uint8_t mapQual = 80;
 
     const std::string seq_rev   = "TTTGCTAACGGTTAA";
     const std::string quals_rev = "+++*?]?]?]?]?--";
@@ -618,7 +618,7 @@ TEST(BAM_BamRecordMapping, can_created_mapped_copy_of_record)
     const std::string tagBases = "AACCGTTAGC";
     const std::string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
-    const uint8_t mapQual = 80;
+    const std::uint8_t mapQual = 80;
     const std::string cigar    = "4=1D2I2D4=";
 
     const BamRecord orig = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);
@@ -663,7 +663,7 @@ TEST(BAM_BamRecordMapping, can_created_mapped_copy_of_record_static)
     const std::string tagBases = "AACCGTTAGC";
     const std::string tagQuals = "?]?]?]?]?*";
     const f_data frames   = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
-    const uint8_t mapQual = 80;
+    const std::uint8_t mapQual = 80;
     const std::string cigar    = "4=1D2I2D4=";
 
     const BamRecord orig = BamRecordMappingTests::MakeRecord(qStart, qEnd, seq, quals, tagBases, tagQuals, frames);

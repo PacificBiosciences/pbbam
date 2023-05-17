@@ -78,7 +78,7 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or
     ///         PBI files.
     ///
-    ZmwGroupQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset);
+    ZmwGroupQuery(std::vector<std::int32_t> zmwWhitelist, const DataSet& dataset);
 
     ZmwGroupQuery(ZmwGroupQuery&&) noexcept;
     ZmwGroupQuery& operator=(ZmwGroupQuery&&) noexcept;

@@ -297,7 +297,7 @@ PlatformModelType PlatformModelFromName(const std::string& name)
 
 }  // namespace
 
-ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes)
+ReadGroupInfo::ReadGroupInfo(std::string baseId, std::pair<std::uint16_t, std::uint16_t> barcodes)
 {
     std::ostringstream id;
     id << baseId << '/' << std::to_string(barcodes.first) << "--"
@@ -317,7 +317,7 @@ ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType)
 {}
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
-                             std::pair<uint16_t, uint16_t> barcodes)
+                             std::pair<std::uint16_t, std::uint16_t> barcodes)
     : ReadGroupInfo{ReadGroupInfoConfig{std::move(movieName), std::move(readType),
                                         PlatformModelType::SEQUEL, std::move(barcodes)}}
 {}
@@ -328,7 +328,8 @@ ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
 {}
 
 ReadGroupInfo::ReadGroupInfo(std::string movieName, std::string readType,
-                             PlatformModelType platform, std::pair<uint16_t, uint16_t> barcodes)
+                             PlatformModelType platform,
+                             std::pair<std::uint16_t, std::uint16_t> barcodes)
     : ReadGroupInfo{ReadGroupInfoConfig{std::move(movieName), std::move(readType), platform,
                                         std::move(barcodes)}}
 {}
@@ -428,7 +429,7 @@ BarcodeQualityType ReadGroupInfo::BarcodeQuality() const
     return barcodeQuality_;
 }
 
-std::optional<uint16_t> ReadGroupInfo::BarcodeForward() const
+std::optional<std::uint16_t> ReadGroupInfo::BarcodeForward() const
 {
     const auto barcodes = Barcodes();
     if (barcodes) {
@@ -437,7 +438,7 @@ std::optional<uint16_t> ReadGroupInfo::BarcodeForward() const
     return {};
 }
 
-std::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
+std::optional<std::uint16_t> ReadGroupInfo::BarcodeReverse() const
 {
     const auto barcodes = Barcodes();
     if (barcodes) {
@@ -446,7 +447,10 @@ std::optional<uint16_t> ReadGroupInfo::BarcodeReverse() const
     return {};
 }
 
-std::optional<std::pair<uint16_t, uint16_t>> ReadGroupInfo::Barcodes() const { return barcodes_; }
+std::optional<std::pair<std::uint16_t, std::uint16_t>> ReadGroupInfo::Barcodes() const
+{
+    return barcodes_;
+}
 
 std::string ReadGroupInfo::BarcodeSequence() const
 {
@@ -859,8 +863,9 @@ ReadGroupInfo& ReadGroupInfo::Id(std::string id)
 
         // catch here so we can give more informative message
         try {
-            barcodes_ = std::pair<uint16_t, uint16_t>(static_cast<uint16_t>(std::stoul(tokens[0])),
-                                                      static_cast<uint16_t>(std::stoul(tokens[2])));
+            barcodes_ = std::pair<std::uint16_t, std::uint16_t>(
+                static_cast<std::uint16_t>(std::stoul(tokens[0])),
+                static_cast<std::uint16_t>(std::stoul(tokens[2])));
         } catch (std::exception& e) {
             throw std::runtime_error{
                 "[pbbam] read group ERROR: could not fetch barcodes from malformed read group "
@@ -877,11 +882,11 @@ ReadGroupInfo& ReadGroupInfo::Id(std::string id)
 int32_t ReadGroupInfo::IdToInt(const std::string& rgId)
 {
     const auto id = GetBaseId(rgId);
-    const uint32_t rawid = std::stoul(id, nullptr, 16);
-    return static_cast<int32_t>(rawid);
+    const std::uint32_t rawid = std::stoul(id, nullptr, 16);
+    return static_cast<std::int32_t>(rawid);
 }
 
-std::string ReadGroupInfo::IntToId(const int32_t id)
+std::string ReadGroupInfo::IntToId(const std::int32_t id)
 {
     std::ostringstream s;
     s << std::setfill('0') << std::setw(8) << std::hex << id;
@@ -1215,7 +1220,7 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 }
 
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
-                            const std::pair<int16_t, int16_t>& barcodes,
+                            const std::pair<std::int16_t, std::int16_t>& barcodes,
                             const std::optional<Data::Strand> strand)
 {
     const std::string barcodeString{std::to_string(barcodes.first) + "--" +
@@ -1227,8 +1232,8 @@ std::string MakeReadGroupId(const ReadGroupInfo& readGroup)
 {
     const auto barcodes = readGroup.Barcodes();
     if (barcodes) {
-        const int16_t bcFor = barcodes->first;
-        const int16_t bcRev = barcodes->second;
+        const std::int16_t bcFor = barcodes->first;
+        const std::int16_t bcRev = barcodes->second;
         return MakeReadGroupId(readGroup.MovieName(), readGroup.ReadType(),
                                std::make_pair(bcFor, bcRev), readGroup.Strand());
     } else {
@@ -1250,7 +1255,7 @@ std::string MakeLegacyReadGroupId(const std::string& movieName, const std::strin
 }
 
 std::string MakeLegacyReadGroupId(const std::string& movieName, const std::string& readType,
-                                  const std::pair<int16_t, int16_t>& barcodes)
+                                  const std::pair<std::int16_t, std::int16_t>& barcodes)
 {
     const std::string barcodeString{std::to_string(barcodes.first) + "--" +
                                     std::to_string(barcodes.second)};
@@ -1261,8 +1266,8 @@ std::string MakeLegacyReadGroupId(const ReadGroupInfo& readGroup)
 {
     const auto barcodes = readGroup.Barcodes();
     if (barcodes) {
-        const int16_t bcFor = barcodes->first;
-        const int16_t bcRev = barcodes->second;
+        const std::int16_t bcFor = barcodes->first;
+        const std::int16_t bcRev = barcodes->second;
         return MakeLegacyReadGroupId(readGroup.MovieName(), readGroup.ReadType(),
                                      std::make_pair(bcFor, bcRev));
     } else {

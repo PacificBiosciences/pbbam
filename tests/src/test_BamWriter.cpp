@@ -49,14 +49,14 @@ void checkSingleRecord(bool useTempFile)
     bamRecord.Impl().SetMapped(false);
 
     TagCollection tags;
-    tags["zm"] = int32_t{100};
-    tags["qs"] = int32_t{0};
-    tags["qe"] = int32_t{5};
-    tags["np"] = int32_t{1};
+    tags["zm"] = std::int32_t{100};
+    tags["qs"] = std::int32_t{0};
+    tags["qe"] = std::int32_t{5};
+    tags["np"] = std::int32_t{1};
     tags["rq"] = static_cast<float>(0.6);
     tags["RG"] = rgId;
     tags["sn"] = expectedSnr;
-    tags["fi"] = std::vector<uint16_t>{};
+    tags["fi"] = std::vector<std::uint16_t>{};
     bamRecord.Impl().Tags(tags);
 
     // write record to file

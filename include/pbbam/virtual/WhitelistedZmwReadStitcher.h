@@ -52,7 +52,7 @@ public:
     /// \throws std::runtime_error if any files (*.bam and/or *.pbi) were not available for reading, or
     ///         if malformed data encountered
     ///
-    WhitelistedZmwReadStitcher(const std::vector<int32_t>& zmwWhitelist,
+    WhitelistedZmwReadStitcher(const std::vector<std::int32_t>& zmwWhitelist,
                                const std::string& primaryBamFilePath,
                                const std::string& scrapsBamFilePath);
 

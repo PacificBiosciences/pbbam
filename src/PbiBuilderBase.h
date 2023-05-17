@@ -123,8 +123,8 @@ void WriteBgzfVector(BGZF* fp, std::vector<T>& data)
 
 struct PbiFieldBlock
 {
-    int64_t pos_;    // file position of block start
-    std::size_t n_;  // number of entries in block
+    std::int64_t pos_;  // file position of block start
+    std::size_t n_;     // number of entries in block
 };
 
 template <typename T>
@@ -150,18 +150,18 @@ public:
 class PbiReferenceDataBuilder
 {
 public:
-    using ReferenceRows = std::pair<int32_t, int32_t>;  // [startRow, endRow)
+    using ReferenceRows = std::pair<std::int32_t, std::int32_t>;  // [startRow, endRow)
 
     explicit PbiReferenceDataBuilder(std::size_t numReferenceSequences);
 
-    bool AddRecord(const BamRecord& record, int32_t rowNumber);
+    bool AddRecord(const BamRecord& record, std::int32_t rowNumber);
     PbiRawReferenceData Result() const;
     void WriteData(BGZF* bgzf);
 
 private:
-    int32_t lastRefId_ = -1;
+    std::int32_t lastRefId_ = -1;
     Data::Position lastPos_ = -1;
-    std::map<uint32_t, PbiReferenceEntry> rawReferenceEntries_;
+    std::map<std::uint32_t, PbiReferenceEntry> rawReferenceEntries_;
 };
 
 struct PbiBuilderBase
@@ -173,10 +173,10 @@ struct PbiBuilderBase
     virtual ~PbiBuilderBase() noexcept;
 
     void AddBarcodeData(const BamRecord& b);
-    void AddBasicData(const BamRecord& b, int64_t uOffset);
+    void AddBasicData(const BamRecord& b, std::int64_t uOffset);
     void AddMappedData(const BamRecord& b);
-    void AddRecord(const BamRecord& b, int64_t uOffset);
-    void AddReferenceData(const BamRecord& b, uint32_t currentRow);
+    void AddRecord(const BamRecord& b, std::int64_t uOffset);
+    void AddReferenceData(const BamRecord& b, std::uint32_t currentRow);
     void Close();
     void FlushBuffers(FlushMode mode);
     void OpenPbiFile();
@@ -257,33 +257,33 @@ struct PbiBuilderBase
     std::size_t numThreads_;
 
     // PBI field buffers
-    PbiField<int32_t> rgIdField_;
-    PbiField<int32_t> qStartField_;
-    PbiField<int32_t> qEndField_;
-    PbiField<int32_t> holeNumField_;
+    PbiField<std::int32_t> rgIdField_;
+    PbiField<std::int32_t> qStartField_;
+    PbiField<std::int32_t> qEndField_;
+    PbiField<std::int32_t> holeNumField_;
     PbiField<float> readQualField_;
-    PbiField<uint8_t> ctxtField_;
-    PbiField<uint64_t> fileOffsetField_;
-    PbiField<int32_t> tIdField_;
-    PbiField<uint32_t> tStartField_;
-    PbiField<uint32_t> tEndField_;
-    PbiField<uint32_t> aStartField_;
-    PbiField<uint32_t> aEndField_;
-    PbiField<uint8_t> revStrandField_;
-    PbiField<uint32_t> nMField_;
-    PbiField<uint32_t> nMMField_;
-    PbiField<uint8_t> mapQualField_;
-    PbiField<uint32_t> nInsOpsField_;
-    PbiField<uint32_t> nDelOpsField_;
-    PbiField<int16_t> bcForwardField_;
-    PbiField<int16_t> bcReverseField_;
-    PbiField<int8_t> bcQualField_;
+    PbiField<std::uint8_t> ctxtField_;
+    PbiField<std::uint64_t> fileOffsetField_;
+    PbiField<std::int32_t> tIdField_;
+    PbiField<std::uint32_t> tStartField_;
+    PbiField<std::uint32_t> tEndField_;
+    PbiField<std::uint32_t> aStartField_;
+    PbiField<std::uint32_t> aEndField_;
+    PbiField<std::uint8_t> revStrandField_;
+    PbiField<std::uint32_t> nMField_;
+    PbiField<std::uint32_t> nMMField_;
+    PbiField<std::uint8_t> mapQualField_;
+    PbiField<std::uint32_t> nInsOpsField_;
+    PbiField<std::uint32_t> nDelOpsField_;
+    PbiField<std::int16_t> bcForwardField_;
+    PbiField<std::int16_t> bcReverseField_;
+    PbiField<std::int8_t> bcQualField_;
 
     // reference data
     std::unique_ptr<PbiReferenceDataBuilder> refDataBuilder_;
 
     // tracking data
-    uint32_t currentRow_ = 0;
+    std::uint32_t currentRow_ = 0;
     bool isClosed_ = false;
     bool hasBarcodeData_ = false;
     bool hasMappedData_ = false;

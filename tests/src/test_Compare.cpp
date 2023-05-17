@@ -32,7 +32,7 @@ BamRecord makeRecord(const Data::Position qStart,
                      const std::string& quals,
                      const std::string& tagBases,
                      const std::string& tagQuals,
-                     const std::vector<uint16_t>& frames)
+                     const std::vector<std::uint16_t>& frames)
 {
     BamRecordImpl impl;
     impl.SetSequenceAndQualities(seq, quals);
@@ -64,8 +64,8 @@ std::vector<BamRecord> makeMappedRecords()
     const std::string quals    = "?]?]?]?]?*";
     const std::string tagBases = "AACCGTTAGC";
     const std::string tagQuals = "?]?]?]?]?*";
-    const std::vector<uint16_t> frames  = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
-    const uint8_t mapQual = 80;
+    const std::vector<std::uint16_t> frames  = { 10, 10, 20, 20, 30, 40, 40, 10, 30, 20 };
+    const std::uint8_t mapQual = 80;
 
     const std::string s1_cigar = "10=";
     const std::string s2_cigar = "5=3D5=";
@@ -218,10 +218,10 @@ TEST(BAM_Compare, can_compare_bam_record_aligned_strand)
 
 TEST(BAM_Compare, can_compare_bam_record_barcode_forward)
 {
-    BamRecord r1; r1.Barcodes(std::make_pair<int16_t,int16_t>(30,20));
-    BamRecord r2; r2.Barcodes(std::make_pair<int16_t,int16_t>(20,30));
-    BamRecord r3; r3.Barcodes(std::make_pair<int16_t,int16_t>(40,10));
-    BamRecord r4; r4.Barcodes(std::make_pair<int16_t,int16_t>(10,40));
+    BamRecord r1; r1.Barcodes(std::make_pair<std::int16_t,int16_t>(30,20));
+    BamRecord r2; r2.Barcodes(std::make_pair<std::int16_t,int16_t>(20,30));
+    BamRecord r3; r3.Barcodes(std::make_pair<std::int16_t,int16_t>(40,10));
+    BamRecord r4; r4.Barcodes(std::make_pair<std::int16_t,int16_t>(10,40));
 
     auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::BarcodeForward());
@@ -234,10 +234,10 @@ TEST(BAM_Compare, can_compare_bam_record_barcode_forward)
 
 TEST(BAM_Compare, can_compare_bam_record_barcode_reverse)
 {
-    BamRecord r1; r1.Barcodes(std::make_pair<int16_t,int16_t>(30,20));
-    BamRecord r2; r2.Barcodes(std::make_pair<int16_t,int16_t>(20,30));
-    BamRecord r3; r3.Barcodes(std::make_pair<int16_t,int16_t>(40,10));
-    BamRecord r4; r4.Barcodes(std::make_pair<int16_t,int16_t>(10,40));
+    BamRecord r1; r1.Barcodes(std::make_pair<std::int16_t,int16_t>(30,20));
+    BamRecord r2; r2.Barcodes(std::make_pair<std::int16_t,int16_t>(20,30));
+    BamRecord r3; r3.Barcodes(std::make_pair<std::int16_t,int16_t>(40,10));
+    BamRecord r4; r4.Barcodes(std::make_pair<std::int16_t,int16_t>(10,40));
 
     auto records = std::vector<BamRecord>{ r1, r2, r3, r4 };
     std::sort(records.begin(), records.end(), Compare::BarcodeReverse());
@@ -250,10 +250,10 @@ TEST(BAM_Compare, can_compare_bam_record_barcode_reverse)
 
 TEST(BAM_Compare, can_compare_bam_record_barcode_quality)
 {
-    uint8_t q1 = 30;
-    uint8_t q2 = 20;
-    uint8_t q3 = 40;
-    uint8_t q4 = 10;
+    std::uint8_t q1 = 30;
+    std::uint8_t q2 = 20;
+    std::uint8_t q3 = 40;
+    std::uint8_t q4 = 10;
 
     auto records = std::vector<BamRecord>
     {
@@ -691,10 +691,10 @@ TEST(BAM_Compare, can_compare_bam_record_reference_start)
 
 TEST(BAM_Compare, can_compare_bam_record_zmw)
 {
-    int32_t z1 = 30;
-    int32_t z2 = 20;
-    int32_t z3 = 40;
-    int32_t z4 = 10;
+    std::int32_t z1 = 30;
+    std::int32_t z2 = 20;
+    std::int32_t z3 = 40;
+    std::int32_t z4 = 10;
 
     auto records = std::vector<BamRecord>
     {

@@ -99,7 +99,7 @@ struct ReadGroupInfoConfig
     std::string MovieName;
     std::string ReadType;
     std::optional<PlatformModelType> Platform{};
-    std::optional<std::pair<uint16_t, uint16_t>> Barcodes{};
+    std::optional<std::pair<std::uint16_t, std::uint16_t>> Barcodes{};
     std::optional<Data::Strand> Strand{};
 };
 
@@ -145,14 +145,14 @@ public:
     /// \param[in] rgId     read group ID string
     /// \returns numeric value of ID
     ///
-    static int32_t IdToInt(const std::string& rgId);
+    static std::int32_t IdToInt(const std::string& rgId);
 
     /// \brief Converts a read group ID number to its string representation.
     ///
     /// \param[in] id     read group ID number
     /// \returns hexadecimal string representation of ID
     ///
-    static std::string IntToId(int32_t id);
+    static std::string IntToId(std::int32_t id);
 
     /// \returns sequencing chemistry from (bindingKig, sequencingKit,
     ///          basecallerVersion)
@@ -203,7 +203,7 @@ public:
     /// \param[in] baseId       string representation of numeric read group ID
     /// \param[in] barcodes     barcode pair for this read group
     ///
-    ReadGroupInfo(std::string baseId, std::pair<uint16_t, uint16_t> barcodes);
+    ReadGroupInfo(std::string baseId, std::pair<std::uint16_t, std::uint16_t> barcodes);
 
     /// \brief Creates a read group info object from a movie name & read type.
     ///
@@ -214,7 +214,7 @@ public:
     /// \sa RecordType
     ///
     ReadGroupInfo(std::string movieName, std::string readType,
-                  std::pair<uint16_t, uint16_t> barcodes);
+                  std::pair<std::uint16_t, std::uint16_t> barcodes);
 
     /// \brief Creates a read group info object from a movie name, read type,
     ///        and platform model.
@@ -227,7 +227,7 @@ public:
     /// \sa RecordType
     ///
     ReadGroupInfo(std::string movieName, std::string readType, PlatformModelType platform,
-                  std::pair<uint16_t, uint16_t> barcodes);
+                  std::pair<std::uint16_t, std::uint16_t> barcodes);
 
     /// \brief Creates a read group info object from a ReadGroupInfoConfig
     ///
@@ -318,19 +318,19 @@ public:
     ///
     /// \note This does **NOT** refer to any data in the description (DS) tag.
     ///
-    std::optional<std::pair<uint16_t, uint16_t>> Barcodes() const;
+    std::optional<std::pair<std::uint16_t, std::uint16_t>> Barcodes() const;
 
     /// \returns forward barcode label stored in the read group ID (\@RG:ID)
     ///
     /// \note This does **NOT** refer to any data in the description (DS) tag.
     ///
-    std::optional<uint16_t> BarcodeForward() const;
+    std::optional<std::uint16_t> BarcodeForward() const;
 
     /// \returns reverse barcode label stored in the read group ID (\@RG:ID)
     ///
     /// \note This does **NOT** refer to any data in the description (DS) tag.
     ///
-    std::optional<uint16_t> BarcodeReverse() const;
+    std::optional<std::uint16_t> BarcodeReverse() const;
 
     //// \returns string value of \@RG:BC
     std::string BarcodeSequence() const;
@@ -822,7 +822,7 @@ private:
     std::optional<Data::Strand> strand_;
 
     // (optional) barcode label handling
-    std::optional<std::pair<uint16_t, uint16_t>> barcodes_;
+    std::optional<std::pair<std::uint16_t, std::uint16_t>> barcodes_;
     std::string baseId_;
 
     Data::FrameEncoder ipdEncoder_ = Data::V1FrameEncoder{};
@@ -873,7 +873,7 @@ std::string MakeReadGroupId(const std::string& movieName, const std::string& rea
 ///          label "/x--y", e.g. "4c1bc9e4/0--1"
 ///
 std::string MakeReadGroupId(const std::string& movieName, const std::string& readType,
-                            const std::pair<int16_t, int16_t>& barcodes,
+                            const std::pair<std::int16_t, std::int16_t>& barcodes,
                             std::optional<Data::Strand> strand = {});
 
 /// \brief Creates a read group ID from a read group object
@@ -933,7 +933,7 @@ std::string MakeLegacyReadGroupId(const std::string& movieName, const std::strin
 ///          (e.g. "4c1bc9e4/0--1")
 ///
 std::string MakeLegacyReadGroupId(const std::string& movieName, const std::string& readType,
-                                  const std::pair<int16_t, int16_t>& barcodes);
+                                  const std::pair<std::int16_t, std::int16_t>& barcodes);
 
 /// \brief Creates a \b LEGACY read group ID from a read group object
 ///

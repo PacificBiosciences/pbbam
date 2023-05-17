@@ -24,7 +24,7 @@ class WhitelistedQuery : public internal::IGroupQuery
     using ReaderType = PbiFilterCompositeBamReader<Compare::Zmw>;
 
 public:
-    WhitelistedQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset)
+    WhitelistedQuery(std::vector<std::int32_t> zmwWhitelist, const DataSet& dataset)
         : reader_{std::make_unique<ReaderType>(PbiZmwFilter{std::move(zmwWhitelist)}, dataset)}
     {
         if (!reader_->GetNext(currentRecord_)) {
@@ -74,7 +74,7 @@ class WhitelistedAlignmentQuery : public internal::IGroupQuery
     using ReaderType = PbiFilterCompositeBamReader<Compare::Zmw>;
 
 public:
-    WhitelistedAlignmentQuery(const std::vector<int32_t>& zmwWhitelist, const DataSet& dataset)
+    WhitelistedAlignmentQuery(const std::vector<std::int32_t>& zmwWhitelist, const DataSet& dataset)
         : whitelist_(zmwWhitelist.cbegin(), zmwWhitelist.cend())
     {
         std::sort(whitelist_.begin(), whitelist_.end());
@@ -114,11 +114,11 @@ public:
     }
 
 private:
-    std::deque<int32_t> whitelist_;
+    std::deque<std::int32_t> whitelist_;
     std::unique_ptr<ReaderType> reader_;
 };
 
-std::unique_ptr<internal::IGroupQuery> MakeWhitelistedQuery(std::vector<int32_t> zmwWhitelist,
+std::unique_ptr<internal::IGroupQuery> MakeWhitelistedQuery(std::vector<std::int32_t> zmwWhitelist,
                                                             const DataSet& dataset)
 {
     const auto mergedHeader = dataset.MergedHeader();
@@ -281,7 +281,7 @@ ZmwGroupQuery::ZmwGroupQuery(const DataSet& dataset, const PbiFilter& filter)
     : internal::IGroupQuery(), d_{std::make_unique<SequentialZmwGroupQuery>(dataset, filter)}
 {}
 
-ZmwGroupQuery::ZmwGroupQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset)
+ZmwGroupQuery::ZmwGroupQuery(std::vector<std::int32_t> zmwWhitelist, const DataSet& dataset)
     : internal::IGroupQuery(), d_{MakeWhitelistedQuery(std::move(zmwWhitelist), dataset)}
 {}
 

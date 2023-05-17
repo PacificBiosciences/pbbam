@@ -120,7 +120,7 @@ public:
     std::shared_ptr<PbiRawData> index_;
     IndexResultBlocks blocks_;
     std::size_t currentBlockReadCount_;
-    uint32_t numMatchingReads_;
+    std::uint32_t numMatchingReads_;
 };
 
 PbiIndexedBamReader::PbiIndexedBamReader(PbiFilter filter, const std::string& filename)

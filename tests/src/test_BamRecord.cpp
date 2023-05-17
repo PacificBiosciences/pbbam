@@ -33,8 +33,8 @@ BamRecordImpl CreateBamImpl()
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Bin(42);
@@ -57,11 +57,11 @@ static
 void CheckRawData(const BamRecordImpl& bam)
 {
     // ensure raw data (lengths at least) matches API-facing data
-    const uint32_t expectedNameBytes = bam.Name().size() + 1;  // include NULL term
-    const uint32_t expectedNameNulls = 4 - (expectedNameBytes % 4);
-    const uint32_t expectedNameLength = expectedNameBytes + expectedNameNulls;
-    const uint32_t expectedNumCigarOps = bam.CigarData().size();
-    const int32_t expectedSeqLength = bam.Sequence().length();
+    const std::uint32_t expectedNameBytes = bam.Name().size() + 1;  // include NULL term
+    const std::uint32_t expectedNameNulls = 4 - (expectedNameBytes % 4);
+    const std::uint32_t expectedNameLength = expectedNameBytes + expectedNameNulls;
+    const std::uint32_t expectedNumCigarOps = bam.CigarData().size();
+    const std::int32_t expectedSeqLength = bam.Sequence().length();
     const std::size_t expectedTagsLength = BamTagCodec::Encode(bam.Tags()).size();
 
     //  Name        CIGAR         Sequence       Quals      Tags
@@ -120,7 +120,7 @@ BamRecord MakeCigaredBaseRecord(const std::string& bases,
 }
 
 static
-BamRecord MakeCigaredFrameRecord(const std::vector<uint16_t>& frames,
+BamRecord MakeCigaredFrameRecord(const std::vector<std::uint16_t>& frames,
                                  const std::string& cigar,
                                  const Data::Strand strand)
 {
@@ -188,7 +188,7 @@ BamRecord MakeCigaredPulseQualRecord(const std::string& seqBases,
 static
 BamRecord MakeCigaredPulseFrameRecord(const std::string& seqBases,
                                      const std::string& pulseCalls,
-                                     const std::vector<uint16_t>& pulseFrames,
+                                     const std::vector<std::uint16_t>& pulseFrames,
                                      const std::string& cigar,
                                      const Data::Strand strand)
 {
@@ -205,7 +205,7 @@ BamRecord MakeCigaredPulseFrameRecord(const std::string& seqBases,
 static
 BamRecord MakeCigaredPulseUIntRecord(const std::string& seqBases,
                                      const std::string& pulseCalls,
-                                     const std::vector<uint32_t>& pulseUInts,
+                                     const std::vector<std::uint32_t>& pulseUInts,
                                      const std::string& cigar,
                                      const Data::Strand strand)
 {
@@ -351,12 +351,12 @@ void CheckBaseTagsClippedAndAligned(const std::string& cigar,
 
 static
 void CheckFrameTagsClippedAndAligned(const std::string& cigar,
-                                     const std::vector<uint16_t>& input,
-                                     const ExpectedResult<std::vector<uint16_t> >& e)
+                                     const std::vector<std::uint16_t>& input,
+                                     const ExpectedResult<std::vector<std::uint16_t> >& e)
 {
 
     // aligned record + IPD, PulseWidth
-    auto makeRecord = [](const std::vector<uint16_t>& newFrames,
+    auto makeRecord = [](const std::vector<std::uint16_t>& newFrames,
                          const std::string& newCigar,
                          const Data::Strand newStrand)
     { return BamRecordTests::MakeCigaredFrameRecord(newFrames, newCigar, newStrand); };
@@ -515,14 +515,14 @@ static
 void CheckPulseFrameTags(const std::string& cigar,
                          const std::string& seqBases,
                          const std::string& pulseCalls,
-                         const std::vector<uint16_t>& pulseFrames,
-                         const ExpectedResult<std::vector<uint16_t>>& allPulses,
-                         const ExpectedResult<std::vector<uint16_t>>& basecallsOnly)
+                         const std::vector<std::uint16_t>& pulseFrames,
+                         const ExpectedResult<std::vector<std::uint16_t>>& allPulses,
+                         const ExpectedResult<std::vector<std::uint16_t>>& basecallsOnly)
 {
     // aligned record + PrePulseFrames
     auto makeRecord = [](const std::string& newSeqBases,
                          const std::string& newPulseCalls,
-                         const std::vector<uint16_t>& newPulseFrames,
+                         const std::vector<std::uint16_t>& newPulseFrames,
                          const std::string& newCigar,
                          const Data::Strand newStrand)
     { return MakeCigaredPulseFrameRecord(newSeqBases, newPulseCalls, newPulseFrames, newCigar, newStrand); };
@@ -604,14 +604,14 @@ static
 void CheckPulseUIntTags(const std::string& cigar,
                         const std::string& seqBases,
                         const std::string& pulseCalls,
-                        const std::vector<uint32_t>& startFrames,
-                        const ExpectedResult<std::vector<uint32_t>>& allPulses,
-                        const ExpectedResult<std::vector<uint32_t>>& basecallsOnly)
+                        const std::vector<std::uint32_t>& startFrames,
+                        const ExpectedResult<std::vector<std::uint32_t>>& allPulses,
+                        const ExpectedResult<std::vector<std::uint32_t>>& basecallsOnly)
 {
    // aligned record + StartFrame
    auto makeRecord = [](const std::string& newSeqBases,
                         const std::string& newPulseCalls,
-                        const std::vector<uint32_t>& newStartFrames,
+                        const std::vector<std::uint32_t>& newStartFrames,
                         const std::string& newCigar,
                         const Data::Strand newStrand)
    { return MakeCigaredPulseUIntRecord(newSeqBases, newPulseCalls, newStartFrames, newCigar, newStrand); };
@@ -677,8 +677,8 @@ TEST(BAM_BamRecord, constructed_with_correct_defaults)
 
     EXPECT_THROW(bam.HoleNumber(), std::exception);
     EXPECT_THROW(bam.NumPasses(), std::exception);
-    EXPECT_EQ(int32_t{0}, bam.QueryEnd());
-    EXPECT_EQ(int32_t{0}, bam.QueryStart());
+    EXPECT_EQ(std::int32_t{0}, bam.QueryEnd());
+    EXPECT_EQ(std::int32_t{0}, bam.QueryStart());
     EXPECT_THROW(bam.ReadAccuracy(), std::exception);
 
     EXPECT_FALSE(bam.HasDeletionQV());
@@ -716,8 +716,8 @@ TEST(BAM_BamRecord, can_be_constructed_from_bamrecordimpl)
     const TagCollection genericTags = genericBam.Tags();
     EXPECT_TRUE(genericTags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), genericTags.at("HX").ToString());
-    EXPECT_EQ(int32_t{-42}, genericTags.at("XY").ToInt32());
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), genericTags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::int32_t{-42}, genericTags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<std::uint8_t>({34, 5, 125}), genericTags.at("CA").ToUInt8Array());
 
     // copy ctor
     BamRecord bam1(genericBam);
@@ -734,8 +734,8 @@ TEST(BAM_BamRecord, can_be_constructed_from_bamrecordimpl)
     const TagCollection bam1Tags = bam1.Impl().Tags();
     EXPECT_TRUE(bam1Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), bam1Tags.at("HX").ToString());
-    EXPECT_EQ(int32_t{-42}, bam1Tags.at("XY").ToInt32());
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), bam1Tags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::int32_t{-42}, bam1Tags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<std::uint8_t>({34, 5, 125}), bam1Tags.at("CA").ToUInt8Array());
 
     // copy assignment
     BamRecord bam2;
@@ -753,8 +753,8 @@ TEST(BAM_BamRecord, can_be_constructed_from_bamrecordimpl)
     const TagCollection bam2Tags = bam2.Impl().Tags();
     EXPECT_TRUE(bam2Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), bam2Tags.at("HX").ToString());
-    EXPECT_EQ(int32_t{-42}, bam2Tags.at("XY").ToInt32());
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), bam2Tags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::int32_t{-42}, bam2Tags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<std::uint8_t>({34, 5, 125}), bam2Tags.at("CA").ToUInt8Array());
 
     // change genericBam, make sure we deep copied bam1 & bam2
     genericBam.Position(2000);
@@ -785,8 +785,8 @@ TEST(BAM_BamRecord, can_be_constructed_from_bamrecordimpl)
     const TagCollection bam3Tags = bam3.Impl().Tags();
     EXPECT_TRUE(bam3Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), bam3Tags.at("HX").ToString());
-    EXPECT_EQ(int32_t{-42}, bam3Tags.at("XY").ToInt32());
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), bam3Tags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::int32_t{-42}, bam3Tags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<std::uint8_t>({34, 5, 125}), bam3Tags.at("CA").ToUInt8Array());
 
     // move assignment
     BamRecord bam4;
@@ -811,8 +811,8 @@ TEST(BAM_BamRecord, can_be_constructed_from_bamrecordimpl)
     const TagCollection bam4Tags = bam4.Impl().Tags();
     EXPECT_TRUE(bam4Tags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), bam4Tags.at("HX").ToString());
-    EXPECT_EQ(int32_t{-42}, bam4Tags.at("XY").ToInt32());
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), bam4Tags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::int32_t{-42}, bam4Tags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<std::uint8_t>({34, 5, 125}), bam4Tags.at("CA").ToUInt8Array());
 }
 
 TEST(BAM_BamRecord, tolerates_self_assignment)
@@ -830,8 +830,8 @@ TEST(BAM_BamRecord, tolerates_self_assignment)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
     bam1.Impl().Tags(tags);
 
     EXPECT_EQ(42, bam1.Impl().Bin());
@@ -846,8 +846,8 @@ TEST(BAM_BamRecord, tolerates_self_assignment)
     const TagCollection fetchedTags1 = bam1.Impl().Tags();
     EXPECT_TRUE(fetchedTags1.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags1.at("HX").ToString());
-    EXPECT_EQ(int32_t{-42}, fetchedTags1.at("XY").ToInt32());
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::int32_t{-42}, fetchedTags1.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<std::uint8_t>({34, 5, 125}), fetchedTags1.at("CA").ToUInt8Array());
 
     BamRecordTests::CheckRawData(bam1);
 }
@@ -877,8 +877,8 @@ TEST(BAM_BamRecord, can_be_modified_via_general_setters)
     const TagCollection fetchedTags = bam.Impl().Tags();
     EXPECT_TRUE(fetchedTags.at("HX").HasModifier(TagModifier::HEX_STRING));
     EXPECT_EQ(std::string("1abc75"), fetchedTags.at("HX").ToString());
-    EXPECT_EQ(int32_t{-42}, fetchedTags.at("XY").ToInt32());
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
+    EXPECT_EQ(std::int32_t{-42}, fetchedTags.at("XY").ToInt32());
+    EXPECT_EQ(std::vector<std::uint8_t>({34, 5, 125}), fetchedTags.at("CA").ToUInt8Array());
 
     BamRecordTests::CheckRawData(bam);
 }

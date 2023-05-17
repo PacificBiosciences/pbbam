@@ -142,11 +142,11 @@ static PbiFilter CreateBarcodeFilter(std::string value, const Compare::Type comp
         if (barcodes.size() != 2) {
             throw std::runtime_error{"[pbbam] PBI filter ERROR: only 2 barcode values expected"};
         }
-        return PbiBarcodesFilter{boost::numeric_cast<int16_t>(std::stoi(barcodes.at(0))),
-                                 boost::numeric_cast<int16_t>(std::stoi(barcodes.at(1))),
+        return PbiBarcodesFilter{boost::numeric_cast<std::int16_t>(std::stoi(barcodes.at(0))),
+                                 boost::numeric_cast<std::int16_t>(std::stoi(barcodes.at(1))),
                                  compareType};
     } else {
-        return PbiBarcodeFilter{boost::numeric_cast<int16_t>(std::stoi(value)), compareType};
+        return PbiBarcodeFilter{boost::numeric_cast<std::int16_t>(std::stoi(value)), compareType};
     }
 }
 
@@ -164,14 +164,15 @@ static PbiFilter CreateBarcodeForwardFilter(std::string value, const Compare::Ty
 
     if (isList(value)) {
         std::vector<std::string> tokens = Split(value, ',');
-        std::vector<int16_t> barcodes;
+        std::vector<std::int16_t> barcodes;
         barcodes.reserve(tokens.size());
         for (const auto& t : tokens) {
-            barcodes.push_back(boost::numeric_cast<int16_t>(std::stoi(t)));
+            barcodes.push_back(boost::numeric_cast<std::int16_t>(std::stoi(t)));
         }
         return PbiBarcodeForwardFilter{std::move(barcodes)};
     } else {
-        return PbiBarcodeForwardFilter{boost::numeric_cast<int16_t>(std::stoi(value)), compareType};
+        return PbiBarcodeForwardFilter{boost::numeric_cast<std::int16_t>(std::stoi(value)),
+                                       compareType};
     }
 }
 
@@ -189,14 +190,15 @@ static PbiFilter CreateBarcodeReverseFilter(std::string value, const Compare::Ty
 
     if (isList(value)) {
         std::vector<std::string> tokens = Split(value, ',');
-        std::vector<int16_t> barcodes;
+        std::vector<std::int16_t> barcodes;
         barcodes.reserve(tokens.size());
         for (const auto& t : tokens) {
-            barcodes.push_back(boost::numeric_cast<int16_t>(std::stoi(t)));
+            barcodes.push_back(boost::numeric_cast<std::int16_t>(std::stoi(t)));
         }
         return PbiBarcodeReverseFilter{std::move(barcodes)};
     } else {
-        return PbiBarcodeReverseFilter{boost::numeric_cast<int16_t>(std::stoi(value)), compareType};
+        return PbiBarcodeReverseFilter{boost::numeric_cast<std::int16_t>(std::stoi(value)),
+                                       compareType};
     }
 }
 
@@ -266,13 +268,13 @@ static PbiFilter CreateQIdFilter(std::string value, const Compare::Type compareT
                 "[pbbam] PBI filter ERROR: unsupported compare type on qid property"};
         }
 
-        std::vector<int32_t> rgIds;
+        std::vector<std::int32_t> rgIds;
         for (const auto& t : Split(value, ',')) {
             rgIds.push_back(std::stoi(t));
         }
         return PbiReadGroupFilter{rgIds, compareType};
     } else {
-        const int32_t n = std::stoi(value);
+        const std::int32_t n = std::stoi(value);
         return PbiReadGroupFilter{n, compareType};
     }
 }
@@ -370,14 +372,15 @@ static PbiFilter CreateReferenceIdFilter(std::string value, const Compare::Type 
         }
 
         const std::vector<std::string> tokens = Split(value, ',');
-        std::vector<int32_t> ids;
+        std::vector<std::int32_t> ids;
         ids.reserve(tokens.size());
         for (const auto& t : tokens) {
-            ids.push_back(boost::numeric_cast<int32_t>(std::stoi(t)));
+            ids.push_back(boost::numeric_cast<std::int32_t>(std::stoi(t)));
         }
         return PbiReferenceIdFilter{std::move(ids), compareType};
     } else {
-        return PbiReferenceIdFilter{boost::numeric_cast<int32_t>(std::stoi(value)), compareType};
+        return PbiReferenceIdFilter{boost::numeric_cast<std::int32_t>(std::stoi(value)),
+                                    compareType};
     }
 }
 
@@ -419,14 +422,14 @@ static PbiFilter CreateZmwFilter(std::string value, const Compare::Type compareT
 
     if (isList(value)) {
         const std::vector<std::string> tokens = Split(value, ',');
-        std::vector<int32_t> zmws;
+        std::vector<std::int32_t> zmws;
         zmws.reserve(tokens.size());
         for (const auto& t : tokens) {
-            zmws.push_back(boost::numeric_cast<int32_t>(std::stoi(t)));
+            zmws.push_back(boost::numeric_cast<std::int32_t>(std::stoi(t)));
         }
         return PbiZmwFilter{std::move(zmws)};
     } else {
-        return PbiZmwFilter{boost::numeric_cast<int32_t>(std::stoi(value)), compareType};
+        return PbiZmwFilter{boost::numeric_cast<std::int32_t>(std::stoi(value)), compareType};
     }
 }
 
@@ -450,8 +453,8 @@ static PbiFilter CreateZmwModuloFilter(const Property& property)
         throw std::runtime_error{"[pbbam] PBI filter ERROR: unsupported hash type: " + hashType};
     }();
 
-    const uint32_t denom = std::stoul(property.Attribute("Modulo"));
-    const uint32_t value = std::stoul(property.Value());
+    const std::uint32_t denom = std::stoul(property.Attribute("Modulo"));
+    const std::uint32_t value = std::stoul(property.Value());
 
     return PbiZmwModuloFilter{denom, value, hash, Compare::EQUAL};
 }
@@ -472,19 +475,19 @@ static PbiFilter FromDataSetProperty(const Property& property, const DataSet& da
         switch (builtInCode) {
 
             // single-value filters
-            case BuiltIn::AlignedEndFilter     : return PbiAlignedEndFilter{ static_cast<uint32_t>(std::stoul(value)), compareType };
-            case BuiltIn::AlignedLengthFilter  : return PbiAlignedLengthFilter{ static_cast<uint32_t>(std::stoul(value)), compareType };
-            case BuiltIn::AlignedStartFilter   : return PbiAlignedStartFilter{ static_cast<uint32_t>(std::stoul(value)), compareType };
-            case BuiltIn::BarcodeQualityFilter : return PbiBarcodeQualityFilter{ static_cast<uint8_t>(std::stoul(value)), compareType };
+            case BuiltIn::AlignedEndFilter     : return PbiAlignedEndFilter{ static_cast<std::uint32_t>(std::stoul(value)), compareType };
+            case BuiltIn::AlignedLengthFilter  : return PbiAlignedLengthFilter{ static_cast<std::uint32_t>(std::stoul(value)), compareType };
+            case BuiltIn::AlignedStartFilter   : return PbiAlignedStartFilter{ static_cast<std::uint32_t>(std::stoul(value)), compareType };
+            case BuiltIn::BarcodeQualityFilter : return PbiBarcodeQualityFilter{ static_cast<std::uint8_t>(std::stoul(value)), compareType };
             case BuiltIn::IdentityFilter       : return PbiIdentityFilter{ std::stof(value), compareType };
-            case BuiltIn::MapQualityFilter     : return PbiMapQualityFilter{ static_cast<uint8_t>(std::stoul(value)), compareType };
+            case BuiltIn::MapQualityFilter     : return PbiMapQualityFilter{ static_cast<std::uint8_t>(std::stoul(value)), compareType };
             case BuiltIn::NumSubreadsFilter    : return PbiNumSubreadsFilter{ std::stoi(value), compareType };
             case BuiltIn::QueryEndFilter       : return PbiQueryEndFilter{ std::stoi(value), compareType };
             case BuiltIn::QueryLengthFilter    : return PbiQueryLengthFilter{ std::stoi(value), compareType };
             case BuiltIn::QueryStartFilter     : return PbiQueryStartFilter{ std::stoi(value), compareType };
             case BuiltIn::ReadAccuracyFilter   : return PbiReadAccuracyFilter{ std::stof(value), compareType };
-            case BuiltIn::ReferenceEndFilter   : return PbiReferenceEndFilter{ static_cast<uint32_t>(std::stoul(value)), compareType };
-            case BuiltIn::ReferenceStartFilter : return PbiReferenceStartFilter{ static_cast<uint32_t>(std::stoul(value)), compareType };
+            case BuiltIn::ReferenceEndFilter   : return PbiReferenceEndFilter{ static_cast<std::uint32_t>(std::stoul(value)), compareType };
+            case BuiltIn::ReferenceStartFilter : return PbiReferenceStartFilter{ static_cast<std::uint32_t>(std::stoul(value)), compareType };
 
             // (maybe) list-value filters
             case BuiltIn::BarcodeFilter        : return CreateBarcodeFilter(value, compareType);

@@ -98,15 +98,15 @@ inline std::string MaybeReverseComplement(std::string&& seq, bool reverse)
 inline void ReverseComplementCaseSens(std::string& seq)
 {
     const std::string original = seq;
-    constexpr std::array<int8_t, 128> RC_TABLE{
+    constexpr std::array<std::int8_t, 128> RC_TABLE{
         4,  4, 4, 4, 4, 4, 4,  4,  4, 4, 4, 4, 4,  4,  4, 4,  4,  4, 4, 4,   4, 4,   4, 4, 4, 4,
         4,  4, 4, 4, 4, 4, 32, 4,  4, 4, 4, 4, 4,  4,  4, 4,  42, 4, 4, 45,  4, 4,   4, 4, 4, 4,
         4,  4, 4, 4, 4, 4, 4,  4,  4, 4, 4, 4, 4,  84, 4, 71, 4,  4, 4, 67,  4, 4,   4, 4, 4, 4,
         78, 4, 4, 4, 4, 4, 65, 65, 4, 4, 4, 4, 4,  4,  4, 4,  4,  4, 4, 116, 4, 103, 4, 4, 4, 99,
         4,  4, 4, 4, 4, 4, 4,  4,  4, 4, 4, 4, 97, 97, 4, 4,  4,  4, 4, 4,   4, 4,   4, 4};
     std::string reverseCompl(original.length(), 'N');
-    for (uint32_t i = 0; i < original.length(); ++i) {
-        reverseCompl[original.length() - i - 1] = RC_TABLE[static_cast<int32_t>(original[i])];
+    for (std::uint32_t i = 0; i < original.length(); ++i) {
+        reverseCompl[original.length() - i - 1] = RC_TABLE[static_cast<std::int32_t>(original[i])];
     }
     seq = reverseCompl;
 }

@@ -297,7 +297,7 @@ TEST(BAM_DataSetQuery, genomic_interval_query_can_use_dataset_input)
 // clang-format off
 TEST(BAM_DataSetQuery, zmw_query_can_use_dataset_input)
 {
-    const std::vector<int32_t> whitelist = {13473, 30983};
+    const std::vector<std::int32_t> whitelist = {13473, 30983};
 
     // single file
     {
@@ -338,7 +338,7 @@ TEST(BAM_DataSetQuery, zmw_query_can_use_dataset_input)
 
 TEST(BAM_DataSetQuery, zmw_group_query_can_use_dataset_input)
 {
-    const std::vector<int32_t> whitelist = {13473, 30983};
+    const std::vector<std::int32_t> whitelist = {13473, 30983};
 
     // single-file
     {
@@ -347,7 +347,7 @@ TEST(BAM_DataSetQuery, zmw_group_query_can_use_dataset_input)
         DataSet dataset{bamFile};
 
         int count = 0;
-        int32_t groupZmw = -1;
+        std::int32_t groupZmw = -1;
         ZmwGroupQuery query{whitelist, dataset};
         for (const std::vector<BamRecord>& group : query) {
             for (const BamRecord& record : group) {
@@ -378,7 +378,7 @@ TEST(BAM_DataSetQuery, zmw_group_query_can_use_dataset_input)
         int totalCount = 0;
         int numRecordsInGroup = 0;
         int groupCount = 0;
-        int32_t groupZmw = -1;
+        std::int32_t groupZmw = -1;
         ZmwGroupQuery query{whitelist, dataset};
         for (const std::vector<BamRecord>& group : query) {
             for (const BamRecord& record : group) {

@@ -113,7 +113,7 @@ public:
         }
     }
 
-    void Write(const BamRecord& record, int64_t* vOffset)
+    void Write(const BamRecord& record, std::int64_t* vOffset)
     {
         BGZF* bgzf = file_.get()->fp.bgzf;
         assert(bgzf);
@@ -185,7 +185,10 @@ void BamWriter::TryFlush()
 
 void BamWriter::Write(const BamRecord& record) { d_->Write(record); }
 
-void BamWriter::Write(const BamRecord& record, int64_t* vOffset) { d_->Write(record, vOffset); }
+void BamWriter::Write(const BamRecord& record, std::int64_t* vOffset)
+{
+    d_->Write(record, vOffset);
+}
 
 void BamWriter::Write(const BamRecordImpl& recordImpl) { d_->Write(recordImpl); }
 

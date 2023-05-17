@@ -19,7 +19,7 @@ class ZmwChunkedFastxBgzfReader final : public ZmwChunkedFastxReaderImpl
 public:
     ZmwChunkedFastxBgzfReader(std::string filename, std::size_t numChunks);
 
-    void Seek(uint64_t pos) final;
+    void Seek(std::uint64_t pos) final;
     FastaSequence ReadNextFasta(bool skipName) final;
     FastqSequence ReadNextFastq(bool skipName) final;
 

@@ -115,7 +115,7 @@ std::string BamRecordView::Sequence() const
     return record_.Sequence(orientation_, aligned_, exciseSoftClips_);
 }
 
-std::vector<uint32_t> BamRecordView::StartFrames() const
+std::vector<std::uint32_t> BamRecordView::StartFrames() const
 {
     return record_.StartFrame(orientation_, aligned_, exciseSoftClips_, pulseBehavior_);
 }

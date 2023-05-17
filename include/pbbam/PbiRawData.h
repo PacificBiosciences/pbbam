@@ -30,7 +30,7 @@ public:
 
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
-    PbiRawBarcodeData(uint32_t numReads);
+    PbiRawBarcodeData(std::uint32_t numReads);
 
     PbiRawBarcodeData() = default;
 
@@ -52,9 +52,9 @@ public:
     /// \name Raw Data Containers
     /// \{
 
-    std::vector<int16_t> bcForward_;
-    std::vector<int16_t> bcReverse_;
-    std::vector<int8_t> bcQual_;
+    std::vector<std::int16_t> bcForward_;
+    std::vector<std::int16_t> bcReverse_;
+    std::vector<std::int8_t> bcQual_;
 
     /// \}
 };
@@ -70,7 +70,7 @@ public:
 
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
-    PbiRawMappedData(uint32_t numReads);
+    PbiRawMappedData(std::uint32_t numReads);
 
     PbiRawMappedData() = default;
 
@@ -102,7 +102,7 @@ public:
     /// \param[in] recordIndex  i-th record
     /// \returns number of deleted bases
     ///
-    uint32_t NumDeletedBasesAt(std::size_t recordIndex) const;
+    std::uint32_t NumDeletedBasesAt(std::size_t recordIndex) const;
 
     /// \brief Calculates the number of inserted bases for a particular record.
     ///
@@ -114,7 +114,7 @@ public:
     /// \param[in] recordIndex  i-th record
     /// \returns number of inserted bases
     ///
-    uint32_t NumInsertedBasesAt(std::size_t recordIndex) const;
+    std::uint32_t NumInsertedBasesAt(std::size_t recordIndex) const;
 
     /// \brief Calculates the number of deleted & inserted bases for a
     ///        particular record.
@@ -122,7 +122,8 @@ public:
     /// \param[in] recordIndex  i-th record in the data set
     /// \returns a pair consisting of (numDeletions,numInsertions)
     ///
-    std::pair<uint32_t, uint32_t> NumDeletedAndInsertedBasesAt(std::size_t recordIndex) const;
+    std::pair<std::uint32_t, std::uint32_t> NumDeletedAndInsertedBasesAt(
+        std::size_t recordIndex) const;
 
     /// \}
 
@@ -130,17 +131,17 @@ public:
     /// \name Raw Data Containers
     /// \{
 
-    std::vector<int32_t> tId_;
-    std::vector<uint32_t> tStart_;
-    std::vector<uint32_t> tEnd_;
-    std::vector<uint32_t> aStart_;
-    std::vector<uint32_t> aEnd_;
-    std::vector<uint8_t> revStrand_;
-    std::vector<uint32_t> nM_;
-    std::vector<uint32_t> nMM_;
-    std::vector<uint8_t> mapQV_;
-    std::vector<uint32_t> nInsOps_;
-    std::vector<uint32_t> nDelOps_;
+    std::vector<std::int32_t> tId_;
+    std::vector<std::uint32_t> tStart_;
+    std::vector<std::uint32_t> tEnd_;
+    std::vector<std::uint32_t> aStart_;
+    std::vector<std::uint32_t> aEnd_;
+    std::vector<std::uint8_t> revStrand_;
+    std::vector<std::uint32_t> nM_;
+    std::vector<std::uint32_t> nMM_;
+    std::vector<std::uint8_t> mapQV_;
+    std::vector<std::uint32_t> nInsOps_;
+    std::vector<std::uint32_t> nDelOps_;
 
     bool hasIndelOps_ = true;
 
@@ -158,8 +159,8 @@ public:
 class PBBAM_EXPORT PbiReferenceEntry
 {
 public:
-    using ID = uint32_t;
-    using Row = uint32_t;
+    using ID = std::uint32_t;
+    using Row = std::uint32_t;
 
 public:
     static const ID UNMAPPED_ID;
@@ -216,7 +217,7 @@ public:
     /// This constructor is recommended as this is the safest way to ensure that
     /// references without observed mappings are included in the final output.
     ///
-    PbiRawReferenceData(uint32_t numRefs);
+    PbiRawReferenceData(std::uint32_t numRefs);
 
     PbiRawReferenceData() = default;
 
@@ -242,7 +243,7 @@ public:
 
     /// \brief Creates an empty data structure, preallocating space for a known
     ///        number of records.
-    PbiRawBasicData(uint32_t numReads);
+    PbiRawBasicData(std::uint32_t numReads);
 
     PbiRawBasicData() = default;
 
@@ -257,7 +258,7 @@ public:
     /// \param[in] b        %BAM record
     /// \param[in] offset   \b virtual file offset where record begins
     ///
-    void AddRecord(const BamRecord& b, int64_t offset);
+    void AddRecord(const BamRecord& b, std::int64_t offset);
 
     /// \}
 
@@ -265,14 +266,14 @@ public:
     /// \name Raw Data Containers
     /// \{
 
-    std::vector<int32_t> rgId_;
-    std::vector<int32_t> qStart_;
-    std::vector<int32_t> qEnd_;
-    std::vector<int32_t> holeNumber_;
+    std::vector<std::int32_t> rgId_;
+    std::vector<std::int32_t> qStart_;
+    std::vector<std::int32_t> qEnd_;
+    std::vector<std::int32_t> holeNumber_;
     std::vector<float> readQual_;
-    std::vector<uint8_t> ctxtFlag_;
-    std::vector<int64_t> fileOffset_;
-    std::vector<uint16_t> fileNumber_;
+    std::vector<std::uint8_t> ctxtFlag_;
+    std::vector<std::int64_t> fileOffset_;
+    std::vector<std::uint16_t> fileNumber_;
 
     /// \}
 };
@@ -351,7 +352,7 @@ public:
     PbiFile::Sections FileSections() const;
 
     /// \returns the number of records in the PBI(s)
-    uint32_t NumReads() const;
+    std::uint32_t NumReads() const;
 
     /// \returns the PBI file's version
     PbiFile::VersionEnum Version() const;
@@ -401,7 +402,7 @@ public:
     /// \param[in] num  number of records
     /// \returns reference to this index
     ///
-    PbiRawData& NumReads(uint32_t num);
+    PbiRawData& NumReads(std::uint32_t num);
 
     /// \brief Sets PBI file version.
     ///
@@ -443,7 +444,7 @@ private:
     std::string filename_;
     PbiFile::VersionEnum version_ = PbiFile::CurrentVersion;
     PbiFile::Sections sections_ = PbiFile::ALL;
-    uint32_t numReads_ = 0;
+    std::uint32_t numReads_ = 0;
     PbiRawBarcodeData barcodeData_;
     PbiRawMappedData mappedData_;
     PbiRawReferenceData referenceData_;

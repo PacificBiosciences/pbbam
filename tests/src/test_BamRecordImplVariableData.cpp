@@ -30,11 +30,11 @@ namespace BamRecordImplVariableDataTests {
 static void CheckRawData(const BamRecordImpl& bam)
 {
     // ensure raw data (lengths at least) matches API-facing data
-    const uint32_t expectedNameBytes = bam.Name().size() + 1;  // include NULL term
-    const uint32_t expectedNameNulls = 4 - (expectedNameBytes % 4);
-    const uint32_t expectedNameLength = expectedNameBytes + expectedNameNulls;
-    const uint32_t expectedNumCigarOps = bam.CigarData().size();
-    const int32_t expectedSeqLength = bam.Sequence().length();
+    const std::uint32_t expectedNameBytes = bam.Name().size() + 1;  // include NULL term
+    const std::uint32_t expectedNameNulls = 4 - (expectedNameBytes % 4);
+    const std::uint32_t expectedNameLength = expectedNameBytes + expectedNameNulls;
+    const std::uint32_t expectedNumCigarOps = bam.CigarData().size();
+    const std::int32_t expectedSeqLength = bam.Sequence().length();
     const std::size_t expectedTagsLength = BamTagCodec::Encode(bam.Tags()).size();
 
     //  Name        CIGAR         Sequence       Quals      Tags
@@ -74,8 +74,8 @@ TEST(BAM_BamRecordImplVarData, can_add_tags)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -96,14 +96,14 @@ TEST(BAM_BamRecordImplVarData, can_add_tags_then_overwrite_with_longer_tags)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -125,13 +125,13 @@ TEST(BAM_BamRecordImplVarData, can_add_tags_then_overwrite_with_shorter_tags)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(longerTags);
@@ -151,8 +151,8 @@ TEST(BAM_BamRecordImplVarData, can_add_tags_then_overwrite_with_empty_tags)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -240,8 +240,8 @@ TEST(BAM_BamRecordImplVarData, can_set_cigar_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.CigarData(cigar);
@@ -270,8 +270,8 @@ TEST(BAM_BamRecordImplVarData, can_set_cigar_tag_with_empty_cigar_string)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.CigarData(cigar);
@@ -314,8 +314,8 @@ TEST(BAM_BamRecordImplVarData, can_set_cigar_tag_then_overwrite_with_longer_ciga
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.CigarData(cigar);
@@ -345,8 +345,8 @@ TEST(BAM_BamRecordImplVarData, can_set_cigar_tag_then_overwrite_with_shorter_cig
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.CigarData(longerCigar);
@@ -376,8 +376,8 @@ TEST(BAM_BamRecordImplVarData, can_set_cigar_tag_then_overwrite_with_empty_cigar
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.CigarData(cigar);
@@ -406,13 +406,13 @@ TEST(BAM_BamRecordImplVarData, can_set_cigar_tag_then_overwrite_with_longer_tag_
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.CigarData(cigar);
@@ -441,13 +441,13 @@ TEST(BAM_BamRecordImplVarData, can_set_cigar_tag_then_overwrite_with_shorter_tag
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.CigarData(cigar);
@@ -474,7 +474,7 @@ TEST(BAM_BamRecordImplVarData, can_set_cigar_tag_then_overwrite_with_empty_tag_c
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     BamRecordImpl bam;
     bam.CigarData(cigar);
@@ -531,7 +531,7 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_preencoded)
     char* encoded = static_cast<char*>(std::calloc(encodedLength, sizeof(char)));
     char* e = encoded;
 
-    uint8_t nucleotideCode{};
+    std::uint8_t nucleotideCode{};
     bool useHighWord = true;
     for (char i : sequence) {
         switch (i) {
@@ -583,7 +583,7 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_preencoded_with_empty_qual)
     auto* encoded = static_cast<char*>(std::calloc(encodedLength, sizeof(char)));
     auto* e = encoded;
 
-    uint8_t nucleotideCode{};
+    std::uint8_t nucleotideCode{};
     bool useHighWord = true;
     for (char i : sequence) {
         switch (i) {
@@ -712,8 +712,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_tags)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -743,8 +743,8 @@ TEST(BAM_BamRecordImplVarData, can_set_empty_seq_qual_then_tags)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -774,8 +774,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_with_empty_qual_then_tags)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -822,8 +822,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_tags_then_longer_seq_qual)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(shortSeq, shortQual);
@@ -856,8 +856,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_tags_then_longer_seq_qual_w
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(shortSeq, shortQual);
@@ -890,8 +890,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_tags_then_shorter_seq_qual)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -924,8 +924,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_tags_then_shorter_seq_qual_
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -957,8 +957,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_tags_then_empty_seq)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -989,13 +989,13 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_tags_then_longer_tags)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1026,13 +1026,13 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_tags_then_shorter_tags)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1061,7 +1061,7 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_tags_then_empty_tags)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1297,8 +1297,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_cigar_then_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1331,8 +1331,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_cigar_then_tag_with_empty_s
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1365,8 +1365,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_cigar_then_tag_with_empty_q
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1399,8 +1399,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_cigar_then_tag_with_empty_c
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1454,8 +1454,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(shortSeq, shortQual);
@@ -1492,8 +1492,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(shortSeq, shortQual);
@@ -1530,8 +1530,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1568,8 +1568,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1604,8 +1604,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_cigar_then_tag_then_overwri
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1641,8 +1641,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1678,8 +1678,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1714,8 +1714,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_cigar_then_tag_then_overwri
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1749,13 +1749,13 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_cigar_then_tag_then_overwri
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1790,13 +1790,13 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1828,8 +1828,8 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_cigar_then_tag_then_overwri
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.SetSequenceAndQualities(sequence, qualities);
@@ -1909,8 +1909,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -1938,8 +1938,8 @@ TEST(BAM_BamRecordImplVarData, can_set_empty_name_then_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -1981,8 +1981,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_tag_then_overwrite_with_longer_
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2012,8 +2012,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_tag_then_overwrite_with_shorter
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(longerName);
@@ -2043,8 +2043,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_tag_then_overwrite_with_empty_n
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2073,13 +2073,13 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_tag_then_overwrite_with_longer_
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2108,13 +2108,13 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_tag_then_overwrite_with_shorter
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2141,8 +2141,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_tag_then_overwrite_with_empty_t
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2300,8 +2300,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_cigar_then_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2332,8 +2332,8 @@ TEST(BAM_BamRecordImplVarData, can_set_empty_name_then_cigar_then_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2364,8 +2364,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_empty_cigar_then_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2413,8 +2413,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_cigar_then_tag_then_overwrite_w
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2447,8 +2447,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_cigar_then_tag_then_overwrite_w
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(longerName);
@@ -2481,8 +2481,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_cigar_then_tag_then_overwrite_w
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2515,8 +2515,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_cigar_then_tag_then_overwrite_w
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2549,8 +2549,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_cigar_then_tag_then_overwrite_w
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2583,8 +2583,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_cigar_then_tag_then_overwrite_w
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2616,13 +2616,13 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_cigar_then_tag_then_overwrite_w
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2654,13 +2654,13 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_cigar_then_tag_then_overwrite_w
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2690,8 +2690,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_cigar_then_tag_then_overwrite_w
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2910,8 +2910,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_seq_qual_then_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2944,8 +2944,8 @@ TEST(BAM_BamRecordImplVarData, can_set_empty_name_then_seq_qual_then_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -2978,8 +2978,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_empty_seq_qual_then_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3012,8 +3012,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_seq_only_then_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3066,8 +3066,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_seq_qual_then_tag_then_overwrit
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3102,8 +3102,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_seq_qual_then_tag_then_overwrit
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(longerName);
@@ -3138,8 +3138,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_seq_qual_then_tag_then_overwrit
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3176,8 +3176,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3214,8 +3214,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3252,8 +3252,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3290,8 +3290,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3326,8 +3326,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_seq_qual_then_tag_then_overwrit
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3361,13 +3361,13 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_seq_qual_then_tag_then_overwrit
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3401,13 +3401,13 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_seq_qual_then_tag_then_overwrit
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3439,8 +3439,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_seq_qual_then_tag_then_overwrit
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3806,8 +3806,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_seq_qual_then_cigar_then_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3843,8 +3843,8 @@ TEST(BAM_BamRecordImplVarData, can_set_empty_name_then_seq_qual_then_cigar_then_
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3880,8 +3880,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_empty_seq_qual_then_cigar_then_
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3917,8 +3917,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_empty_seq_only_then_cigar_then_
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -3954,8 +3954,8 @@ TEST(BAM_BamRecordImplVarData, can_set_name_then_seq_qual_then_empty_cigar_then_
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4014,8 +4014,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4054,8 +4054,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(longerName);
@@ -4094,8 +4094,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4135,8 +4135,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4176,8 +4176,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4217,8 +4217,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4258,8 +4258,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4298,8 +4298,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4338,8 +4338,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4378,8 +4378,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4418,8 +4418,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4457,13 +4457,13 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4501,13 +4501,13 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection longerTags;
     longerTags["HX"] = std::string("1abc75");
     longerTags["HX"].Modifier(TagModifier::HEX_STRING);
-    longerTags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    longerTags["XY"] = int32_t{-42};
+    longerTags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    longerTags["XY"] = std::int32_t{-42};
 
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     BamRecordImpl bam;
     bam.Name(readName);
@@ -4543,8 +4543,8 @@ TEST(BAM_BamRecordImplVarData,
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Name(readName);

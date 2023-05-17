@@ -177,7 +177,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct BarcodeForward : public MemberFunctionBase<int16_t, &BamRecord::BarcodeForward>
+    struct BarcodeForward : public MemberFunctionBase<std::int16_t, &BamRecord::BarcodeForward>
     {};
 
     /// \brief Compares on BamRecord::BarcodeQuality.
@@ -188,7 +188,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct BarcodeQuality : public MemberFunctionBase<uint8_t, &BamRecord::BarcodeQuality>
+    struct BarcodeQuality : public MemberFunctionBase<std::uint8_t, &BamRecord::BarcodeQuality>
     {};
 
     /// \brief Compares on BamRecord::BarcodeReverse.
@@ -199,7 +199,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct BarcodeReverse : public MemberFunctionBase<int16_t, &BamRecord::BarcodeReverse>
+    struct BarcodeReverse : public MemberFunctionBase<std::int16_t, &BamRecord::BarcodeReverse>
     {};
 
     /// \brief Compares on BamRecord::FullName (lexicographical).
@@ -235,7 +235,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct MapQuality : public MemberFunctionBase<uint8_t, &BamRecord::MapQuality>
+    struct MapQuality : public MemberFunctionBase<std::uint8_t, &BamRecord::MapQuality>
     {};
 
     /// \brief Compares on BamRecord::MovieName.
@@ -372,7 +372,8 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReadGroupNumericId : public MemberFunctionBase<int32_t, &BamRecord::ReadGroupNumericId>
+    struct ReadGroupNumericId
+        : public MemberFunctionBase<std::int32_t, &BamRecord::ReadGroupNumericId>
     {};
 
     /// \brief Compares on BamRecord::ReferenceEnd.
@@ -394,7 +395,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct ReferenceId : public MemberFunctionBase<int32_t, &BamRecord::ReferenceId>
+    struct ReferenceId : public MemberFunctionBase<std::int32_t, &BamRecord::ReferenceId>
     {};
 
     /// \brief Compares on BamRecord::ReferenceName.
@@ -427,7 +428,7 @@ public:
     /// \note Currently only supports std::less<T> comparisons (i.e. sorting by
     ///       ascending value).
     ///
-    struct Zmw : public MemberFunctionBase<int32_t, &BamRecord::HoleNumber>
+    struct Zmw : public MemberFunctionBase<std::int32_t, &BamRecord::HoleNumber>
     {};
 
     /// \}

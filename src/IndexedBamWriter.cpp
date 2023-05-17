@@ -48,8 +48,8 @@ namespace BAM {
 
 struct GzIndexEntry
 {
-    int64_t vAddress;
-    int64_t uAddress;
+    std::int64_t vAddress;
+    std::int64_t uAddress;
 };
 
 // TODO: come back to refseqs, sorting, etc
@@ -77,7 +77,7 @@ public:
             throw IndexedBamWriterException{gziFn, "could not open *.gzi file"};
         }
 
-        uint64_t numElements;
+        std::uint64_t numElements;
         if (fread(&numElements, sizeof(numElements), 1, gziFile.get()) < 1) {
             throw IndexedBamWriterException{gziFn, "could not read from *.gzi file"};
         }
@@ -87,7 +87,7 @@ public:
 
         std::vector<GzIndexEntry> result;
         result.reserve(numElements);
-        for (uint32_t i = 0; i < numElements; ++i) {
+        for (std::uint32_t i = 0; i < numElements; ++i) {
             GzIndexEntry entry;
             const auto vReturn = fread(&entry.vAddress, sizeof(entry.vAddress), 1, gziFile.get());
             const auto uReturn = fread(&entry.uAddress, sizeof(entry.uAddress), 1, gziFile.get());
@@ -126,12 +126,13 @@ public:
 
             // transform offsets from GZI
             for (std::size_t j = 0; j < fileOffsetField_.buffer_.size(); ++j) {
-                while ((k < index.size() - 1) && (static_cast<uint64_t>(index.at(k + 1).uAddress) <=
-                                                  fileOffsetField_.buffer_[j])) {
+                while ((k < index.size() - 1) &&
+                       (static_cast<std::uint64_t>(index.at(k + 1).uAddress) <=
+                        fileOffsetField_.buffer_[j])) {
                     ++k;
                 }
                 const GzIndexEntry& e = index.at(k);
-                const int64_t uOffset = fileOffsetField_.buffer_[j] - e.uAddress;
+                const std::int64_t uOffset = fileOffsetField_.buffer_[j] - e.uAddress;
                 const auto result = ((e.vAddress << 16) | uOffset);
                 fileOffsetField_.buffer_[j] = result;
             }
@@ -308,7 +309,7 @@ public:
                 remainingLength = (b->l_data - c->l_qname);
             } else {
                 const std::size_t cigarEnd =
-                    ((uint8_t*)bam_get_cigar(b) - b->data) + (c->n_cigar * 4);
+                    ((std::uint8_t*)bam_get_cigar(b) - b->data) + (c->n_cigar * 4);
                 remainingLength = 8 + (b->l_data - cigarEnd) + 4 + (4 * c->n_cigar);
             }
 
@@ -324,7 +325,7 @@ private:
     std::unique_ptr<samFile, HtslibFileDeleter> bam_;
     std::unique_ptr<PbiBuilder2> builder_;
     bool isOpen_ = false;
-    int64_t uncompressedFilePos_ = 0;
+    std::int64_t uncompressedFilePos_ = 0;
 };
 
 #else  // htslib < v1.10
@@ -466,8 +467,8 @@ public:
 
         struct stat st;
         int ret = 0;
-        int64_t lastFileSize = 0;
-        int64_t numBytesRead = 0;
+        std::int64_t lastFileSize = 0;
+        std::int64_t numBytesRead = 0;
 
         auto initBgzf = [&bgzf, &bamFilename, numThreads]() {
             bgzf.reset(bgzf_open(bamFilename.c_str(), "rb"));
@@ -582,7 +583,7 @@ public:
                 remainingLength = (b->l_data - c->l_qname);
             else {
                 const std::size_t cigarEnd =
-                    ((uint8_t*)bam_get_cigar(b) - b->data) + (c->n_cigar * 4);
+                    ((std::uint8_t*)bam_get_cigar(b) - b->data) + (c->n_cigar * 4);
                 remainingLength = 8 + (b->l_data - cigarEnd) + 4 + (4 * c->n_cigar);
             }
 
@@ -638,7 +639,7 @@ private:
     std::atomic<bool> done_{false};
     std::atomic<std::size_t> maxTrailingDistance_{0};
 
-    int64_t uncompressedFilePos_ = 0;
+    std::int64_t uncompressedFilePos_ = 0;
 };
 
 #endif  // HTS_VERSION

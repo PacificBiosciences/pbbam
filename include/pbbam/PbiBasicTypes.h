@@ -40,8 +40,8 @@ public:
 public:
     std::size_t firstIndex_ =
         0;  ///< index of block's first record in BAM/PBI files (e.g. i-th record)
-    std::size_t numReads_ = 0;    ///< number of reads in this block
-    int64_t virtualOffset_ = -1;  ///< virtual offset of first record in this block
+    std::size_t numReads_ = 0;         ///< number of reads in this block
+    std::int64_t virtualOffset_ = -1;  ///< virtual offset of first record in this block
 };
 
 /// \brief container of PBI result blocks

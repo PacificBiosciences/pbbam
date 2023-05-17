@@ -67,7 +67,7 @@ public:
         // Use environment variable as number of BamReader threads
         if (const char* envCStr = std::getenv("PB_BAMREADER_THREADS")) {
             try {
-                const int32_t numThreads = std::stoi(envCStr);
+                const std::int32_t numThreads = std::stoi(envCStr);
                 if (numThreads <= 0) {
                     std::ostringstream s;
                     s << "[pbbam] BAM reader ERROR: environment variable PB_BAMREADER_THREADS is "
@@ -171,7 +171,7 @@ bool BamReader::GetNext(BamRecord& record)
 
 int BamReader::ReadRawData(samFile* file, bam1_t* b) { return bam_read1(file->fp.bgzf, b); }
 
-void BamReader::VirtualSeek(int64_t virtualOffset)
+void BamReader::VirtualSeek(std::int64_t virtualOffset)
 {
     const auto result = bgzf_seek(Bgzf(), virtualOffset, SEEK_SET);
     if (result != 0) {

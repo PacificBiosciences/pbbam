@@ -84,7 +84,7 @@ public:
     /// \returns ZMW hole number
     /// \throws if missing zm tag & record name does not contain hole number
     ///
-    int32_t HoleNumber() const;
+    std::int32_t HoleNumber() const;
 
     /// \returns this record's LocalContextFlags
     Data::LocalContextFlags LocalContextFlags() const;
@@ -93,7 +93,7 @@ public:
     std::string MovieName() const;
 
     /// \returns "number of complete passes of the insert"
-    int32_t NumPasses() const;
+    std::int32_t NumPasses() const;
 
     /// \returns the record's query end position, or Sequence().length() if not
     ///          stored
@@ -104,7 +104,7 @@ public:
 
     /// \returns the number of frames from start of movie to the last base of read
     ///
-    int32_t QueryEndFrameNumber() const;
+    std::int32_t QueryEndFrameNumber() const;
 
     /// \returns the record's query start position, or 0 if not stored
     ///
@@ -115,7 +115,7 @@ public:
 
     /// \returns the number of frames from start of movie to the first base of read
     ///
-    int32_t QueryStartFrameNumber() const;
+    std::int32_t QueryStartFrameNumber() const;
 
     /// \returns this record's expected read accuracy [0, 1000]
     Data::Accuracy ReadAccuracy() const;
@@ -162,7 +162,7 @@ public:
     std::string ReadGroupBaseId() const;
 
     /// \returns integer value for this record's read group ID
-    int32_t ReadGroupNumericId() const;
+    std::int32_t ReadGroupNumericId() const;
 
     /// \returns this scrap record's scrap region type
     VirtualRegionType ScrapRegionType() const;
@@ -215,7 +215,7 @@ public:
     /// \returns this record's mapping quality. A value of 255 indicates
     ///          "unknown"
     ///
-    uint8_t MapQuality() const;
+    std::uint8_t MapQuality() const;
 
     /// \returns the number of deleted bases (relative to reference)
     std::size_t NumDeletedBases() const;
@@ -254,7 +254,7 @@ public:
     ///
     /// \note This is only a valid identifier within this %BAM file
     ///
-    int32_t ReferenceId() const;
+    std::int32_t ReferenceId() const;
 
     /// \returns this record's reference name.
     ///
@@ -289,28 +289,28 @@ public:
     /// \throws std::runtime_error if barcode data is absent or malformed.
     /// \sa HasBarcodes
     ///
-    int16_t BarcodeForward() const;
+    std::int16_t BarcodeForward() const;
 
     /// \returns barcode call confidence (Phred-scaled posterior probability
     ///          of correct barcode call)
     ///
     /// \sa HasBarcodeQuality
     ///
-    uint8_t BarcodeQuality() const;
+    std::uint8_t BarcodeQuality() const;
 
     /// \returns reverse barcode id
     ///
     /// \throws std::runtime_error if barcode data is absent or malformed.
     /// \sa HasBarcodes
     ///
-    int16_t BarcodeReverse() const;
+    std::int16_t BarcodeReverse() const;
 
     /// \returns the forward and reverse barcode ids
     ///
     /// \throws std::runtime_error if barcode data is absent or malformed.
     /// \sa HasBarcodes
     ///
-    std::pair<int16_t, int16_t> Barcodes() const;
+    std::pair<std::int16_t, std::int16_t> Barcodes() const;
 
     /// \}
 
@@ -328,21 +328,21 @@ public:
     /// \throws std::runtime_error if segment read data is absent or malformed.
     /// \sa HasSegmentIndex
     ///
-    int32_t SegmentIndex() const;
+    std::int32_t SegmentIndex() const;
 
     /// \returns index of left adapater
     ///
     /// \throws std::runtime_error if segment read data is absent or malformed.
     /// \sa HasSegmentLeadingAdapterIndex
     ///
-    int32_t SegmentLeftAdapterIndex() const;
+    std::int32_t SegmentLeftAdapterIndex() const;
 
     /// \returns index of right adapater
     ///
     /// \throws std::runtime_error if segment read data is absent or malformed.
     /// \sa HasSegmentTrailingAdapterIndex
     ///
-    int32_t SegmentRightAdapterIndex() const;
+    std::int32_t SegmentRightAdapterIndex() const;
 
     /// \returns segment read supplemental data, decoded to JSON
     ///
@@ -885,11 +885,11 @@ public:
     ///
     /// \param[in] orientation     Orientation of output
     ///
-    /// \returns StartFrame as uint32_t vector
+    /// \returns StartFrame as std::uint32_t vector
     ///
-    std::vector<uint32_t> StartFrame(Data::Orientation orientation = Data::Orientation::NATIVE,
-                                     bool aligned = false, bool exciseSoftClips = false,
-                                     PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    std::vector<std::uint32_t> StartFrame(Data::Orientation orientation = Data::Orientation::NATIVE,
+                                          bool aligned = false, bool exciseSoftClips = false,
+                                          PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     /// \}
 
@@ -924,7 +924,7 @@ public:
     /// \param[in] holeNumber
     /// \returns reference to this record
     ///
-    BamRecord& HoleNumber(int32_t holeNumber);
+    BamRecord& HoleNumber(std::int32_t holeNumber);
 
     /// \brief Sets this record's local context flags
     ///
@@ -938,7 +938,7 @@ public:
     /// \param[in] numPasses
     /// \returns reference to this record
     ///
-    BamRecord& NumPasses(int32_t numPasses);
+    BamRecord& NumPasses(std::int32_t numPasses);
 
     /// \brief Sets this record's query end position.
     ///
@@ -954,7 +954,7 @@ public:
     /// \param[in] frame number
     /// \returns reference to this record
     ///
-    BamRecord& QueryEndFrameNumber(int32_t frameNumber);
+    BamRecord& QueryEndFrameNumber(std::int32_t frameNumber);
 
     /// \brief Sets this record's query start position.
     ///
@@ -970,7 +970,7 @@ public:
     /// \param[in] frame number
     /// \returns reference to this record
     ///
-    BamRecord& QueryStartFrameNumber(int32_t frameNumber);
+    BamRecord& QueryStartFrameNumber(std::int32_t frameNumber);
 
     /// \brief Sets this record's expected read accuracy [0, 1000]
     ///
@@ -1042,14 +1042,14 @@ public:
     /// \param[in] barcodeIds
     /// \returns reference to this record
     ///
-    BamRecord& Barcodes(const std::pair<int16_t, int16_t>& barcodeIds);
+    BamRecord& Barcodes(const std::pair<std::int16_t, std::int16_t>& barcodeIds);
 
     /// \brief Sets this record's barcode quality ('bq' tag)
     ///
     /// \param[in] quality Phred-scaled confidence call
     /// \returns reference to this record
     ///
-    BamRecord& BarcodeQuality(uint8_t quality);
+    BamRecord& BarcodeQuality(std::uint8_t quality);
 
     /// \}
 
@@ -1061,21 +1061,21 @@ public:
     /// \param[in] index    0-based index of this segment within its source read
     /// \returns reference to this record
     ///
-    BamRecord& SegmentIndex(int32_t index);
+    BamRecord& SegmentIndex(std::int32_t index);
 
     /// \returns Sets this segment's left adapter index ('dl' tag)
     ///
     /// \param[in] index    0-based index of segment left adapter
     /// \returns reference to this record
     ///
-    BamRecord& SegmentLeftAdapterIndex(int32_t index);
+    BamRecord& SegmentLeftAdapterIndex(std::int32_t index);
 
     /// \returns Sets this segment's right adapter index ('dr' tag)
     ///
     /// \param[in] index    0-based index of segment right adapter
     /// \returns reference to this record
     ///
-    BamRecord& SegmentRightAdapterIndex(int32_t index);
+    BamRecord& SegmentRightAdapterIndex(std::int32_t index);
 
     /// \returns Sets this segment's supplemental data ('ds' tag)
     ///
@@ -1215,7 +1215,7 @@ public:
     /// \param[in] encodedPhotons
     /// \returns reference to this record
     ///
-    BamRecord& Pkmean(const std::vector<uint16_t>& encodedPhotons);
+    BamRecord& Pkmean(const std::vector<std::uint16_t>& encodedPhotons);
 
     /// \brief Sets this record's Pkmid values ("pa" tag).
     ///
@@ -1229,7 +1229,7 @@ public:
     /// \param[in] encodedPhotons
     /// \returns reference to this record
     ///
-    BamRecord& Pkmid(const std::vector<uint16_t>& encodedPhotons);
+    BamRecord& Pkmid(const std::vector<std::uint16_t>& encodedPhotons);
 
     /// \brief Sets this record's Pkmean2 values ("ps" tag).
     ///
@@ -1243,7 +1243,7 @@ public:
     /// \param[in] encodedPhotons
     /// \returns reference to this record
     ///
-    BamRecord& Pkmean2(const std::vector<uint16_t>& encodedPhotons);
+    BamRecord& Pkmean2(const std::vector<std::uint16_t>& encodedPhotons);
 
     /// \brief Sets this record's Pkmid2 values ("pi" tag).
     ///
@@ -1257,7 +1257,7 @@ public:
     /// \param[in] encodedPhotons
     /// \returns reference to this record
     ///
-    BamRecord& Pkmid2(const std::vector<uint16_t>& encodedPhotons);
+    BamRecord& Pkmid2(const std::vector<std::uint16_t>& encodedPhotons);
 
     /// \brief Sets this record's PreBaseFrames aka IPD values ("ip" tag).
     ///
@@ -1387,7 +1387,7 @@ public:
     /// \param[in] startFrame
     /// \returns reference to this record
     ///
-    BamRecord& StartFrame(const std::vector<uint32_t>& startFrame);
+    BamRecord& StartFrame(const std::vector<std::uint32_t>& startFrame);
 
     /// \}
 
@@ -1427,7 +1427,7 @@ public:
 
     static const float photonFactor;
 
-    static std::vector<uint16_t> EncodePhotons(const std::vector<float>& data);
+    static std::vector<std::uint16_t> EncodePhotons(const std::vector<float>& data);
 
     /// \}
 
@@ -1459,30 +1459,31 @@ public:
                              Data::Position end, bool exciseFlankingInserts = false);
 
     /// Creates a copied record from input, with mapping applied
-    static BamRecord Mapped(const BamRecord& input, int32_t referenceId, Data::Position refStart,
-                            Data::Strand strand, const Data::Cigar& cigar, uint8_t mappingQuality);
+    static BamRecord Mapped(const BamRecord& input, std::int32_t referenceId,
+                            Data::Position refStart, Data::Strand strand, const Data::Cigar& cigar,
+                            std::uint8_t mappingQuality);
 
     /// Splits the (5mC) basemods `Mm` and `Ml` tags
     struct SplitBasemods
     {
-        std::vector<int32_t> LeadingSeparatingC;
-        std::vector<uint8_t> LeadingQuals;
+        std::vector<std::int32_t> LeadingSeparatingC;
+        std::vector<std::uint8_t> LeadingQuals;
 
-        std::vector<int32_t> RetainedSeparatingC;
-        std::vector<uint8_t> RetainedQuals;
+        std::vector<std::int32_t> RetainedSeparatingC;
+        std::vector<std::uint8_t> RetainedQuals;
 
-        std::vector<int32_t> TrailingSeparatingC;
-        std::vector<uint8_t> TrailingQuals;
+        std::vector<std::int32_t> TrailingSeparatingC;
+        std::vector<std::uint8_t> TrailingQuals;
 
-        int32_t PrefixLostBases{0};
+        std::int32_t PrefixLostBases{0};
 
-        static std::vector<int32_t> SplitBasemodsString(const std::string& str);
+        static std::vector<std::int32_t> SplitBasemodsString(const std::string& str);
 
-        static std::string SeparatingCToString(const std::vector<int32_t>& vec);
+        static std::string SeparatingCToString(const std::vector<std::int32_t>& vec);
     };
     static SplitBasemods ClipBasemodsTag(const std::string& seq,
                                          const std::string& oldBasemodsString,
-                                         const std::vector<uint8_t>& basemodsQVs,
+                                         const std::vector<std::uint8_t>& basemodsQVs,
                                          std::size_t clipFrom, std::size_t clipLength);
 
     /// Applies clipping to this record
@@ -1494,12 +1495,12 @@ public:
                       bool exciseFlankingInserts = false) const;
 
     /// Applies mapping to this record
-    BamRecord& Map(int32_t referenceId, Data::Position refStart, Data::Strand strand,
-                   const Data::Cigar& cigar, uint8_t mappingQuality);
+    BamRecord& Map(std::int32_t referenceId, Data::Position refStart, Data::Strand strand,
+                   const Data::Cigar& cigar, std::uint8_t mappingQuality);
 
     /// Creates a copied record from this one, with mapping applied
-    BamRecord Mapped(int32_t referenceId, Data::Position refStart, Data::Strand strand,
-                     const Data::Cigar& cigar, uint8_t mappingQuality) const;
+    BamRecord Mapped(std::int32_t referenceId, Data::Position refStart, Data::Strand strand,
+                     const Data::Cigar& cigar, std::uint8_t mappingQuality) const;
     /// \}
 
     ///
@@ -1580,21 +1581,21 @@ private:
     //
     // TODO (DB): clean this up w.r.t FetchUInt8s
     //
-    std::vector<uint32_t> FetchUInt32sRaw(BamRecordTag tag) const;
-    std::vector<uint32_t> FetchUInt32s(BamRecordTag tag,
-                                       Data::Orientation orientation = Data::Orientation::NATIVE,
-                                       bool aligned = false, bool exciseSoftClips = false,
-                                       PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    std::vector<std::uint32_t> FetchUInt32sRaw(BamRecordTag tag) const;
+    std::vector<std::uint32_t> FetchUInt32s(
+        BamRecordTag tag, Data::Orientation orientation = Data::Orientation::NATIVE,
+        bool aligned = false, bool exciseSoftClips = false,
+        PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
     // UInt tags (e.g. pulse exclusion)
     //
     // ODO (DB): clean this up w.r.t FetchUInt32s
     //
-    std::vector<uint8_t> FetchUInt8sRaw(BamRecordTag tag) const;
-    std::vector<uint8_t> FetchUInt8s(BamRecordTag tag,
-                                     Data::Orientation orientation = Data::Orientation::NATIVE,
-                                     bool aligned = false, bool exciseSoftClips = false,
-                                     PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
+    std::vector<std::uint8_t> FetchUInt8sRaw(BamRecordTag tag) const;
+    std::vector<std::uint8_t> FetchUInt8s(BamRecordTag tag,
+                                          Data::Orientation orientation = Data::Orientation::NATIVE,
+                                          bool aligned = false, bool exciseSoftClips = false,
+                                          PulseBehavior pulseBehavior = PulseBehavior::ALL) const;
 
 private:
     ///\internal

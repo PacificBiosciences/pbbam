@@ -221,7 +221,7 @@ int32_t AutomationParameters::CellNFCIndex() const
     return std::stoi(GetParameter(Element::CELL_NFC_INDEX));
 }
 
-AutomationParameters& AutomationParameters::CellNFCIndex(int32_t i)
+AutomationParameters& AutomationParameters::CellNFCIndex(std::int32_t i)
 {
     return SetParameter(Element::CELL_NFC_INDEX, "Int32", std::to_string(i));
 }
@@ -233,7 +233,7 @@ int32_t AutomationParameters::CollectionNumber() const
     return std::stoi(GetParameter(Element::COLLECTION_NUMBER));
 }
 
-AutomationParameters& AutomationParameters::CollectionNumber(int32_t i)
+AutomationParameters& AutomationParameters::CollectionNumber(std::int32_t i)
 {
     return SetParameter(Element::COLLECTION_NUMBER, "Int32", std::to_string(i));
 }
@@ -284,7 +284,7 @@ int32_t AutomationParameters::ExtraIMWashes() const
     return std::stoi(GetParameter(Element::EXTRA_IM_WASHES));
 }
 
-AutomationParameters& AutomationParameters::ExtraIMWashes(int32_t i)
+AutomationParameters& AutomationParameters::ExtraIMWashes(std::int32_t i)
 {
     return SetParameter(Element::EXTRA_IM_WASHES, "Int32", std::to_string(i));
 }
@@ -335,7 +335,7 @@ int32_t AutomationParameters::InsertSize() const
     return std::stoi(GetParameter(Element::INSERT_SIZE));
 }
 
-AutomationParameters& AutomationParameters::InsertSize(int32_t i)
+AutomationParameters& AutomationParameters::InsertSize(std::int32_t i)
 {
     return SetParameter(Element::INSERT_SIZE, "Int32", std::to_string(i));
 }
@@ -395,7 +395,7 @@ int32_t AutomationParameters::TipSearchMaxDuration() const
     return std::stoi(GetParameter(Element::TIP_SEARCH_MAX_DURATION));
 }
 
-AutomationParameters& AutomationParameters::TipSearchMaxDuration(int32_t i)
+AutomationParameters& AutomationParameters::TipSearchMaxDuration(std::int32_t i)
 {
     return SetParameter(Element::TIP_SEARCH_MAX_DURATION, "Int32", std::to_string(i));
 }

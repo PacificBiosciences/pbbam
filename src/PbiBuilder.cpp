@@ -79,7 +79,7 @@ PbiBuilder& PbiBuilder::operator=(PbiBuilder&&) noexcept = default;
 
 PbiBuilder::~PbiBuilder() noexcept = default;
 
-void PbiBuilder::AddRecord(const BamRecord& record, const int64_t vOffset)
+void PbiBuilder::AddRecord(const BamRecord& record, const std::int64_t vOffset)
 {
     d_->AddRecord(record, vOffset);
 }

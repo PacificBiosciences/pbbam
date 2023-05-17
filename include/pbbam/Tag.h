@@ -27,12 +27,12 @@ enum class TagDataType
     UINT32,            ///< uint32_t
     FLOAT,             ///< float
     STRING,            ///< std::string
-    INT8_ARRAY,        ///< std::vector<int8_t>
-    UINT8_ARRAY = 10,  ///< std::vector<uint8_t>
-    INT16_ARRAY,       ///< std::vector<int16_t>
-    UINT16_ARRAY,      ///< std::vector<uint16_t>
-    INT32_ARRAY,       ///< std::vector<int32_t>
-    UINT32_ARRAY,      ///< std::vector<uint32_t>
+    INT8_ARRAY,        ///< std::vector<std::int8_t>
+    UINT8_ARRAY = 10,  ///< std::vector<std::uint8_t>
+    INT16_ARRAY,       ///< std::vector<std::int16_t>
+    UINT16_ARRAY,      ///< std::vector<std::uint16_t>
+    INT32_ARRAY,       ///< std::vector<std::int32_t>
+    UINT32_ARRAY,      ///< std::vector<std::uint32_t>
     FLOAT_ARRAY = 15   ///< std::vector<float>
 };
 
@@ -53,7 +53,7 @@ enum class TagModifier
     ///
     /// SAM/BAM has the concept of an ASCII character that is distinct from an
     /// 8-bit integer. However, there is no such pure separation in C++ - as
-    /// int8_t/uint8_t are likely implemented as typedefs around char/unsigned
+    /// std::int8_t/uint8_t are likely implemented as typedefs around char/unsigned
     /// char. Thus this modifier can be used to indicate a tag's value should be
     /// interpreted as a printable, ASCII character.
     ///
@@ -96,7 +96,7 @@ public:
     /// For ASCII tags, use one of these methods:
     /// \include code/Tag_AsciiCtor.txt
     ///
-    Tag(int8_t value);
+    Tag(std::int8_t value);
 
     /// \brief Creates a Tag from a signed 8-bit integer or character,
     ///        applying the provided modifier.
@@ -104,9 +104,9 @@ public:
     /// This method allows direct construction of an ASCII character, rather
     /// than an 8-bit integer (e.g. Tag('A', TagModifier::ASCII_CHAR) ).
     ///
-    /// \throws runtime_error if \p modifier is not valid for int8_t data
+    /// \throws runtime_error if \p modifier is not valid for std::int8_t data
     ///
-    Tag(int8_t value, TagModifier mod);
+    Tag(std::int8_t value, TagModifier mod);
 
     /// \brief Creates a Tag from an unsigned 8-bit integer or character.
     ///
@@ -115,19 +115,19 @@ public:
     /// a char. For ASCII tags, use one of these methods:
     /// \include code/Tag_AsciiCtor.txt
     ///
-    Tag(uint8_t value);
+    Tag(std::uint8_t value);
 
     /// \brief Creates a Tag from 16-bit integer.
-    Tag(int16_t value);
+    Tag(std::int16_t value);
 
     /// \brief Creates a Tag from 16-bit unsigned integer.
-    Tag(uint16_t value);
+    Tag(std::uint16_t value);
 
     /// \brief Creates a Tag from 32-bit signed integer.
-    Tag(int32_t value);
+    Tag(std::int32_t value);
 
     /// \brief Creates a Tag from 32-bit unsigned integer.
-    Tag(uint32_t value);
+    Tag(std::uint32_t value);
 
     /// \brief Creates a Tag from floating-point value.
     Tag(float value);
@@ -142,22 +142,22 @@ public:
     Tag(std::string value, TagModifier mod);
 
     /// \brief Creates a Tag from a vector of 8-bit integers.
-    Tag(std::vector<int8_t> value);
+    Tag(std::vector<std::int8_t> value);
 
     /// \brief Creates a Tag from a vector of 8-bit unsigned integers.
-    Tag(std::vector<uint8_t> value);
+    Tag(std::vector<std::uint8_t> value);
 
     /// \brief Creates a Tag from a vector of 16-bit integers.
-    Tag(std::vector<int16_t> value);
+    Tag(std::vector<std::int16_t> value);
 
     /// \brief Creates a Tag from a vector of 16-bit unsigned integers.
-    Tag(std::vector<uint16_t> value);
+    Tag(std::vector<std::uint16_t> value);
 
     /// Constructs a Tag from a vector of 32-bit integers.
-    Tag(std::vector<int32_t> value);
+    Tag(std::vector<std::int32_t> value);
 
     /// \brief Creates a Tag from a vector of 32-bit unsigned integers.
-    Tag(std::vector<uint32_t> value);
+    Tag(std::vector<std::uint32_t> value);
 
     /// \brief Creates a Tag from a vector of floating-point values.
     Tag(std::vector<float> value);
@@ -165,20 +165,20 @@ public:
     Tag() = default;
 
     Tag& operator=(std::monostate value);
-    Tag& operator=(int8_t value);
-    Tag& operator=(uint8_t value);
-    Tag& operator=(int16_t value);
-    Tag& operator=(uint16_t value);
-    Tag& operator=(int32_t value);
-    Tag& operator=(uint32_t value);
+    Tag& operator=(std::int8_t value);
+    Tag& operator=(std::uint8_t value);
+    Tag& operator=(std::int16_t value);
+    Tag& operator=(std::uint16_t value);
+    Tag& operator=(std::int32_t value);
+    Tag& operator=(std::uint32_t value);
     Tag& operator=(float value);
     Tag& operator=(std::string value);
-    Tag& operator=(std::vector<int8_t> value);
-    Tag& operator=(std::vector<uint8_t> value);
-    Tag& operator=(std::vector<int16_t> value);
-    Tag& operator=(std::vector<uint16_t> value);
-    Tag& operator=(std::vector<int32_t> value);
-    Tag& operator=(std::vector<uint32_t> value);
+    Tag& operator=(std::vector<std::int8_t> value);
+    Tag& operator=(std::vector<std::uint8_t> value);
+    Tag& operator=(std::vector<std::int16_t> value);
+    Tag& operator=(std::vector<std::uint16_t> value);
+    Tag& operator=(std::vector<std::int32_t> value);
+    Tag& operator=(std::vector<std::uint32_t> value);
     Tag& operator=(std::vector<float> value);
 
     bool operator==(const Tag& other) const;
@@ -201,27 +201,27 @@ public:
 
     /// \returns tag data as signed 8-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    int8_t ToInt8() const;
+    std::int8_t ToInt8() const;
 
     /// \returns tag data as unsigned 8-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    uint8_t ToUInt8() const;
+    std::uint8_t ToUInt8() const;
 
     /// \returns tag data as signed 16-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    int16_t ToInt16() const;
+    std::int16_t ToInt16() const;
 
     /// \returns tag data as unsigned 16-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    uint16_t ToUInt16() const;
+    std::uint16_t ToUInt16() const;
 
     /// \returns tag data as signed 32-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    int32_t ToInt32() const;
+    std::int32_t ToInt32() const;
 
     /// \returns tag data as unsigned 32-bit (casting if needed)
     /// \throws std::runtime_error if not integral data, or out of valid range
-    uint32_t ToUInt32() const;
+    std::uint32_t ToUInt32() const;
 
     /// \returns tag data as float
     /// \throws std::runtime_error if tag does not contain a value of
@@ -233,35 +233,35 @@ public:
     ///         type: std::string
     std::string ToString() const;
 
-    /// \returns tag data as std::vector<int8_t>
+    /// \returns tag data as std::vector<std::int8_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
-    ///         type: std::vector<int8_t>
-    std::vector<int8_t> ToInt8Array() const;
+    ///         type: std::vector<std::int8_t>
+    std::vector<std::int8_t> ToInt8Array() const;
 
-    /// \returns tag data as std::vector<uint8_t>
+    /// \returns tag data as std::vector<std::uint8_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
-    ///         type: std::vector<uint8_t>
-    std::vector<uint8_t> ToUInt8Array() const;
+    ///         type: std::vector<std::uint8_t>
+    std::vector<std::uint8_t> ToUInt8Array() const;
 
-    /// \returns tag data as std::vector<int16_t>
+    /// \returns tag data as std::vector<std::int16_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
-    ///         type: std::vector<int16_t>
-    std::vector<int16_t> ToInt16Array() const;
+    ///         type: std::vector<std::int16_t>
+    std::vector<std::int16_t> ToInt16Array() const;
 
-    /// \returns tag data as std::vector<uint16_t>
+    /// \returns tag data as std::vector<std::uint16_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
-    ///         type: std::vector<uint16_t>
-    std::vector<uint16_t> ToUInt16Array() const;
+    ///         type: std::vector<std::uint16_t>
+    std::vector<std::uint16_t> ToUInt16Array() const;
 
-    /// \returns tag data as std::vector<int32_t>
+    /// \returns tag data as std::vector<std::int32_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
-    ///         type: std::vector<int32_t>
-    std::vector<int32_t> ToInt32Array() const;
+    ///         type: std::vector<std::int32_t>
+    std::vector<std::int32_t> ToInt32Array() const;
 
-    /// \returns tag data as std::vector<uint32_t>
+    /// \returns tag data as std::vector<std::uint32_t>
     /// \throws std::runtime_error if tag does not contain a value of explicit
-    ///         type: std::vector<uint32_t>
-    std::vector<uint32_t> ToUInt32Array() const;
+    ///         type: std::vector<std::uint32_t>
+    std::vector<std::uint32_t> ToUInt32Array() const;
 
     /// \returns tag data as std::vector<float>
     /// \throws std::runtime_error if tag does not contain a value of explicit
@@ -305,22 +305,22 @@ public:
     ///          TagModifier of TagModifier::HEX_STRING
     bool IsHexString() const;
 
-    /// \returns true if tag contains a value of type: std::vector<int8_t>
+    /// \returns true if tag contains a value of type: std::vector<std::int8_t>
     bool IsInt8Array() const;
 
-    /// \returns true if tag contains a value of type: std::vector<uint8_t>
+    /// \returns true if tag contains a value of type: std::vector<std::uint8_t>
     bool IsUInt8Array() const;
 
-    /// \returns true if tag contains a value of type: std::vector<int16_t>
+    /// \returns true if tag contains a value of type: std::vector<std::int16_t>
     bool IsInt16Array() const;
 
-    /// \returns true if tag contains a value of type: std::vector<uint16_t>
+    /// \returns true if tag contains a value of type: std::vector<std::uint16_t>
     bool IsUInt16Array() const;
 
-    /// \returns true if tag contains a value of type: std::vector<int32_t>
+    /// \returns true if tag contains a value of type: std::vector<std::int32_t>
     bool IsInt32Array() const;
 
-    /// \returns true if tag contains a value of type: std::vector<uint32_t>
+    /// \returns true if tag contains a value of type: std::vector<std::uint32_t>
     bool IsUInt32Array() const;
 
     /// \returns true if tag contains a value of type: std::vector<float>
@@ -394,20 +394,20 @@ public:
     // clang-format off
     // NOTE - keep this synced with TagDataType enum ordering
     using var_t = std::variant<std::monostate, // <-- default constructor creates variant of this type
-                               int8_t,
-                               uint8_t,
-                               int16_t,
-                               uint16_t,
-                               int32_t,
-                               uint32_t,
+                               std::int8_t,
+                               std::uint8_t,
+                               std::int16_t,
+                               std::uint16_t,
+                               std::int32_t,
+                               std::uint32_t,
                                float,
                                std::string,
-                               std::vector<int8_t>,
-                               std::vector<uint8_t>,
-                               std::vector<int16_t>,
-                               std::vector<uint16_t>,
-                               std::vector<int32_t>,
-                               std::vector<uint32_t>,
+                               std::vector<std::int8_t>,
+                               std::vector<std::uint8_t>,
+                               std::vector<std::int16_t>,
+                               std::vector<std::uint16_t>,
+                               std::vector<std::int32_t>,
+                               std::vector<std::uint32_t>,
                                std::vector<float> >;
     // clang-format on
 

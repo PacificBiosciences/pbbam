@@ -17,7 +17,7 @@ struct FaiZmwChunk
     std::string FirstSeqName;
 
     /// File offset to the sequence of the chunk's first entry.
-    uint64_t FirstSeqOffset;
+    std::uint64_t FirstSeqOffset;
 
     // Total number of records in chunk.
     std::size_t NumRecords;

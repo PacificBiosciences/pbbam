@@ -46,10 +46,10 @@ FaiZmwChunker::FaiZmwChunker(const FaiIndex& index, const std::size_t numChunks)
     }
 
     // tease apart unique ZMWs
-    int32_t currentHoleNumber = -1;
+    std::int32_t currentHoleNumber = -1;
     std::vector<FaiZmwChunk> rawChunks;
     for (const auto& name : names) {
-        const int32_t holeNumber = HoleNumber(name);
+        const std::int32_t holeNumber = HoleNumber(name);
         if (holeNumber != currentHoleNumber) {
             rawChunks.emplace_back(FaiZmwChunk{name, index.Entry(name).SeqOffset, 1, 1});
             currentHoleNumber = holeNumber;

@@ -32,22 +32,25 @@ public:
     static void Save(const PbiRawData& rawData, const std::string& filename);
 
     // per-component load
-    static void LoadBarcodeData(PbiRawBarcodeData& barcodeData, uint32_t numReads, BGZF* fp);
+    static void LoadBarcodeData(PbiRawBarcodeData& barcodeData, std::uint32_t numReads, BGZF* fp);
     static void LoadHeader(PbiRawData& index, BGZF* fp);
-    static void LoadMappedData(PbiRawMappedData& mappedData, uint32_t numReads, BGZF* fp);
+    static void LoadMappedData(PbiRawMappedData& mappedData, std::uint32_t numReads, BGZF* fp);
     static void LoadReferenceData(PbiRawReferenceData& referenceData, BGZF* fp);
-    static void LoadBasicData(PbiRawBasicData& basicData, uint32_t numReads, BGZF* fp);
+    static void LoadBasicData(PbiRawBasicData& basicData, std::uint32_t numReads, BGZF* fp);
 
     // per-data-field load
     template <typename T>
-    static void LoadBgzfVector(BGZF* fp, std::vector<T>& data, uint32_t numReads);
+    static void LoadBgzfVector(BGZF* fp, std::vector<T>& data, std::uint32_t numReads);
 
     // per-component write
-    static void WriteBarcodeData(const PbiRawBarcodeData& barcodeData, uint32_t numReads, BGZF* fp);
+    static void WriteBarcodeData(const PbiRawBarcodeData& barcodeData, std::uint32_t numReads,
+                                 BGZF* fp);
     static void WriteHeader(const PbiRawData& index, BGZF* fp);
-    static void WriteMappedData(const PbiRawMappedData& mappedData, uint32_t numReads, BGZF* fp);
+    static void WriteMappedData(const PbiRawMappedData& mappedData, std::uint32_t numReads,
+                                BGZF* fp);
     static void WriteReferenceData(const PbiRawReferenceData& referenceData, BGZF* fp);
-    static void WriteBasicData(const PbiRawBasicData& subreadData, uint32_t numReads, BGZF* fp);
+    static void WriteBasicData(const PbiRawBasicData& subreadData, std::uint32_t numReads,
+                               BGZF* fp);
 
     // per-data-field write
     template <typename T>
@@ -60,7 +63,7 @@ private:
 };
 
 template <typename T>
-void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const uint32_t numReads)
+void PbiIndexIO::LoadBgzfVector(BGZF* fp, std::vector<T>& data, const std::uint32_t numReads)
 {
     assert(fp);
     data.resize(numReads);

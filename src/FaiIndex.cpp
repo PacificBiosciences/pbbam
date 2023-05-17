@@ -126,7 +126,7 @@ const FaiEntry& FaiIndex::Entry(const std::string& name) const
     return found->second;
 }
 
-const FaiEntry& FaiIndex::Entry(const uint32_t row) const
+const FaiEntry& FaiIndex::Entry(const std::uint32_t row) const
 {
     const auto& name = d_->names_.at(row);
     return Entry(name);

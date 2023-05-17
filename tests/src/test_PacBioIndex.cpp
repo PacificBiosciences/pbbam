@@ -191,10 +191,10 @@ TEST(BAM_PacBioIndex, can_create_inline_with_bam_writer)
     const std::string tempPbiFn = tempBamFn + ".pbi";
 
     // NOTE: new file differs in size than existing (different write parameters may yield different file sizes, even though content is same)
-    const std::vector<int64_t> expectedNewOffsets = {33816576,   236126208, 391315456, 469106688,
-                                                     537067520,  587792384, 867303424, 1182793728,
-                                                     1449787392, 1582628864};
-    std::vector<int64_t> observedOffsets;
+    const std::vector<std::int64_t> expectedNewOffsets = {
+        33816576,  236126208, 391315456,  469106688,  537067520,
+        587792384, 867303424, 1182793728, 1449787392, 1582628864};
+    std::vector<std::int64_t> observedOffsets;
 
     // create PBI on the fly from input BAM while we write to new file
     {
@@ -204,7 +204,7 @@ TEST(BAM_PacBioIndex, can_create_inline_with_bam_writer)
         BamWriter writer{tempBamFn, header};  // default compression, default thread count
         PbiBuilder builder{tempPbiFn, header.Sequences().size()};
 
-        int64_t vOffset = 0;
+        std::int64_t vOffset = 0;
         EntireFileQuery entireFile{bamFile};
         for (const BamRecord& record : entireFile) {
             writer.Write(record, &vOffset);
@@ -217,9 +217,9 @@ TEST(BAM_PacBioIndex, can_create_inline_with_bam_writer)
 
     // sanity check on original file
     {
-        const std::vector<int64_t> originalFileOffsets = {33816576, 33825163,  33831333, 33834264,
-                                                          33836542, 33838065,  33849818, 33863499,
-                                                          33874621, 1392836608};
+        const std::vector<std::int64_t> originalFileOffsets = {
+            33816576, 33825163, 33831333, 33834264, 33836542,
+            33838065, 33849818, 33863499, 33874621, 1392836608};
         BamRecord r;
         BamReader reader{PacBioIndexTests::test2BamFn};
         for (std::size_t i = 0; i < originalFileOffsets.size(); ++i) {
@@ -287,17 +287,17 @@ TEST(BAM_PacBioIndex, can_load_sections_from_pbi_file)
     EXPECT_FALSE(index.HasMappedData());
     EXPECT_TRUE(index.HasBarcodeData());
 
-    const std::vector<int16_t> expectedBcForward{
+    const std::vector<std::int16_t> expectedBcForward{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
-    const std::vector<int16_t> expectedBcReverse{
+    const std::vector<std::int16_t> expectedBcReverse{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
-    const std::vector<int8_t> expectedBcQuality{
+    const std::vector<std::int8_t> expectedBcQuality{
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -322,9 +322,10 @@ TEST(BAM_PacBioIndex, reference_data_is_absent_from_unsorted_bam)
 
 TEST(BAM_PacBioIndex, loads_offsets_from_pbi_file)
 {
-    const uint32_t expectedNumReads = 10;
-    const std::vector<int64_t> expectedOffsets{33816576, 33825163, 33831333, 33834264, 33836542,
-                                               33838065, 33849818, 33863499, 33874621, 1392836608};
+    const std::uint32_t expectedNumReads = 10;
+    const std::vector<std::int64_t> expectedOffsets{33816576, 33825163,  33831333, 33834264,
+                                                    33836542, 33838065,  33849818, 33863499,
+                                                    33874621, 1392836608};
 
     const BamFile bamFile{PacBioIndexTests::test2BamFn};
     const PbiRawData index{bamFile.PacBioIndexFilename()};
@@ -363,7 +364,7 @@ TEST(BAM_PacBioIndex, can_aggregate_multiple_pbi_file_data_from_dataset)
     const PbiRawBarcodeData& mergedBarcodeData = index.BarcodeData();
     const PbiRawMappedData& mergedMappedData = index.MappedData();
 
-    const uint32_t expectedTotal = 13;  // 4 + 8 + 1
+    const std::uint32_t expectedTotal = 13;  // 4 + 8 + 1
 
     // 'meta' info
     EXPECT_EQ(expectedTotal, index.NumReads());
@@ -425,7 +426,7 @@ TEST(BAM_PbiIndexCache, can_load_from_dataset)
 {
     const DataSet ds{PbbamTestsConfig::Data_Dir + "/chunking/chunking.subreadset.xml"};
 
-    std::vector<uint32_t> readCounts;
+    std::vector<std::uint32_t> readCounts;
     for (const BamFile& bamFile : ds.BamFiles()) {
         const PbiRawData index{bamFile};
         readCounts.push_back(index.NumReads());

@@ -149,10 +149,10 @@ public:
     std::string ReferenceName(int id) const;
 
     /// \returns length of requested reference \p name. 0 if not found
-    uint32_t ReferenceLength(const std::string& name) const;
+    std::uint32_t ReferenceLength(const std::string& name) const;
 
     /// \returns length of requested reference \p id. 0 if not found
-    uint32_t ReferenceLength(int id) const;
+    std::uint32_t ReferenceLength(int id) const;
 
     /// \}
 

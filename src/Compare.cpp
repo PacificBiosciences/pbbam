@@ -79,8 +79,8 @@ static const std::unordered_map<Compare::Type, TypeAlias, CompareTypeHash> typeA
 
 bool Compare::AlignmentPosition::operator()(const BamRecord& lhs, const BamRecord& rhs) const
 {
-    const int32_t lhsId = lhs.ReferenceId();
-    const int32_t rhsId = rhs.ReferenceId();
+    const std::int32_t lhsId = lhs.ReferenceId();
+    const std::int32_t rhsId = rhs.ReferenceId();
 
     // push unmapped reads to bottom
     if (lhsId == -1) {

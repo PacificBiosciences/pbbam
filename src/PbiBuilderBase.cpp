@@ -60,15 +60,15 @@ PbiBuilderBase::~PbiBuilderBase() noexcept
 void PbiBuilderBase::AddBarcodeData(const BamRecord& b)
 {
     // initialize w/ 'missing' value
-    int16_t bcForward = -1;
-    int16_t bcReverse = -1;
-    int8_t bcQuality = -1;
+    std::int16_t bcForward = -1;
+    std::int16_t bcReverse = -1;
+    std::int8_t bcQuality = -1;
 
     // check for any barcode data (both required)
     if (b.HasBarcodes() && b.HasBarcodeQuality()) {
         // fetch data from record
         std::tie(bcForward, bcReverse) = b.Barcodes();
-        bcQuality = static_cast<int8_t>(b.BarcodeQuality());
+        bcQuality = static_cast<std::int8_t>(b.BarcodeQuality());
 
         // double-check & reset to 'missing' value if any less than zero
         if (bcForward < 0 && bcReverse < 0 && bcQuality < 0) {
@@ -86,10 +86,10 @@ void PbiBuilderBase::AddBarcodeData(const BamRecord& b)
     bcQualField_.Add(bcQuality);
 }
 
-void PbiBuilderBase::AddBasicData(const BamRecord& b, int64_t uOffset)
+void PbiBuilderBase::AddBasicData(const BamRecord& b, std::int64_t uOffset)
 {
     // read group ID
-    const auto rgId = [&b]() -> int32_t {
+    const auto rgId = [&b]() -> std::int32_t {
         auto rgIdString = b.ReadGroupBaseId();
         if (rgIdString.empty()) {
             rgIdString = MakeReadGroupId(b.MovieName(), ToString(b.Type()));
@@ -99,15 +99,16 @@ void PbiBuilderBase::AddBasicData(const BamRecord& b, int64_t uOffset)
 
     // query start/end
     const auto isCcsOrTranscript = (IsCcsOrTranscript(b.Type()));
-    const int32_t qStart = (isCcsOrTranscript ? 0 : b.QueryStart());
-    const int32_t qEnd = (isCcsOrTranscript ? b.Impl().SequenceLength() : b.QueryEnd());
+    const std::int32_t qStart = (isCcsOrTranscript ? 0 : b.QueryStart());
+    const std::int32_t qEnd = (isCcsOrTranscript ? b.Impl().SequenceLength() : b.QueryEnd());
 
     // add'l data
-    const int32_t holeNum = (b.HasHoleNumber() ? b.HoleNumber() : 0);
+    const std::int32_t holeNum = (b.HasHoleNumber() ? b.HoleNumber() : 0);
     const float readAccuracy =
         (b.HasReadAccuracy() ? boost::numeric_cast<float>(b.ReadAccuracy()) : 0.0F);
-    const uint8_t ctxt = (b.HasLocalContextFlags() ? b.LocalContextFlags()
-                                                   : Data::LocalContextFlags::NO_LOCAL_CONTEXT);
+    const std::uint8_t ctxt =
+        (b.HasLocalContextFlags() ? b.LocalContextFlags()
+                                  : Data::LocalContextFlags::NO_LOCAL_CONTEXT);
 
     // store
     rgIdField_.Add(rgId);
@@ -123,18 +124,18 @@ void PbiBuilderBase::AddMappedData(const BamRecord& b)
 {
     // alignment position
     const auto tId = b.ReferenceId();
-    const auto tStart = static_cast<uint32_t>(b.ReferenceStart());
-    const auto tEnd = static_cast<uint32_t>(b.ReferenceEnd());
-    const auto aStart = static_cast<uint32_t>(b.AlignedStart());
-    const auto aEnd = static_cast<uint32_t>(b.AlignedEnd());
-    const auto isReverseStrand = [&b]() -> uint8_t {
+    const auto tStart = static_cast<std::uint32_t>(b.ReferenceStart());
+    const auto tEnd = static_cast<std::uint32_t>(b.ReferenceEnd());
+    const auto aStart = static_cast<std::uint32_t>(b.AlignedStart());
+    const auto aEnd = static_cast<std::uint32_t>(b.AlignedEnd());
+    const auto isReverseStrand = [&b]() -> std::uint8_t {
         return (b.AlignedStrand() == Data::Strand::REVERSE ? 1 : 0);
     }();
 
     // alignment quality
     const auto matchData = b.NumMatchesAndMismatches();
-    const auto nM = static_cast<uint32_t>(matchData.first);
-    const auto nMM = static_cast<uint32_t>(matchData.second);
+    const auto nM = static_cast<std::uint32_t>(matchData.first);
+    const auto nMM = static_cast<std::uint32_t>(matchData.second);
     const auto mapQuality = b.MapQuality();
 
     // indel operations
@@ -160,7 +161,7 @@ void PbiBuilderBase::AddMappedData(const BamRecord& b)
     nDelOpsField_.Add(nDelOps);
 }
 
-void PbiBuilderBase::AddRecord(const BamRecord& b, int64_t uOffset)
+void PbiBuilderBase::AddRecord(const BamRecord& b, std::int64_t uOffset)
 {
     // ensure updated data (necessary?)
     BAM::BamRecordMemory::UpdateRecordTags(b);
@@ -176,7 +177,7 @@ void PbiBuilderBase::AddRecord(const BamRecord& b, int64_t uOffset)
     ++currentRow_;
 }
 
-void PbiBuilderBase::AddReferenceData(const BamRecord& b, uint32_t currentRow)
+void PbiBuilderBase::AddReferenceData(const BamRecord& b, std::uint32_t currentRow)
 {
     // only add if coordinate-sorted hint is set
     // update with info from refDataBuilder
@@ -319,8 +320,8 @@ void PbiBuilderBase::WritePbiHeader()
     }
 
     // version, pbi_flags, & n_reads
-    auto version = static_cast<uint32_t>(PbiFile::CurrentVersion);
-    uint16_t pbi_flags = sections;
+    auto version = static_cast<std::uint32_t>(PbiFile::CurrentVersion);
+    std::uint16_t pbi_flags = sections;
     auto numReads = currentRow_;
     if (bgzf->is_be) {
         version = ed_swap_4(version);
@@ -362,11 +363,11 @@ PbiReferenceDataBuilder::PbiReferenceDataBuilder(std::size_t numReferenceSequenc
     rawReferenceEntries_[PbiReferenceEntry::UNMAPPED_ID] = PbiReferenceEntry{};
 }
 
-bool PbiReferenceDataBuilder::AddRecord(const BamRecord& record, int32_t rowNumber)
+bool PbiReferenceDataBuilder::AddRecord(const BamRecord& record, std::int32_t rowNumber)
 {
     // fetch ref ID & pos for record
-    const int32_t tId = record.ReferenceId();
-    const int32_t pos = record.ReferenceStart();
+    const std::int32_t tId = record.ReferenceId();
+    const std::int32_t pos = record.ReferenceStart();
 
     // sanity checks to protect against non-coordinate-sorted BAMs
     if (lastRefId_ != tId || (lastRefId_ >= 0 && tId < 0)) {
@@ -387,7 +388,8 @@ bool PbiReferenceDataBuilder::AddRecord(const BamRecord& record, int32_t rowNumb
             //
             // error: refs are out of order (can stop checking refs)
             //
-            PbiReferenceEntry& currentEntry = rawReferenceEntries_.at(static_cast<uint32_t>(tId));
+            PbiReferenceEntry& currentEntry =
+                rawReferenceEntries_.at(static_cast<std::uint32_t>(tId));
             if (currentEntry.beginRow_ != PbiReferenceEntry::UNSET_ROW) {
                 return false;
             }
@@ -398,7 +400,7 @@ bool PbiReferenceDataBuilder::AddRecord(const BamRecord& record, int32_t rowNumb
     }
 
     // update row numbers
-    PbiReferenceEntry& entry = rawReferenceEntries_.at(static_cast<uint32_t>(tId));
+    PbiReferenceEntry& entry = rawReferenceEntries_.at(static_cast<std::uint32_t>(tId));
     if (entry.beginRow_ == PbiReferenceEntry::UNSET_ROW) {
         entry.beginRow_ = rowNumber;
     }
@@ -426,7 +428,7 @@ void PbiReferenceDataBuilder::WriteData(BGZF* bgzf)
     const auto refData = Result();
 
     // num_refs
-    uint32_t numRefs = refData.entries_.size();
+    std::uint32_t numRefs = refData.entries_.size();
     if (bgzf->is_be) {
         numRefs = ed_swap_4(numRefs);
     }

@@ -256,13 +256,13 @@ public:
 
     /// \returns number of reads that pass the current filter
     ///
-    uint32_t NumReads() const;
+    std::uint32_t NumReads() const;
 
     /// \}
 
 private:
     PbiIndexCache indexCache_;
-    uint32_t numReads_;
+    std::uint32_t numReads_;
 };
 
 /// \brief The SequentialCompositeBamReader class provides read access to

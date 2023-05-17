@@ -16,7 +16,7 @@ namespace BAM {
 class WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcherPrivate
 {
 public:
-    WhitelistedZmwReadStitcherPrivate(const std::vector<int32_t>& zmwWhitelist,
+    WhitelistedZmwReadStitcherPrivate(const std::vector<std::int32_t>& zmwWhitelist,
                                       const std::string& primaryBamFilePath,
                                       const std::string& scrapsBamFilePath)
         : primaryBamFile_{std::make_unique<BamFile>(primaryBamFilePath)}
@@ -89,9 +89,9 @@ private:
     std::unique_ptr<PbiIndexedBamReader> primaryReader_;
     std::unique_ptr<PbiIndexedBamReader> scrapsReader_;
     std::unique_ptr<BamHeader> polyHeader_;
-    std::deque<int32_t> zmwWhitelist_;
+    std::deque<std::int32_t> zmwWhitelist_;
 
-    void PreFilterZmws(const std::vector<int32_t>& zmwWhitelist)
+    void PreFilterZmws(const std::vector<std::int32_t>& zmwWhitelist)
     {
         // fetch input ZMWs
         const PbiRawData primaryIndex{primaryBamFile_->PacBioIndexFilename()};
@@ -100,7 +100,7 @@ private:
         const auto& scrapsZmws = scrapsIndex.BasicData().holeNumber_;
 
         // toss them all into a set (for uniqueness & lookup here soon)
-        std::set<int32_t> inputZmws;
+        std::set<std::int32_t> inputZmws;
         for (const auto& zmw : primaryZmws) {
             inputZmws.insert(zmw);
         }
@@ -110,7 +110,7 @@ private:
 
         // check our requested whitelist against files' ZMWs, keep if found
         const auto inputEnd = inputZmws.cend();
-        for (const int32_t zmw : zmwWhitelist) {
+        for (const std::int32_t zmw : zmwWhitelist) {
             if (inputZmws.find(zmw) != inputEnd) {
                 zmwWhitelist_.push_back(zmw);
             }
@@ -122,9 +122,9 @@ private:
 // ZmwReadStitcher implementation
 // --------------------------------
 
-WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcher(const std::vector<int32_t>& zmwWhitelist,
-                                                       const std::string& primaryBamFilePath,
-                                                       const std::string& scrapsBamFilePath)
+WhitelistedZmwReadStitcher::WhitelistedZmwReadStitcher(
+    const std::vector<std::int32_t>& zmwWhitelist, const std::string& primaryBamFilePath,
+    const std::string& scrapsBamFilePath)
     : d_{std::make_unique<WhitelistedZmwReadStitcherPrivate>(zmwWhitelist, primaryBamFilePath,
                                                              scrapsBamFilePath)}
 {}

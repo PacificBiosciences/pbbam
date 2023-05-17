@@ -719,13 +719,13 @@ TEST(BAM_PbiFilter, can_filter_on_num_subreads)
     index.NumReads(21);
 
     PbiRawBasicData& subreadData = index.BasicData();
-    subreadData.rgId_ = std::vector<int32_t>(21, 0);
-    subreadData.qStart_ = std::vector<int32_t>(21, 0);
-    subreadData.qEnd_ = std::vector<int32_t>(21, 0);
+    subreadData.rgId_ = std::vector<std::int32_t>(21, 0);
+    subreadData.qStart_ = std::vector<std::int32_t>(21, 0);
+    subreadData.qEnd_ = std::vector<std::int32_t>(21, 0);
     subreadData.readQual_ = std::vector<float>(21, 0);
-    subreadData.ctxtFlag_ = std::vector<uint8_t>(21, 0);
-    subreadData.fileOffset_ = std::vector<int64_t>(21, 0);
-    subreadData.fileNumber_ = std::vector<uint16_t>(21, 0);
+    subreadData.ctxtFlag_ = std::vector<std::uint8_t>(21, 0);
+    subreadData.fileOffset_ = std::vector<std::int64_t>(21, 0);
+    subreadData.fileNumber_ = std::vector<std::uint16_t>(21, 0);
     subreadData.holeNumber_ = {0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 6};
 
     {  // >= 3
@@ -881,12 +881,12 @@ TEST(BAM_PbiFilter, can_filter_on_read_group)
         PbiFilterTests::checkFilterRows(filter, std::vector<std::size_t>{0, 1, 2, 3});
     }
     {  // multi-ID
-        const auto ids = std::vector<int32_t>({-1197849594, 200});
+        const auto ids = std::vector<std::int32_t>({-1197849594, 200});
         const auto filter = PbiReadGroupFilter{ids};
         PbiFilterTests::checkFilterRows(filter, std::vector<std::size_t>{0, 1, 2, 3});
     }
     {  // multi-ID blacklist
-        const auto ids = std::vector<int32_t>({-1197849594, 200});
+        const auto ids = std::vector<std::int32_t>({-1197849594, 200});
         const auto filter = PbiReadGroupFilter{ids, Compare::NOT_CONTAINS};
         PbiFilterTests::checkFilterRows(filter, std::vector<std::size_t>{});
     }
@@ -926,12 +926,12 @@ TEST(BAM_PbiFilter, can_filter_on_reference_id)
         PbiFilterTests::checkFilterRows(filter, std::vector<std::size_t>{});
     }
     {
-        const auto ids = std::vector<int32_t>({0, 42});
+        const auto ids = std::vector<std::int32_t>({0, 42});
         const auto filter = PbiFilter{PbiReferenceIdFilter{ids}};
         PbiFilterTests::checkFilterRows(filter, std::vector<std::size_t>{0, 1, 2, 3});
     }
     {
-        const auto ids = std::vector<int32_t>({0});
+        const auto ids = std::vector<std::int32_t>({0});
         const auto filter = PbiFilter{PbiReferenceIdFilter{ids, Compare::NOT_CONTAINS}};
         PbiFilterTests::checkFilterRows(filter, std::vector<std::size_t>{});
     }
@@ -996,13 +996,13 @@ TEST(BAM_PbiFilter, can_filter_on_zmw)
         PbiFilterTests::checkFilterRows(filter, std::vector<std::size_t>{});
     }
     {
-        const auto zmws = std::vector<int32_t>({14743, 42, 200});
+        const auto zmws = std::vector<std::int32_t>({14743, 42, 200});
         const auto filter = PbiFilter{PbiZmwFilter{zmws}};
         PbiFilterTests::checkFilterRows(filter, std::vector<std::size_t>{0, 1, 2, 3});
     }
     {
         // blacklist
-        const auto zmws = std::vector<int32_t>{14743};
+        const auto zmws = std::vector<std::int32_t>{14743};
         const auto filter = PbiFilter{PbiZmwFilter{zmws, Compare::NOT_CONTAINS}};
         PbiFilterTests::checkFilterRows(filter, std::vector<std::size_t>{});
     }

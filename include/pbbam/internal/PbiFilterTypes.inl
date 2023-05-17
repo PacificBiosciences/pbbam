@@ -255,24 +255,24 @@ bool MappedDataFilterBase<T, field>::MappedDataFilterBase::Accepts(const PbiRawD
 
 // PbiAlignedEndFilter
 
-inline PbiAlignedEndFilter::PbiAlignedEndFilter(const uint32_t position, const Compare::Type cmp)
-    : internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::A_END>{position, cmp}
+inline PbiAlignedEndFilter::PbiAlignedEndFilter(const std::uint32_t position, const Compare::Type cmp)
+    : internal::MappedDataFilterBase<std::uint32_t, PbiFile::MappedField::A_END>{position, cmp}
 {
 }
 
 // PbiAlignedLengthFilter
 
-inline PbiAlignedLengthFilter::PbiAlignedLengthFilter(const uint32_t length,
+inline PbiAlignedLengthFilter::PbiAlignedLengthFilter(const std::uint32_t length,
                                                       const Compare::Type cmp)
-    : internal::FilterBase<uint32_t>{length, cmp}
+    : internal::FilterBase<std::uint32_t>{length, cmp}
 {
 }
 
 // PbiAlignedStartFilter
 
-inline PbiAlignedStartFilter::PbiAlignedStartFilter(const uint32_t position,
+inline PbiAlignedStartFilter::PbiAlignedStartFilter(const std::uint32_t position,
                                                     const Compare::Type cmp)
-    : internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::A_START>{position, cmp}
+    : internal::MappedDataFilterBase<std::uint32_t, PbiFile::MappedField::A_START>{position, cmp}
 {
 }
 
@@ -290,13 +290,13 @@ inline PbiAlignedStrandFilter::PbiAlignedStrandFilter(const Data::Strand strand,
 
 // PbiBarcodeFilter
 
-inline PbiBarcodeFilter::PbiBarcodeFilter(const int16_t barcode, const Compare::Type cmp)
+inline PbiBarcodeFilter::PbiBarcodeFilter(const std::int16_t barcode, const Compare::Type cmp)
     : compositeFilter_{PbiFilter::Union(
           {PbiBarcodeForwardFilter{barcode, cmp}, PbiBarcodeReverseFilter{barcode, cmp}})}
 {
 }
 
-inline PbiBarcodeFilter::PbiBarcodeFilter(std::vector<int16_t> barcodes, const Compare::Type cmp)
+inline PbiBarcodeFilter::PbiBarcodeFilter(std::vector<std::int16_t> barcodes, const Compare::Type cmp)
     : compositeFilter_{PbiFilter::Union(
           {PbiBarcodeForwardFilter{barcodes, cmp}, PbiBarcodeReverseFilter{barcodes, cmp}})}
 {
@@ -309,51 +309,51 @@ inline bool PbiBarcodeFilter::Accepts(const PbiRawData& idx, const std::size_t r
 
 // PbiBarcodeForwardFilter
 
-inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(const int16_t bcFwdId,
+inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(const std::int16_t bcFwdId,
                                                         const Compare::Type cmp)
-    : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_FORWARD>{bcFwdId, cmp}
+    : internal::BarcodeDataFilterBase<std::int16_t, PbiFile::BarcodeField::BC_FORWARD>{bcFwdId, cmp}
 {
 }
 
-inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(std::vector<int16_t> barcodes,
+inline PbiBarcodeForwardFilter::PbiBarcodeForwardFilter(std::vector<std::int16_t> barcodes,
                                                         const Compare::Type cmp)
-    : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_FORWARD>{
+    : internal::BarcodeDataFilterBase<std::int16_t, PbiFile::BarcodeField::BC_FORWARD>{
           std::move(barcodes), cmp}
 {
 }
 
 // PbiBarcodeQualityFilter
 
-inline PbiBarcodeQualityFilter::PbiBarcodeQualityFilter(const uint8_t bcQuality,
+inline PbiBarcodeQualityFilter::PbiBarcodeQualityFilter(const std::uint8_t bcQuality,
                                                         const Compare::Type cmp)
-    : internal::BarcodeDataFilterBase<uint8_t, PbiFile::BarcodeField::BC_QUALITY>{bcQuality, cmp}
+    : internal::BarcodeDataFilterBase<std::uint8_t, PbiFile::BarcodeField::BC_QUALITY>{bcQuality, cmp}
 {
 }
 
 // PbiBarcodeReverseFilter
 
-inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(const int16_t bcRevId,
+inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(const std::int16_t bcRevId,
                                                         const Compare::Type cmp)
-    : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_REVERSE>{bcRevId, cmp}
+    : internal::BarcodeDataFilterBase<std::int16_t, PbiFile::BarcodeField::BC_REVERSE>{bcRevId, cmp}
 {
 }
 
-inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(std::vector<int16_t> barcodes,
+inline PbiBarcodeReverseFilter::PbiBarcodeReverseFilter(std::vector<std::int16_t> barcodes,
                                                         const Compare::Type cmp)
-    : internal::BarcodeDataFilterBase<int16_t, PbiFile::BarcodeField::BC_REVERSE>{
+    : internal::BarcodeDataFilterBase<std::int16_t, PbiFile::BarcodeField::BC_REVERSE>{
           std::move(barcodes), cmp}
 {
 }
 
 // PbiBarcodesFilter
 
-inline PbiBarcodesFilter::PbiBarcodesFilter(const std::pair<int16_t, int16_t> barcodes,
+inline PbiBarcodesFilter::PbiBarcodesFilter(const std::pair<std::int16_t, std::int16_t> barcodes,
                                             const Compare::Type cmp)
     : PbiBarcodesFilter{barcodes.first, barcodes.second, cmp}
 {
 }
 
-inline PbiBarcodesFilter::PbiBarcodesFilter(const int16_t bcForward, const int16_t bcReverse,
+inline PbiBarcodesFilter::PbiBarcodesFilter(const std::int16_t bcForward, const std::int16_t bcReverse,
                                             const Compare::Type cmp)
     : compositeFilter_{PbiFilter::Intersection(
           {PbiBarcodeForwardFilter{bcForward, cmp}, PbiBarcodeReverseFilter{bcReverse, cmp}})}
@@ -383,8 +383,8 @@ inline PbiLocalContextFilter::PbiLocalContextFilter(const Data::LocalContextFlag
 
 // PbiMapQualityFilter
 
-inline PbiMapQualityFilter::PbiMapQualityFilter(const uint8_t mapQual, const Compare::Type cmp)
-    : internal::MappedDataFilterBase<uint8_t, PbiFile::MappedField::MAP_QUALITY>{mapQual, cmp}
+inline PbiMapQualityFilter::PbiMapQualityFilter(const std::uint8_t mapQual, const Compare::Type cmp)
+    : internal::MappedDataFilterBase<std::uint8_t, PbiFile::MappedField::MAP_QUALITY>{mapQual, cmp}
 {
 }
 
@@ -422,22 +422,22 @@ inline PbiNumMismatchesFilter::PbiNumMismatchesFilter(const std::size_t numMisma
 
 // PbiQueryEndFilter
 
-inline PbiQueryEndFilter::PbiQueryEndFilter(const int32_t position, const Compare::Type cmp)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::Q_END>{position, cmp}
+inline PbiQueryEndFilter::PbiQueryEndFilter(const std::int32_t position, const Compare::Type cmp)
+    : internal::BasicDataFilterBase<std::int32_t, PbiFile::BasicField::Q_END>{position, cmp}
 {
 }
 
 // PbiQueryLengthFilter
 
-inline PbiQueryLengthFilter::PbiQueryLengthFilter(const int32_t length, const Compare::Type cmp)
-    : internal::FilterBase<int32_t>{length, cmp}
+inline PbiQueryLengthFilter::PbiQueryLengthFilter(const std::int32_t length, const Compare::Type cmp)
+    : internal::FilterBase<std::int32_t>{length, cmp}
 {
 }
 
 // PbiQueryStartFilter
 
-inline PbiQueryStartFilter::PbiQueryStartFilter(const int32_t position, const Compare::Type cmp)
-    : internal::BasicDataFilterBase<int32_t, PbiFile::BasicField::Q_START>{position, cmp}
+inline PbiQueryStartFilter::PbiQueryStartFilter(const std::int32_t position, const Compare::Type cmp)
+    : internal::BasicDataFilterBase<std::int32_t, PbiFile::BasicField::Q_START>{position, cmp}
 {
 }
 
@@ -451,62 +451,62 @@ inline PbiReadAccuracyFilter::PbiReadAccuracyFilter(const Data::Accuracy accurac
 
 // PbiReferenceEndFilter
 
-inline PbiReferenceEndFilter::PbiReferenceEndFilter(const uint32_t tEnd, const Compare::Type cmp)
-    : internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::T_END>{tEnd, cmp}
+inline PbiReferenceEndFilter::PbiReferenceEndFilter(const std::uint32_t tEnd, const Compare::Type cmp)
+    : internal::MappedDataFilterBase<std::uint32_t, PbiFile::MappedField::T_END>{tEnd, cmp}
 {
 }
 
 // PbiReferenceIdFilter
 
-inline PbiReferenceIdFilter::PbiReferenceIdFilter(const int32_t tId, const Compare::Type cmp)
-    : internal::MappedDataFilterBase<int32_t, PbiFile::MappedField::T_ID>{tId, cmp}
+inline PbiReferenceIdFilter::PbiReferenceIdFilter(const std::int32_t tId, const Compare::Type cmp)
+    : internal::MappedDataFilterBase<std::int32_t, PbiFile::MappedField::T_ID>{tId, cmp}
 {
 }
 
-inline PbiReferenceIdFilter::PbiReferenceIdFilter(std::vector<int32_t> tIds,
+inline PbiReferenceIdFilter::PbiReferenceIdFilter(std::vector<std::int32_t> tIds,
                                                   const Compare::Type cmp)
-    : internal::MappedDataFilterBase<int32_t, PbiFile::MappedField::T_ID>{std::move(tIds), cmp}
+    : internal::MappedDataFilterBase<std::int32_t, PbiFile::MappedField::T_ID>{std::move(tIds), cmp}
 {
 }
 
 // PbiReferenceStartFilter
 
-inline PbiReferenceStartFilter::PbiReferenceStartFilter(const uint32_t tStart,
+inline PbiReferenceStartFilter::PbiReferenceStartFilter(const std::uint32_t tStart,
                                                         const Compare::Type cmp)
-    : internal::MappedDataFilterBase<uint32_t, PbiFile::MappedField::T_START>{tStart, cmp}
+    : internal::MappedDataFilterBase<std::uint32_t, PbiFile::MappedField::T_START>{tStart, cmp}
 {
 }
 
 // PbiZmwModuloFilter
 
-inline PbiZmwModuloFilter::PbiZmwModuloFilter(const uint32_t denominator, const uint32_t value,
+inline PbiZmwModuloFilter::PbiZmwModuloFilter(const std::uint32_t denominator, const std::uint32_t value,
                                               const FilterHash hashType, const Compare::Type cmp)
     : denominator_{denominator}, value_{value}, hash_{hashType}, cmp_{cmp}
 {
 }
 
-inline uint32_t UnsignedLongIntCast(const int32_t zm) { return static_cast<uint32_t>(zm); }
+inline std::uint32_t UnsignedLongIntCast(const std::int32_t zm) { return static_cast<std::uint32_t>(zm); }
 
-inline uint32_t BoostHashCombine(const int32_t zm)
+inline std::uint32_t BoostHashCombine(const std::int32_t zm)
 {
-    constexpr uint16_t MASK = 0xFFFF;
+    constexpr std::uint16_t MASK = 0xFFFF;
 
-    const uint16_t upper = (zm >> 16) & MASK;
-    const uint16_t lower = zm & MASK;
+    const std::uint16_t upper = (zm >> 16) & MASK;
+    const std::uint16_t lower = zm & MASK;
 
     // FIXME: discrepancies with Python API. Will return to nail down.
 
     std::size_t seed = 0;
     boost::hash_combine(seed, upper);
     boost::hash_combine(seed, lower);
-    return static_cast<uint32_t>(seed);
+    return static_cast<std::uint32_t>(seed);
 }
 
 inline bool PbiZmwModuloFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
     const auto zm = idx.BasicData().holeNumber_.at(row);
 
-    uint32_t hashValue;
+    std::uint32_t hashValue;
     switch (hash_) {
         case FilterHash::UNSIGNED_LONG_CAST: {
             hashValue = UnsignedLongIntCast(zm);

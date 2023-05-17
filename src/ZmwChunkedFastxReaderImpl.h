@@ -19,7 +19,7 @@ class ZmwChunkedFastxReaderImpl
 public:
     virtual ~ZmwChunkedFastxReaderImpl();
 
-    virtual void Seek(uint64_t pos) = 0;
+    virtual void Seek(std::uint64_t pos) = 0;
     virtual FastaSequence ReadNextFasta(bool skipName) = 0;
     virtual FastqSequence ReadNextFastq(bool skipName) = 0;
 

@@ -43,14 +43,14 @@ static BamRecord makeValidMappedRecord()
     tags["iq"] = std::string{"(+#1'$#*1&"};
     tags["mq"] = std::string{"&1~51*5&~2"};
     tags["sq"] = std::string{"<32<4<<<<3"};
-    tags["ip"] = std::vector<uint8_t>{2, 0, 10, 22, 34, 0, 2, 3, 0, 16};
-    tags["np"] = int32_t{1};
-    tags["qe"] = int32_t{10};
-    tags["qs"] = int32_t{0};
-    tags["zm"] = int32_t{54130};
-    tags["cx"] = int32_t{2};
-    tags["AS"] = int32_t{-3020};
-    tags["NM"] = int32_t{134};
+    tags["ip"] = std::vector<std::uint8_t>{2, 0, 10, 22, 34, 0, 2, 3, 0, 16};
+    tags["np"] = std::int32_t{1};
+    tags["qe"] = std::int32_t{10};
+    tags["qs"] = std::int32_t{0};
+    tags["zm"] = std::int32_t{54130};
+    tags["cx"] = std::int32_t{2};
+    tags["AS"] = std::int32_t{-3020};
+    tags["NM"] = std::int32_t{134};
     tags["rq"] = static_cast<float>(0.854);
     tags["sn"] = std::vector<float>{2.0, 2.0, 2.0, 2.0};
     impl.Tags(tags);
@@ -79,14 +79,14 @@ static BamRecord makeValidUnmappedRecord()
     tags["iq"] = std::string{",*11111001"};
     tags["mq"] = std::string{"&47088')34"};
     tags["sq"] = std::string{"8<4<:<6<0<"};
-    tags["ip"] = std::vector<uint8_t>{255, 9, 20, 43, 38, 12, 9, 30, 39, 22};
-    tags["np"] = int32_t{1};
-    tags["qe"] = int32_t{10};
-    tags["qs"] = int32_t{0};
-    tags["zm"] = int32_t{8};
-    tags["cx"] = int32_t{2};
-    tags["AS"] = int32_t{-3020};
-    tags["NM"] = int32_t{134};
+    tags["ip"] = std::vector<std::uint8_t>{255, 9, 20, 43, 38, 12, 9, 30, 39, 22};
+    tags["np"] = std::int32_t{1};
+    tags["qe"] = std::int32_t{10};
+    tags["qs"] = std::int32_t{0};
+    tags["zm"] = std::int32_t{8};
+    tags["cx"] = std::int32_t{2};
+    tags["AS"] = std::int32_t{-3020};
+    tags["NM"] = std::int32_t{134};
     tags["rq"] = static_cast<float>(0.811);
     tags["sn"] = std::vector<float>{2.0, 2.0, 2.0, 2.0};
     impl.Tags(tags);
@@ -472,7 +472,7 @@ TEST(BAM_Validator, reports_invalid_tag_lengths)
     // NOTE: disabling "internal" tag checks for now, only checking "standard"
     //       PacBioBAM tags
 
-    //    const auto& pulses = vector<uint16_t>{42, 42, 42};
+    //    const auto& pulses = vector<std::uint16_t>{42, 42, 42};
     //    CheckInvalidTagLength("pv", QualityValues("@@").Fastq());  // AltLabelQV
     //    CheckInvalidTagLength("pq", QualityValues("@@").Fastq());  // LabelQV
     //    CheckInvalidTagLength("pg", QualityValues("@@").Fastq());  // PulseMergeQv

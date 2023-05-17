@@ -285,13 +285,14 @@ DataSet DataSet::FromXml(const std::string& xml)
 std::vector<Data::GenomicInterval> DataSet::GenomicIntervals() const
 {
     // need to gather the contig lengths
-    std::map<std::string, int32_t> contigLengths;
+    std::map<std::string, std::int32_t> contigLengths;
     for (const BamFile& b : BamFiles()) {
         const BamHeader& header = b.Header();
-        const int32_t numContigs = header.NumSequences();
-        for (int32_t i = 0; i < numContigs; ++i) {
+        const std::int32_t numContigs = header.NumSequences();
+        for (std::int32_t i = 0; i < numContigs; ++i) {
             const std::string refName = header.SequenceName(i);
-            const int32_t refLength = boost::lexical_cast<int32_t>(header.SequenceLength(i));
+            const std::int32_t refLength =
+                boost::lexical_cast<std::int32_t>(header.SequenceLength(i));
 
             const auto it = contigLengths.find(refName);
             if (it == contigLengths.cend()) {
@@ -307,17 +308,17 @@ std::vector<Data::GenomicInterval> DataSet::GenomicIntervals() const
 
     // with the lengths of all contigs known, we can build
     // the minimal interval set induced by the filters
-    using intT = boost::icl::interval_set<int32_t>;
+    using intT = boost::icl::interval_set<std::int32_t>;
     using intInterval = intT::interval_type;
 
     std::map<std::string, intT> contigIntervals;
-    int32_t numFilters = 0;
+    std::int32_t numFilters = 0;
 
     for (const auto& xmlFilter : Filters()) {
         ++numFilters;
         std::optional<std::string> contigName;
 
-        intT intersectedInterval{intInterval{0, std::numeric_limits<int32_t>::max()}};
+        intT intersectedInterval{intInterval{0, std::numeric_limits<std::int32_t>::max()}};
 
         for (const auto& xmlProperty : xmlFilter.Properties()) {
             const auto& XmlName = xmlProperty.Name();
@@ -346,7 +347,8 @@ std::vector<Data::GenomicInterval> DataSet::GenomicIntervals() const
                         "[pbbam] dataset ERROR: 'tstart' only supports '<' and '<=' operators"};
                 }
 
-                const int32_t end = boost::lexical_cast<int32_t>(XmlValue) + ("<=" == XmlOperator);
+                const std::int32_t end =
+                    boost::lexical_cast<std::int32_t>(XmlValue) + ("<=" == XmlOperator);
                 intersectedInterval &= intInterval(0, end);
             } else if ("tend" == XmlName) {
                 if ((XmlOperator != ">") && (XmlOperator != ">=")) {
@@ -354,9 +356,9 @@ std::vector<Data::GenomicInterval> DataSet::GenomicIntervals() const
                         "[pbbam] dataset ERROR: 'tend' only supports '>' and '>=' operators"};
                 }
 
-                const int32_t start =
-                    boost::lexical_cast<int32_t>(XmlValue) - (">=" == XmlOperator);
-                intersectedInterval &= intInterval(start, std::numeric_limits<int32_t>::max());
+                const std::int32_t start =
+                    boost::lexical_cast<std::int32_t>(XmlValue) - (">=" == XmlOperator);
+                intersectedInterval &= intInterval(start, std::numeric_limits<std::int32_t>::max());
             } else {
                 throw std::runtime_error{"[pbbam] dataset ERROR: '" + XmlName +
                                          "' is an unrecognized filter property name"};

@@ -94,14 +94,14 @@ public:
     ///
     /// \throws std::runtime_error if failed to seek
     ///
-    void VirtualSeek(int64_t virtualOffset);
+    void VirtualSeek(std::int64_t virtualOffset);
 
     /// \returns current (virtual) file position.
     ///
     /// \note This is \b NOT a normal file offset, but the virtual offset used
     ///       in %BAM indexing.
     ///
-    int64_t VirtualTell() const;
+    std::int64_t VirtualTell() const;
 
     /// \}
 

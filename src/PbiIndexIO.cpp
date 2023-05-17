@@ -130,7 +130,7 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
     };
 
     const auto bamFiles = dataset.BamFiles();
-    uint16_t fileNumber = 0;
+    std::uint16_t fileNumber = 0;
     for (const auto& bamFile : bamFiles) {
         PbiRawData currentPbi{bamFile.PacBioIndexFilename()};
         if (!compatibleVersion(currentPbi.Version())) {
@@ -155,7 +155,7 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
         Utility::MoveAppend(std::move(currentBasicData.ctxtFlag_), aggregateBasicData.ctxtFlag_);
         Utility::MoveAppend(std::move(currentBasicData.fileOffset_),
                             aggregateBasicData.fileOffset_);
-        Utility::MoveAppend(std::vector<uint16_t>(currentPbiCount, fileNumber),
+        Utility::MoveAppend(std::vector<std::uint16_t>(currentPbiCount, fileNumber),
                             aggregateBasicData.fileNumber_);
 
         // BarcodeData
@@ -169,11 +169,11 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
             Utility::MoveAppend(std::move(currentBarcodeData.bcQual_),
                                 aggregateBarcodeData.bcQual_);
         } else {
-            Utility::MoveAppend(std::vector<int16_t>(currentPbiCount, -1),
+            Utility::MoveAppend(std::vector<std::int16_t>(currentPbiCount, -1),
                                 aggregateBarcodeData.bcForward_);
-            Utility::MoveAppend(std::vector<int16_t>(currentPbiCount, -1),
+            Utility::MoveAppend(std::vector<std::int16_t>(currentPbiCount, -1),
                                 aggregateBarcodeData.bcReverse_);
-            Utility::MoveAppend(std::vector<int8_t>(currentPbiCount, -1),
+            Utility::MoveAppend(std::vector<std::int8_t>(currentPbiCount, -1),
                                 aggregateBarcodeData.bcQual_);
         }
 
@@ -199,27 +199,32 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
             }
 
         } else {
-            Utility::MoveAppend(std::vector<int32_t>(currentPbiCount, -1),
+            Utility::MoveAppend(std::vector<std::int32_t>(currentPbiCount, -1),
                                 aggregateMappedData.tId_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
-                                aggregateMappedData.tStart_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
-                                aggregateMappedData.tEnd_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
-                                aggregateMappedData.aStart_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
-                                aggregateMappedData.aEnd_);
-            Utility::MoveAppend(std::vector<uint8_t>(currentPbiCount, 0),
+            Utility::MoveAppend(
+                std::vector<std::uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
+                aggregateMappedData.tStart_);
+            Utility::MoveAppend(
+                std::vector<std::uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
+                aggregateMappedData.tEnd_);
+            Utility::MoveAppend(
+                std::vector<std::uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
+                aggregateMappedData.aStart_);
+            Utility::MoveAppend(
+                std::vector<std::uint32_t>(currentPbiCount, Data::UNMAPPED_POSITION),
+                aggregateMappedData.aEnd_);
+            Utility::MoveAppend(std::vector<std::uint8_t>(currentPbiCount, 0),
                                 aggregateMappedData.revStrand_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, 0), aggregateMappedData.nM_);
-            Utility::MoveAppend(std::vector<uint32_t>(currentPbiCount, 0),
+            Utility::MoveAppend(std::vector<std::uint32_t>(currentPbiCount, 0),
+                                aggregateMappedData.nM_);
+            Utility::MoveAppend(std::vector<std::uint32_t>(currentPbiCount, 0),
                                 aggregateMappedData.nMM_);
-            Utility::MoveAppend(std::vector<uint8_t>(currentPbiCount, 255),
+            Utility::MoveAppend(std::vector<std::uint8_t>(currentPbiCount, 255),
                                 aggregateMappedData.mapQV_);
             if (aggregateVersion >= PbiFile::Version_4_0_0) {
-                Utility::MoveAppend(std::vector<uint8_t>(currentPbiCount, 0),
+                Utility::MoveAppend(std::vector<std::uint8_t>(currentPbiCount, 0),
                                     aggregateMappedData.nInsOps_);
-                Utility::MoveAppend(std::vector<uint8_t>(currentPbiCount, 0),
+                Utility::MoveAppend(std::vector<std::uint8_t>(currentPbiCount, 0),
                                     aggregateMappedData.nDelOps_);
             }
         }
@@ -230,7 +235,8 @@ void PbiIndexIO::LoadFromDataSet(PbiRawData& aggregateData, const DataSet& datas
     aggregateData.Version(aggregateVersion);
 }
 
-void PbiIndexIO::LoadBarcodeData(PbiRawBarcodeData& barcodeData, const uint32_t numReads, BGZF* fp)
+void PbiIndexIO::LoadBarcodeData(PbiRawBarcodeData& barcodeData, const std::uint32_t numReads,
+                                 BGZF* fp)
 {
     // read from file
     LoadBgzfVector(fp, barcodeData.bcForward_, numReads);
@@ -252,9 +258,9 @@ void PbiIndexIO::LoadHeader(PbiRawData& index, BGZF* fp)
     }
 
     // version, pbi_flags, & n_reads
-    uint32_t version;
-    uint16_t sections;
-    uint32_t numReads;
+    std::uint32_t version;
+    std::uint16_t sections;
+    std::uint32_t numReads;
     bytesRead = bgzf_read(fp, &version, sizeof(version));
     bytesRead = bgzf_read(fp, &sections, sizeof(sections));
     bytesRead = bgzf_read(fp, &numReads, sizeof(numReads));
@@ -279,7 +285,8 @@ void PbiIndexIO::LoadHeader(PbiRawData& index, BGZF* fp)
     bytesRead = bgzf_read(fp, &reserved, reservedLength);
 }
 
-void PbiIndexIO::LoadMappedData(PbiRawMappedData& mappedData, const uint32_t numReads, BGZF* fp)
+void PbiIndexIO::LoadMappedData(PbiRawMappedData& mappedData, const std::uint32_t numReads,
+                                BGZF* fp)
 {
     // read from file
     LoadBgzfVector(fp, mappedData.tId_, numReads);
@@ -307,7 +314,7 @@ void PbiIndexIO::LoadReferenceData(PbiRawReferenceData& referenceData, BGZF* fp)
     assert(sizeof(PbiReferenceEntry::Row) == 4);
 
     // num refs
-    uint32_t numRefs;
+    std::uint32_t numRefs;
     auto ret = bgzf_read(fp, &numRefs, 4);
     if (fp->is_be) {
         numRefs = ed_swap_4(numRefs);
@@ -329,7 +336,7 @@ void PbiIndexIO::LoadReferenceData(PbiRawReferenceData& referenceData, BGZF* fp)
     std::ignore = ret;
 }
 
-void PbiIndexIO::LoadBasicData(PbiRawBasicData& basicData, const uint32_t numReads, BGZF* fp)
+void PbiIndexIO::LoadBasicData(PbiRawBasicData& basicData, const std::uint32_t numReads, BGZF* fp)
 {
     // read from file
     LoadBgzfVector(fp, basicData.rgId_, numReads);
@@ -373,8 +380,8 @@ void PbiIndexIO::Save(const PbiRawData& index, const std::string& filename)
     }
 }
 
-void PbiIndexIO::WriteBarcodeData(const PbiRawBarcodeData& barcodeData, const uint32_t numReads,
-                                  BGZF* fp)
+void PbiIndexIO::WriteBarcodeData(const PbiRawBarcodeData& barcodeData,
+                                  const std::uint32_t numReads, BGZF* fp)
 {
     // validate
     CheckExpectedSize(barcodeData, numReads);
@@ -392,9 +399,9 @@ void PbiIndexIO::WriteHeader(const PbiRawData& index, BGZF* fp)
     auto ret = bgzf_write(fp, MAGIC.data(), 4);
 
     // version, pbi_flags, & n_reads
-    auto version = static_cast<uint32_t>(index.Version());
-    uint16_t pbi_flags = index.FileSections();
-    auto numReads = static_cast<uint16_t>(index.NumReads());
+    auto version = static_cast<std::uint32_t>(index.Version());
+    std::uint16_t pbi_flags = index.FileSections();
+    auto numReads = static_cast<std::uint16_t>(index.NumReads());
     if (fp->is_be) {
         version = ed_swap_4(version);
         pbi_flags = ed_swap_2(pbi_flags);
@@ -411,7 +418,7 @@ void PbiIndexIO::WriteHeader(const PbiRawData& index, BGZF* fp)
     std::ignore = ret;
 }
 
-void PbiIndexIO::WriteMappedData(const PbiRawMappedData& mappedData, const uint32_t numReads,
+void PbiIndexIO::WriteMappedData(const PbiRawMappedData& mappedData, const std::uint32_t numReads,
                                  BGZF* fp)
 {
     // validate
@@ -460,7 +467,8 @@ void PbiIndexIO::WriteReferenceData(const PbiRawReferenceData& referenceData, BG
     std::ignore = ret;
 }
 
-void PbiIndexIO::WriteBasicData(const PbiRawBasicData& basicData, const uint32_t numReads, BGZF* fp)
+void PbiIndexIO::WriteBasicData(const PbiRawBasicData& basicData, const std::uint32_t numReads,
+                                BGZF* fp)
 {
     // validate
     CheckExpectedSize(basicData, numReads);

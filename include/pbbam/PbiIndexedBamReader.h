@@ -92,7 +92,7 @@ public:
     /// \returns the current filter active on this reader
     const PbiFilter& Filter() const;
 
-    uint32_t NumReads() const;
+    std::uint32_t NumReads() const;
 
     /// \brief Sets a new filter on the reader.
     ///

@@ -42,7 +42,7 @@ bool VirtualZmwBamRecord::HasVirtualRegionType(const VirtualRegionType regionTyp
 Data::Frames VirtualZmwBamRecord::IPDV1Frames(Data::Orientation orientation) const
 {
     const auto rawFrames = this->IPDRaw(orientation);
-    const std::vector<uint8_t> rawData(rawFrames.Data().begin(), rawFrames.Data().end());
+    const std::vector<std::uint8_t> rawData(rawFrames.Data().begin(), rawFrames.Data().end());
     return Data::Frames::Decode(rawData);
 }
 
@@ -72,7 +72,7 @@ void VirtualZmwBamRecord::StitchSources()
     Data::Frames px;
     std::vector<float> pa;
     std::vector<float> pm;
-    std::vector<uint32_t> sf;
+    std::vector<std::uint32_t> sf;
     std::vector<BAM::PulseExclusionReason> pe;
 
     // initialize capacity

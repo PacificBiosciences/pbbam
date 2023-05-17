@@ -19,8 +19,8 @@ TEST(BAM_BamRecordImplTags, can_check_presence_of_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -47,7 +47,7 @@ TEST(BAM_BamRecordImplTags, can_add_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -56,7 +56,7 @@ TEST(BAM_BamRecordImplTags, can_add_tag)
     EXPECT_TRUE(bam.HasTag("CA"));
     EXPECT_FALSE(bam.HasTag("XY"));
 
-    bam.AddTag("XY", int32_t{-42});
+    bam.AddTag("XY", std::int32_t{-42});
 
     EXPECT_TRUE(bam.HasTag("HX"));
     EXPECT_TRUE(bam.HasTag("CA"));
@@ -73,9 +73,9 @@ TEST(BAM_BamRecordImplTags, can_add_tag)
     EXPECT_EQ(-42, fetchedTags.at("XY").ToInt32());
 
     // fail on invalid adds
-    EXPECT_FALSE(bam.AddTag("", int32_t{-42}));
-    EXPECT_FALSE(bam.AddTag("some_too_long_name", int32_t{-42}));
-    EXPECT_FALSE(bam.AddTag("XY", int32_t{-42}));  // reject duplicate
+    EXPECT_FALSE(bam.AddTag("", std::int32_t{-42}));
+    EXPECT_FALSE(bam.AddTag("some_too_long_name", std::int32_t{-42}));
+    EXPECT_FALSE(bam.AddTag("XY", std::int32_t{-42}));  // reject duplicate
 }
 
 TEST(BAM_BamRecordImplTags, can_remove_tag)
@@ -83,8 +83,8 @@ TEST(BAM_BamRecordImplTags, can_remove_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -119,8 +119,8 @@ TEST(BAM_BamRecordImplTags, can_edit_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -133,7 +133,7 @@ TEST(BAM_BamRecordImplTags, can_edit_tag)
     EXPECT_TRUE(fetchedTags.Contains("XY"));
     EXPECT_EQ(-42, fetchedTags.at("XY").ToInt32());
 
-    const bool editedOk = bam.EditTag("XY", int32_t{500});
+    const bool editedOk = bam.EditTag("XY", std::int32_t{500});
     EXPECT_TRUE(editedOk);
     EXPECT_TRUE(bam.HasTag("XY"));
 
@@ -154,8 +154,8 @@ TEST(BAM_BamRecordImplTags, can_query_tag)
     TagCollection tags;
     tags["HX"] = std::string("1abc75");
     tags["HX"].Modifier(TagModifier::HEX_STRING);
-    tags["CA"] = std::vector<uint8_t>({34, 5, 125});
-    tags["XY"] = int32_t{-42};
+    tags["CA"] = std::vector<std::uint8_t>({34, 5, 125});
+    tags["XY"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);
@@ -165,8 +165,8 @@ TEST(BAM_BamRecordImplTags, can_query_tag)
     EXPECT_TRUE(bam.HasTag("XY"));
 
     EXPECT_EQ(std::string("1abc75"), bam.TagValue("HX").ToString());
-    EXPECT_EQ(std::vector<uint8_t>({34, 5, 125}), bam.TagValue("CA").ToUInt8Array());
-    EXPECT_EQ(int32_t{-42}, bam.TagValue("XY").ToInt32());
+    EXPECT_EQ(std::vector<std::uint8_t>({34, 5, 125}), bam.TagValue("CA").ToUInt8Array());
+    EXPECT_EQ(std::int32_t{-42}, bam.TagValue("XY").ToInt32());
 
     EXPECT_FALSE(bam.HasTag("zz"));
     EXPECT_FALSE(bam.HasTag(""));
@@ -180,11 +180,11 @@ TEST(BAM_BamRecordImplTags, can_query_tag)
 TEST(BAM_BamRecordImplTags, can_query_array_or_string_tag_length)
 {
     TagCollection tags;
-    tags["xx"] = std::vector<int32_t>{};
+    tags["xx"] = std::vector<std::int32_t>{};
     tags["yy"] = std::string{};
-    tags["aa"] = std::vector<uint8_t>({34, 5, 125});
+    tags["aa"] = std::vector<std::uint8_t>({34, 5, 125});
     tags["bb"] = std::string{"triforce"};
-    tags["cc"] = int32_t{-42};
+    tags["cc"] = std::int32_t{-42};
 
     BamRecordImpl bam;
     bam.Tags(tags);

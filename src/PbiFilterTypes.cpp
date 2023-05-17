@@ -168,7 +168,7 @@ bool PbiMovieNameFilter::Accepts(const PbiRawData& idx, const std::size_t row) c
             std::make_pair(barcodeData.bcForward_.at(i), barcodeData.bcReverse_.at(i));
         for (const auto& movieName : movieNames_) {
             const auto tryBarcodedType = [&](const std::string& readType) {
-                int32_t barcodedId =
+                std::int32_t barcodedId =
                     ReadGroupInfo::IdToInt(MakeReadGroupId(movieName, readType, barcodes));
                 if (barcodedId == rgId) {
                     candidateRgIds_.insert(barcodedId);  // found combo, save for future lookup
@@ -251,7 +251,7 @@ struct PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate
 
     void InitializeLookup(const PbiRawData& idx) const
     {
-        lookup_ = std::set<int32_t>{};
+        lookup_ = std::set<std::int32_t>{};
         const auto& zmws = idx.BasicData().holeNumber_;
 
         auto shouldKeep = [this](int count) {
@@ -279,7 +279,7 @@ struct PbiNumSubreadsFilter::PbiNumSubreadsFilterPrivate
 
     int numSubreads_;
     Compare::Type cmp_;
-    mutable std::optional<std::set<int32_t>> lookup_;  // mutable for lazy-load
+    mutable std::optional<std::set<std::int32_t>> lookup_;  // mutable for lazy-load
 };
 
 PbiNumSubreadsFilter::PbiNumSubreadsFilter(int numSubreads, const Compare::Type cmp)
@@ -317,10 +317,10 @@ bool PbiQueryLengthFilter::Accepts(const PbiRawData& idx, const std::size_t row)
 struct PbiQueryNameFilter::PbiQueryNameFilterPrivate
 {
 public:
-    using QueryInterval = std::pair<int32_t, int32_t>;
+    using QueryInterval = std::pair<std::int32_t, std::int32_t>;
     using QueryIntervals = std::set<QueryInterval>;
-    using ZmwData = std::unordered_map<int32_t, std::optional<QueryIntervals>>;
-    using RgIdLookup = std::unordered_map<int32_t, std::shared_ptr<ZmwData>>;
+    using ZmwData = std::unordered_map<std::int32_t, std::optional<QueryIntervals>>;
+    using RgIdLookup = std::unordered_map<std::int32_t, std::shared_ptr<ZmwData>>;
 
     PbiQueryNameFilterPrivate(const std::vector<std::string>& queryNames,
                               const Compare::Type cmp = Compare::EQUAL)
@@ -399,7 +399,7 @@ public:
         }
     }
 
-    std::vector<int32_t> CandidateRgIds(const std::string& movieName, const RecordType type)
+    std::vector<std::int32_t> CandidateRgIds(const std::string& movieName, const RecordType type)
     {
         if (type == RecordType::SEGMENT) {
             return {
@@ -486,7 +486,7 @@ public:
         }
     }
 
-    std::shared_ptr<ZmwData> UpdateRgLookup(const std::vector<int32_t>& rgIds)
+    std::shared_ptr<ZmwData> UpdateRgLookup(const std::vector<std::int32_t>& rgIds)
     {
         assert(!rgIds.empty());
 
@@ -545,17 +545,19 @@ bool PbiQueryNameFilter::Accepts(const PbiRawData& idx, const std::size_t row) c
 
 // PbiReadGroupFilter
 
-PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<int32_t>& rgIds, const Compare::Type cmp)
+PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<std::int32_t>& rgIds,
+                                       const Compare::Type cmp)
     : cmp_{cmp}
 {
     std::vector<ReadGroupInfo> readGroups{rgIds.size()};
-    std::transform(rgIds.cbegin(), rgIds.cend(), readGroups.begin(),
-                   [](const int32_t rgId) { return ReadGroupInfo{ReadGroupInfo::IntToId(rgId)}; });
+    std::transform(rgIds.cbegin(), rgIds.cend(), readGroups.begin(), [](const std::int32_t rgId) {
+        return ReadGroupInfo{ReadGroupInfo::IntToId(rgId)};
+    });
     AddReadGroups(readGroups);
 }
 
-PbiReadGroupFilter::PbiReadGroupFilter(const int32_t rgId, const Compare::Type cmp)
-    : PbiReadGroupFilter{std::vector<int32_t>{rgId}, cmp}
+PbiReadGroupFilter::PbiReadGroupFilter(const std::int32_t rgId, const Compare::Type cmp)
+    : PbiReadGroupFilter{std::vector<std::int32_t>{rgId}, cmp}
 {}
 
 PbiReadGroupFilter::PbiReadGroupFilter(const std::vector<ReadGroupInfo>& readGroups,
@@ -586,7 +588,7 @@ PbiReadGroupFilter::PbiReadGroupFilter(const std::string& rgId,
 
 bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const std::size_t row) const
 {
-    const auto DoFiltersMatch = [&](const int32_t rowRgId) {
+    const auto DoFiltersMatch = [&](const std::int32_t rowRgId) {
         const auto foundInFilterList = readGroups_.find(rowRgId);
         if (foundInFilterList == readGroups_.cend()) {
             return false;
@@ -595,14 +597,14 @@ bool PbiReadGroupFilter::Accepts(const PbiRawData& idx, const std::size_t row) c
         // matching ID found, check for potential barcode requirements
 
         if (idx.HasBarcodeData()) {
-            const int16_t rowBcForward = idx.BarcodeData().bcForward_.at(row);
-            const int16_t rowBcReverse = idx.BarcodeData().bcReverse_.at(row);
+            const std::int16_t rowBcForward = idx.BarcodeData().bcForward_.at(row);
+            const std::int16_t rowBcReverse = idx.BarcodeData().bcReverse_.at(row);
 
             for (const auto& filterReadGroup : foundInFilterList->second) {
                 const auto& filterBarcodes = filterReadGroup.Barcodes();
                 if (filterBarcodes) {
-                    const int16_t filterBcForward = filterBarcodes->first;
-                    const int16_t filterBcReverse = filterBarcodes->second;
+                    const std::int16_t filterBcForward = filterBarcodes->first;
+                    const std::int16_t filterBcReverse = filterBarcodes->second;
                     if ((rowBcForward == filterBcForward) && (rowBcReverse == filterBcReverse)) {
                         // found matching barcodes
                         return true;
@@ -703,7 +705,7 @@ void PbiReferenceNameFilter::Initialize(const PbiRawData& idx) const
 
     // multi-value (whitelist/blacklist)
     else {
-        std::vector<int32_t> ids;
+        std::vector<std::int32_t> ids;
         for (const auto& rname : *rnameWhitelist_) {
             ids.push_back(bamFile.ReferenceId(rname));
         }
@@ -741,10 +743,11 @@ void PbiReferenceNameFilter::Validate() const
 
 // PbiZmwFilter
 
-PbiZmwFilter::PbiZmwFilter(const int32_t zmw, const Compare::Type cmp) : cmp_{cmp}, singleZmw_{zmw}
+PbiZmwFilter::PbiZmwFilter(const std::int32_t zmw, const Compare::Type cmp)
+    : cmp_{cmp}, singleZmw_{zmw}
 {}
 
-PbiZmwFilter::PbiZmwFilter(std::vector<int32_t> whitelist, const Compare::Type cmp)
+PbiZmwFilter::PbiZmwFilter(std::vector<std::int32_t> whitelist, const Compare::Type cmp)
     : cmp_{cmp}, zmwLookup_{whitelist.begin(), whitelist.end()}
 {
     // verify white list compare type

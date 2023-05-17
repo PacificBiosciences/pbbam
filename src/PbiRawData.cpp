@@ -23,7 +23,7 @@ namespace BAM {
 // PbiRawBarcodeData implementation
 // ----------------------------------
 
-PbiRawBarcodeData::PbiRawBarcodeData(uint32_t numReads)
+PbiRawBarcodeData::PbiRawBarcodeData(std::uint32_t numReads)
 {
     bcForward_.reserve(numReads);
     bcReverse_.reserve(numReads);
@@ -36,11 +36,11 @@ void PbiRawBarcodeData::AddRecord(const BamRecord& b)
     if (b.HasBarcodes() && b.HasBarcodeQuality()) {
 
         // fetch data from record
-        int16_t bcForward;
-        int16_t bcReverse;
+        std::int16_t bcForward;
+        std::int16_t bcReverse;
         std::tie(bcForward, bcReverse) = b.Barcodes();
 
-        const auto bcQuality = boost::numeric_cast<int8_t>(b.BarcodeQuality());
+        const auto bcQuality = boost::numeric_cast<std::int8_t>(b.BarcodeQuality());
 
         // only store actual data if all values >= 0
         if (bcForward >= 0 && bcReverse >= 0 && bcQuality >= 0) {
@@ -61,7 +61,7 @@ void PbiRawBarcodeData::AddRecord(const BamRecord& b)
 // PbiRawMappedData implementation
 // ----------------------------------
 
-PbiRawMappedData::PbiRawMappedData(uint32_t numReads)
+PbiRawMappedData::PbiRawMappedData(std::uint32_t numReads)
 {
     tId_.reserve(numReads);
     tStart_.reserve(numReads);
@@ -100,7 +100,7 @@ uint32_t PbiRawMappedData::NumDeletedBasesAt(std::size_t recordIndex) const
     return NumDeletedAndInsertedBasesAt(recordIndex).first;
 }
 
-std::pair<uint32_t, uint32_t> PbiRawMappedData::NumDeletedAndInsertedBasesAt(
+std::pair<std::uint32_t, std::uint32_t> PbiRawMappedData::NumDeletedAndInsertedBasesAt(
     std::size_t recordIndex) const
 {
     const auto aStart = aStart_.at(recordIndex);
@@ -139,13 +139,13 @@ PbiReferenceEntry::PbiReferenceEntry(ID id, Row beginRow, Row endRow)
 // PbiRawReferenceData implementation
 // ------------------------------------
 
-PbiRawReferenceData::PbiRawReferenceData(uint32_t numRefs) { entries_.reserve(numRefs); }
+PbiRawReferenceData::PbiRawReferenceData(std::uint32_t numRefs) { entries_.reserve(numRefs); }
 
 // ----------------------------------
 // PbiRawBasicData implementation
 // ----------------------------------
 
-PbiRawBasicData::PbiRawBasicData(uint32_t numReads)
+PbiRawBasicData::PbiRawBasicData(std::uint32_t numReads)
 {
     rgId_.reserve(numReads);
     qStart_.reserve(numReads);
@@ -157,7 +157,7 @@ PbiRawBasicData::PbiRawBasicData(uint32_t numReads)
     fileNumber_.reserve(numReads);
 }
 
-void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
+void PbiRawBasicData::AddRecord(const BamRecord& b, std::int64_t offset)
 {
     // read group ID
     auto rgId = b.ReadGroupBaseId();
@@ -165,7 +165,7 @@ void PbiRawBasicData::AddRecord(const BamRecord& b, int64_t offset)
         rgId = MakeReadGroupId(b.MovieName(), ToString(b.Type()));
     }
     const auto rawid = std::stoul(rgId, nullptr, 16);
-    const auto id = static_cast<int32_t>(rawid);
+    const auto id = static_cast<std::int32_t>(rawid);
     rgId_.push_back(id);
 
     // query start/end
@@ -236,7 +236,7 @@ bool PbiRawData::HasSection(const PbiFile::Section section) const
 
 uint32_t PbiRawData::NumReads() const { return numReads_; }
 
-PbiRawData& PbiRawData::NumReads(uint32_t num)
+PbiRawData& PbiRawData::NumReads(std::uint32_t num)
 {
     numReads_ = num;
     return *this;

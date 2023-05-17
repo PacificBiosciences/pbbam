@@ -20,7 +20,7 @@ void PbiFile::CreateFrom(const BamFile& bamFile,
                        compressionLevel, numThreads};
     BamReader reader{bamFile};
     BamRecord b;
-    int64_t offset = reader.VirtualTell();
+    std::int64_t offset = reader.VirtualTell();
     while (reader.GetNext(b)) {
         builder.AddRecord(b, offset);
         offset = reader.VirtualTell();

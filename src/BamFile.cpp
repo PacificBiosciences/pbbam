@@ -104,7 +104,7 @@ public:
 
     std::string filename_;
     BamHeader header_;
-    int64_t firstAlignmentOffset_;
+    std::int64_t firstAlignmentOffset_;
 };
 
 BamFile::BamFile(std::string filename) : d_{std::make_unique<BamFilePrivate>(std::move(filename))}

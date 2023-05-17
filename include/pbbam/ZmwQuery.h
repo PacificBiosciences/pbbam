@@ -35,7 +35,7 @@ public:
     /// \throws std::runtime_error on failure to open/read underlying %BAM or
     ///         PBI files.
     ///
-    ZmwQuery(std::vector<int32_t> zmwWhitelist, const DataSet& dataset);
+    ZmwQuery(std::vector<std::int32_t> zmwWhitelist, const DataSet& dataset);
 
     ZmwQuery(ZmwQuery&&) noexcept;
     ZmwQuery& operator=(ZmwQuery&&) noexcept;
