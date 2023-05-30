@@ -382,11 +382,11 @@ BamRecordImpl& BamRecordImpl::Name(const std::string& name)
     d_->core.l_qname = totalNameSize;
     d_->core.l_extranul = numExtraNulls;
     std::uint32_t* newCigarStart = bam_get_cigar(d_);
-    memmove(newCigarStart, oldCigarStart, trailingDataLength);
+    std::memmove(newCigarStart, oldCigarStart, trailingDataLength);
 
     // fill in new name
-    memcpy(d_->data, name.c_str(), numChars);
-    memset(d_->data + numChars, '\0', numExtraNulls);
+    std::memcpy(d_->data, name.c_str(), numChars);
+    std::memset(d_->data + numChars, '\0', numExtraNulls);
     return *this;
 }
 
@@ -467,7 +467,7 @@ void BamRecordImpl::SetCigarData(const Data::Cigar& cigar)
     const std::size_t trailingDataLength = oldLengthData - (oldSequenceStart - d_->data);
     d_->core.n_cigar = numCigarOps;
     std::uint8_t* newSequenceStart = bam_get_seq(d_);
-    memmove(newSequenceStart, oldSequenceStart, trailingDataLength);
+    std::memmove(newSequenceStart, oldSequenceStart, trailingDataLength);
 
     // fill in new CIGAR data
     std::uint32_t* cigarDataStart = bam_get_cigar(d_);
@@ -628,14 +628,14 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
         oldLengthData - (oldTagStart - reinterpret_cast<const unsigned char*>(d_->data));
     d_->core.l_qseq = sequenceLength;
     std::uint8_t* newTagStart = bam_get_aux(d_);
-    memmove(newTagStart, oldTagStart, trailingDataLength);
+    std::memmove(newTagStart, oldTagStart, trailingDataLength);
 
     // fill in new sequence
     std::uint8_t* pEncodedSequence = bam_get_seq(d_);
     if (isPreencoded) {
-        memcpy(pEncodedSequence, sequence, encodedSequenceLength);
+        std::memcpy(pEncodedSequence, sequence, encodedSequenceLength);
     } else {
-        memset(pEncodedSequence, 0, encodedSequenceLength);
+        std::memset(pEncodedSequence, 0, encodedSequenceLength);
         for (std::size_t i = 0; i < sequenceLength; ++i) {
             pEncodedSequence[i >> 1] |= seq_nt16_table[static_cast<int>(sequence[i])]
                                         << ((~i & 1) << 2);
@@ -644,8 +644,8 @@ BamRecordImpl& BamRecordImpl::SetSequenceAndQualitiesInternal(const char* sequen
 
     // fill in quality values
     std::uint8_t* encodedQualities = bam_get_qual(d_);
-    if ((qualities == nullptr) || (strlen(qualities) == 0)) {
-        memset(encodedQualities, 0xff, sequenceLength);
+    if ((qualities == nullptr) || (std::strlen(qualities) == 0)) {
+        std::memset(encodedQualities, 0xff, sequenceLength);
     } else {
         for (std::size_t i = 0; i < sequenceLength; ++i) {
             encodedQualities[i] = qualities[i] - 33;  // FASTQ ASCII -> int conversion
@@ -689,14 +689,14 @@ std::optional<int> BamRecordImpl::TagLength(const std::string& tagName) const
         case 'H':
             [[fallthrough]];
         case 'Z': {
-            return strlen(reinterpret_cast<const char*>(&tagData[0]));
+            return std::strlen(reinterpret_cast<const char*>(&tagData[0]));
         }
 
         // array tag
         case 'B': {
             ++tagData;  // skip array's value type code
             std::uint32_t numElements = 0;
-            memcpy(&numElements, &tagData[0], sizeof(std::uint32_t));
+            std::memcpy(&numElements, &tagData[0], sizeof(std::uint32_t));
             return numElements;
         }
 
@@ -839,7 +839,7 @@ void BamRecordImpl::UpdateTagMap() const
             case 'Z':
             case 'H': {
                 // null-terminated string
-                i += strlen(reinterpret_cast<const char*>(&tagStart[i])) + 1;
+                i += std::strlen(reinterpret_cast<const char*>(&tagStart[i])) + 1;
                 break;
             }
 
@@ -869,7 +869,7 @@ void BamRecordImpl::UpdateTagMap() const
                 }
 
                 std::uint32_t numElements = 0;
-                memcpy(&numElements, &tagStart[i], sizeof(std::uint32_t));
+                std::memcpy(&numElements, &tagStart[i], sizeof(std::uint32_t));
                 i += (4 + (elementSize * numElements));
                 break;
             }

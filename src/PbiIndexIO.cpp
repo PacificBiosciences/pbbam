@@ -252,7 +252,7 @@ void PbiIndexIO::LoadHeader(PbiRawData& index, BGZF* fp)
     // 'magic' string
     char magic[4];
     auto bytesRead = bgzf_read(fp, magic, 4);
-    if (bytesRead != 4 || strncmp(magic, "PBI\1", 4)) {
+    if (bytesRead != 4 || std::strncmp(magic, "PBI\1", 4)) {
         throw std::runtime_error{
             "[pbbam] PBI index I/O ERROR: expected PBI file, found unknown format instead"};
     }
@@ -413,7 +413,7 @@ void PbiIndexIO::WriteHeader(const PbiRawData& index, BGZF* fp)
 
     // reserved space
     char reserved[18];
-    memset(reserved, 0, 18);
+    std::memset(reserved, 0, 18);
     ret = bgzf_write(fp, reserved, 18);
     std::ignore = ret;
 }

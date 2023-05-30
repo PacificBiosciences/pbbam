@@ -257,7 +257,7 @@ public:
             std::size_t refHeader = 0;
             for (int i = 0; i < hdr->n_targets; ++i) {
                 char* n = hdr->target_name[i];
-                refHeader += (8 + (strlen(n) + 1));
+                refHeader += (8 + (std::strlen(n) + 1));
             }
             return textHeader + refHeader;
         };
@@ -428,7 +428,7 @@ public:
             std::size_t refHeader = 0;
             for (int i = 0; i < hdr->n_targets; ++i) {
                 char* n = hdr->target_name[i];
-                refHeader += (8 + (strlen(n) + 1));
+                refHeader += (8 + (std::strlen(n) + 1));
             }
             return textHeader + refHeader;
         };

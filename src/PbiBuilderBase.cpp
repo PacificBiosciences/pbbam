@@ -334,7 +334,7 @@ void PbiBuilderBase::WritePbiHeader()
 
     // reserved space
     char reserved[18];
-    memset(reserved, 0, 18);
+    std::memset(reserved, 0, 18);
     bgzf_write_safe(bgzf, reserved, 18);
 }
 

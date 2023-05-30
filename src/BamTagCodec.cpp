@@ -27,8 +27,8 @@ void appendBamMultiValue(const std::vector<T>& container, kstring_t* str)
     kputsn_(&n, sizeof(n), str);
 
     // If n == 0, then `container.data()` **might** return a nullptr.
-    // kputsn_() internally memcpy's data from the first pointer, and
-    // if this is a nullptr, we invoke undefined behavior on memcpy.
+    // kputsn_() internally std::memcpy's data from the first pointer, and
+    // if this is a nullptr, we invoke undefined behavior on std::memcpy.
     if (n) {
         kputsn_(reinterpret_cast<const char*>(container.data()), n * sizeof(T), str);
     }
@@ -38,7 +38,7 @@ template <typename T>
 T readBamValue(const std::uint8_t* src, std::size_t& offset)
 {
     T value;
-    memcpy(&value, &src[offset], sizeof(value));
+    std::memcpy(&value, &src[offset], sizeof(value));
     offset += sizeof(value);
     return value;
 }
@@ -47,7 +47,7 @@ template <typename T>
 std::vector<T> readBamMultiValue(const std::uint8_t* src, std::size_t& offset)
 {
     std::uint32_t numElements;
-    memcpy(&numElements, &src[offset], sizeof(std::uint32_t));
+    std::memcpy(&numElements, &src[offset], sizeof(std::uint32_t));
     offset += 4;
 
     std::vector<T> result;
@@ -110,7 +110,8 @@ TagCollection BamTagCodec::Decode(const std::vector<std::uint8_t>& data)
 
             case 'Z':
             case 'H': {
-                const std::size_t dataLength = strlen(reinterpret_cast<const char*>(&pData[i]));
+                const std::size_t dataLength =
+                    std::strlen(reinterpret_cast<const char*>(&pData[i]));
                 const std::string value(reinterpret_cast<const char*>(&pData[i]), dataLength);
                 tags[tagName] = value;
                 if (tagType == 'H') {
@@ -336,7 +337,7 @@ Tag BamTagCodec::FromRawData(std::uint8_t* rawData)
 
         case 'Z':
         case 'H': {
-            const std::size_t dataLength = strlen(reinterpret_cast<const char*>(&rawData[0]));
+            const std::size_t dataLength = std::strlen(reinterpret_cast<const char*>(&rawData[0]));
             const std::string value(reinterpret_cast<const char*>(&rawData[0]), dataLength);
             Tag t{value};
             if (tagType == 'H') {
@@ -480,7 +481,7 @@ std::vector<std::uint8_t> BamTagCodec::ToRawData(const Tag& tag,
     // store temp contents in actual destination
     std::vector<std::uint8_t> result;
     result.resize(str.l);
-    memcpy(reinterpret_cast<char*>(&result[0]), str.s, str.l);
+    std::memcpy(reinterpret_cast<char*>(&result[0]), str.s, str.l);
     free(str.s);
     return result;
 }

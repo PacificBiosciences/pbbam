@@ -4,6 +4,8 @@
 #include <utility>
 #include <vector>
 
+#include <cstring>
+
 #include <gtest/gtest.h>
 
 #include <htslib/sam.h>
@@ -216,7 +218,7 @@ TEST(BAM_BamHeader, can_encode_to_raw_bam_binary)
     rawData->ignore_sam_err = 0;
     rawData->l_text = text.size();
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
-    memcpy(rawData->text, text.c_str(), rawData->l_text);
+    std::memcpy(rawData->text, text.c_str(), rawData->l_text);
 
     const std::string rawText{rawData->text, rawData->l_text};
     EXPECT_EQ(expectedText, rawText);
@@ -269,7 +271,7 @@ TEST(BAM_BamHeader, can_decode_from_raw_bam_binary)
     rawData->ignore_sam_err = 0;
     rawData->l_text = text.size();
     rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
-    memcpy(rawData->text, text.c_str(), rawData->l_text);
+    std::memcpy(rawData->text, text.c_str(), rawData->l_text);
 
     const BamHeader newHeader{std::string(rawData->text, rawData->l_text)};
 
