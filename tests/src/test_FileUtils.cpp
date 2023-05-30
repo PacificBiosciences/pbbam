@@ -27,7 +27,7 @@ TEST(BAM_FileUtils, can_determines_if_file_exists)
 
     const std::string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_exists_check.tmp";
     const std::string cmd = "touch " + tmp;
-    ASSERT_EQ(0, system(cmd.c_str()));
+    ASSERT_EQ(0, std::system(cmd.c_str()));
     EXPECT_TRUE(FileUtils::Exists(tmp));
 }
 
@@ -44,9 +44,9 @@ TEST(BAM_FileUtils, can_determines_last_modified_time)
     const std::string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_lastmod_check.tmp";
     const std::string rmCmd = "rm " + tmp;
     const std::string touchCmd = "touch  " + tmp;
-    const auto ret = system(rmCmd.c_str());
+    const auto ret = std::system(rmCmd.c_str());
     std::ignore = ret;
-    ASSERT_EQ(0, system(touchCmd.c_str()));
+    ASSERT_EQ(0, std::system(touchCmd.c_str()));
 
     const auto stamp = FileUtils::LastModified(tmp);
     const auto stampDuration = stamp.time_since_epoch();
@@ -114,7 +114,7 @@ TEST(BAM_FileUtils, can_determines_file_size)
 {
     const std::string tmp = PbbamTestsConfig::GeneratedData_Dir + "/pbbam_empty_file.tmp";
     const std::string cmd = "touch " + tmp;
-    ASSERT_EQ(0, system(cmd.c_str()));
+    ASSERT_EQ(0, std::system(cmd.c_str()));
     EXPECT_EQ(0, FileUtils::Size(tmp));
 
     EXPECT_THROW(FileUtils::Size("does_not_exist.txt"), std::runtime_error);

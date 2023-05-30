@@ -22,7 +22,7 @@ std::vector<float> readFloatSamMultiValue(const std::string& data)
     auto* c = const_cast<char*>(data.c_str());
     const char* end = c + data.length();
     while (c + 1 < end) {
-        result.emplace_back(strtof(c + 1, &c));
+        result.emplace_back(std::strtof(c + 1, &c));
     }
     return result;
 }
@@ -34,7 +34,7 @@ std::vector<T> readSignedSamMultiValue(const std::string& data)
     auto* c = const_cast<char*>(data.c_str());
     const char* end = c + data.length();
     while (c + 1 < end) {
-        result.emplace_back(strtol(c + 1, &c, 0));
+        result.emplace_back(std::strtol(c + 1, &c, 0));
     }
     return result;
 }
@@ -46,7 +46,7 @@ std::vector<T> readUnsignedSamMultiValue(const std::string& data)
     auto* c = const_cast<char*>(data.c_str());
     const char* end = c + data.length();
     while (c + 1 < end) {
-        result.emplace_back(strtoul(c + 1, &c, 0));
+        result.emplace_back(std::strtoul(c + 1, &c, 0));
     }
     return result;
 }

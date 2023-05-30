@@ -570,7 +570,7 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_preencoded)
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     BamRecordImplVariableDataTests::CheckRawData(bam);
 
-    free(encoded);
+    std::free(encoded);
 }
 
 TEST(BAM_BamRecordImplVarData, can_set_seq_qual_preencoded_with_empty_qual)
@@ -622,7 +622,7 @@ TEST(BAM_BamRecordImplVarData, can_set_seq_qual_preencoded_with_empty_qual)
     EXPECT_EQ(qualities, bam.Qualities().Fastq());
     BamRecordImplVariableDataTests::CheckRawData(bam);
 
-    free(encoded);
+    std::free(encoded);
 }
 
 TEST(BAM_BamRecordImplVarData, can_set_seq_qual_then_overwrite_with_longer_seq_and_qual)

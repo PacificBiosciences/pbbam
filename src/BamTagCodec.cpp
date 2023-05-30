@@ -291,7 +291,7 @@ std::vector<std::uint8_t> BamTagCodec::Encode(const TagCollection& tags)
 
             // unsupported tag type
             default: {
-                free(str.s);
+                std::free(str.s);
                 throw std::runtime_error{
                     "[pbbam] BAM tag format ERROR: unsupported tag-type encountered: " +
                     std::to_string(static_cast<std::uint16_t>(tag.Type()))};
@@ -470,7 +470,7 @@ std::vector<std::uint8_t> BamTagCodec::ToRawData(const Tag& tag,
 
             // unsupported tag type
             default: {
-                free(str.s);
+                std::free(str.s);
                 throw std::runtime_error{
                     "[pbbam] BAM tag format ERROR: unsupported tag-type encountered: " +
                     std::to_string(static_cast<std::uint16_t>(tag.Type()))};
@@ -482,7 +482,7 @@ std::vector<std::uint8_t> BamTagCodec::ToRawData(const Tag& tag,
     std::vector<std::uint8_t> result;
     result.resize(str.l);
     std::memcpy(reinterpret_cast<char*>(&result[0]), str.s, str.l);
-    free(str.s);
+    std::free(str.s);
     return result;
 }
 

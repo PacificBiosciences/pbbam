@@ -154,7 +154,7 @@ TEST(BAM_PacBioIndex, can_create_from_bam_file)
     cmd += PacBioIndexTests::test2BamFn;
     cmd += " ";
     cmd += tempBamFn;
-    const auto cmdResult = system(cmd.c_str());
+    const auto cmdResult = std::system(cmd.c_str());
     std::ignore = cmdResult;
 
     const BamFile bamFile{tempBamFn};
@@ -274,7 +274,7 @@ TEST(BAM_PacBioIndex, can_load_sections_from_pbi_file)
     cmd += PacBioIndexTests::phi29BamFn;
     cmd += " ";
     cmd += tempDir;
-    const auto cmdResult = system(cmd.c_str());
+    const auto cmdResult = std::system(cmd.c_str());
     std::ignore = cmdResult;
 
     const BamFile bamFile{tempBamFn};

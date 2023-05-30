@@ -355,7 +355,7 @@ void BamRecordImpl::MaybeReallocData()
     if (d_->m_data < static_cast<std::uint32_t>(d_->l_data)) {
         d_->m_data = d_->l_data;
         kroundup32(d_->m_data);
-        d_->data = static_cast<std::uint8_t*>(realloc(d_->data, d_->m_data));
+        d_->data = static_cast<std::uint8_t*>(std::realloc(d_->data, d_->m_data));
     }
 }
 

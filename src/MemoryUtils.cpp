@@ -35,7 +35,7 @@ std::shared_ptr<bam_hdr_t> BamHeaderMemory::MakeRawHeader(const BamHeader& heade
                                        HtslibHeaderDeleter());
     rawData->ignore_sam_err = 0;
     rawData->l_text = text.size();
-    rawData->text = static_cast<char*>(calloc(rawData->l_text + 1, 1));
+    rawData->text = static_cast<char*>(std::calloc(rawData->l_text + 1, 1));
     std::memcpy(rawData->text, text.c_str(), rawData->l_text);
 
 // HTS_VERSION only added >= v1.10, and this step is only necessary before then

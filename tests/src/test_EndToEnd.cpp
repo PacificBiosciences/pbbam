@@ -65,14 +65,14 @@ int RunBam2Sam(const std::string& bamFn, const std::string& samFn)
 {
     std::ostringstream s;
     s << PbbamTestsConfig::Bam2Sam << " " << bamFn << " > " << samFn;
-    return system(s.str().c_str());
+    return std::system(s.str().c_str());
 }
 
 int RunDiff(const std::string& fn1, const std::string& fn2)
 {
     std::ostringstream s;
     s << "diff " << fn1 << " " << fn2;
-    return system(s.str().c_str());
+    return std::system(s.str().c_str());
 }
 
 void Remove(const std::vector<std::string>& files)

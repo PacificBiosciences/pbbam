@@ -220,7 +220,7 @@ const ChemistryTable& GetChemistryTableFromEnv()
     static std::map<std::string, ChemistryTable> tableCache;
 
     std::string chemPath;
-    const char* pth = getenv("SMRT_CHEMISTRY_BUNDLE_DIR");
+    const char* pth = std::getenv("SMRT_CHEMISTRY_BUNDLE_DIR");
     if (pth != nullptr && pth[0] != '\0') {
         chemPath = pth;
     } else {

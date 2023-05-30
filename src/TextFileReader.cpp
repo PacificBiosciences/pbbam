@@ -34,7 +34,7 @@ public:
         GetNext();
     }
 
-    ~TextFileReaderPrivate() { free(k_.s); }
+    ~TextFileReaderPrivate() { std::free(k_.s); }
 
     void GetNext()
     {
