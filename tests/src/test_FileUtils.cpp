@@ -151,7 +151,7 @@ std::string removeDiskName(const std::string& filePath)
 {
     if (filePath.size() >= 2) {
         const char firstChar = filePath.at(0);
-        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':')) {
+        if ((std::isalpha(firstChar) != 0) && (filePath.at(1) == ':')) {
             return filePath.substr(2);
         }
     }
@@ -177,7 +177,7 @@ bool native_pathIsAbsolute(const std::string& filePath)
     // if starts with drive name and colon ("C:\foo\bar.txt")
     if (filePath.size() >= 2) {
         const char firstChar = filePath.at(0);
-        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':')) {
+        if ((std::isalpha(firstChar) != 0) && (filePath.at(1) == ':')) {
             return native_pathIsAbsolute(removeDiskName(filePath));
         }
     }

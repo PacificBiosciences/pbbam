@@ -212,7 +212,7 @@ static PbiFilter CreateLocalContextFilter(const std::string& value, const Compar
     Data::LocalContextFlags filterValue = Data::LocalContextFlags::NO_LOCAL_CONTEXT;
 
     // if raw integer
-    if (isdigit(value.at(0))) {
+    if (std::isdigit(value.at(0))) {
         filterValue = static_cast<Data::LocalContextFlags>(std::stoi(value));
 
         // else interpret as flag names

@@ -47,7 +47,7 @@ static std::string removeDiskName(const std::string& filePath)
 {
     if (filePath.size() >= 2) {
         const char firstChar = filePath.at(0);
-        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':')) return filePath.substr(2);
+        if ((std::isalpha(firstChar) != 0) && (filePath.at(1) == ':')) return filePath.substr(2);
     }
     return filePath;
 }
@@ -68,7 +68,7 @@ static bool native_pathIsAbsolute(const std::string& filePath)
     // strip the drive name and check to see if the remaining path is absolute
     if (filePath.size() >= 2) {
         const char firstChar = filePath.at(0);
-        if ((isalpha(firstChar) != 0) && (filePath.at(1) == ':'))
+        if ((std::isalpha(firstChar) != 0) && (filePath.at(1) == ':'))
             return native_pathIsAbsolute(removeDiskName(filePath));
     }
 

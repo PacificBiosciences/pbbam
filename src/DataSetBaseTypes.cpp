@@ -273,7 +273,7 @@ StrictEntityType::StrictEntityType(const std::string& metatype, const std::strin
     transformedMetatype.resize(numChars);
     for (std::size_t i = 0; i < numChars; ++i) {
         const char c = metatype.at(i);
-        transformedMetatype[i] = ((c == '.') ? '_' : tolower(c));
+        transformedMetatype[i] = ((c == '.') ? '_' : std::tolower(c));
     }
     const std::string tsn =
         transformedMetatype + "-" + TimeUtils::ToDataSetFormat(TimeUtils::CurrentTime());
