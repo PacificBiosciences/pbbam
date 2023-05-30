@@ -184,5 +184,5 @@ TEST(BAM_FastqMerging, can_merge_bams_to_fastq_output)
         EXPECT_EQ(mergedFastqNames[i], seqs[i].Name());
     }
 
-    remove(outFastq.c_str());
+    std::remove(outFastq.c_str());
 }

@@ -28,13 +28,13 @@ public:
 private:
     int FetchRecord();
 
-    // kseq needs a '__read' function with this signature, so fread does not work
+    // kseq needs a '__read' function with this signature, so std::fread does not work
     // in this case. gzread/bgzf_read match but we want better seek performance
     // than gzstream and are specifically not using indexed BGZF
-    static int ReadFromFile(FILE* fp, void* data, std::size_t length);
+    static int ReadFromFile(std::FILE* fp, void* data, std::size_t length);
 
-    // specialize kseq_t for FILE handle
-    KSEQ_INIT(FILE*, ReadFromFile)
+    // specialize kseq_t for std::FILE handle
+    KSEQ_INIT(std::FILE*, ReadFromFile)
     struct KSeqDeleter
     {
         void operator()(kseq_t* seq) const noexcept
@@ -46,7 +46,7 @@ private:
         }
     };
 
-    std::unique_ptr<FILE, Utility::FileDeleter> file_;
+    std::unique_ptr<std::FILE, Utility::FileDeleter> file_;
     std::unique_ptr<kseq_t, KSeqDeleter> seq_;
 };
 

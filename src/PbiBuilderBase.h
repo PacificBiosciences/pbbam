@@ -251,7 +251,7 @@ struct PbiBuilderBase
     // file/general info
     std::string pbiFilename_;
     std::string tempFilename_;
-    std::unique_ptr<FILE, Utility::FileDeleter> tempFile_;
+    std::unique_ptr<std::FILE, Utility::FileDeleter> tempFile_;
     std::unique_ptr<BGZF, HtslibBgzfDeleter> pbiFile_;
     PbiBuilder::CompressionLevel compressionLevel_;
     std::size_t numThreads_;

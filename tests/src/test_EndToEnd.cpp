@@ -78,7 +78,7 @@ int RunDiff(const std::string& fn1, const std::string& fn2)
 void Remove(const std::vector<std::string>& files)
 {
     for (const auto& fn : files) {
-        remove(fn.c_str());
+        std::remove(fn.c_str());
     }
 }
 

@@ -19,7 +19,7 @@ namespace BAM {
 ZmwChunkedFastxTextReader::ZmwChunkedFastxTextReader(std::string filename,
                                                      const std::size_t numChunks)
     : ZmwChunkedFastxReaderImpl{std::move(filename), numChunks}
-    , file_{fopen(fastxFilename_.c_str(), "r")}
+    , file_{std::fopen(fastxFilename_.c_str(), "r")}
     , seq_{kseq_init(file_.get())}
 {
     // check file handle
@@ -115,7 +115,7 @@ int ZmwChunkedFastxTextReader::FetchRecord(bool skipName)
     return seq_->seq.l;
 }
 
-int ZmwChunkedFastxTextReader::ReadFromFile(FILE* fp, void* data, std::size_t length)
+int ZmwChunkedFastxTextReader::ReadFromFile(std::FILE* fp, void* data, std::size_t length)
 {
     return static_cast<int>(std::fread(data, sizeof(std::uint8_t), length, fp));
 }
@@ -160,7 +160,7 @@ FastqSequence ZmwChunkedFastxTextReader::ReadNextFastq(bool skipName)
 void ZmwChunkedFastxTextReader::Seek(std::uint64_t pos)
 {
     // seek to sequence 'id' & reset kseq handle
-    auto result = fseek(file_.get(), pos, SEEK_SET);
+    auto result = std::fseek(file_.get(), pos, SEEK_SET);
     if (result != 0) {
         std::ostringstream msg;
         msg << "[pbbam] chunked FASTX reader ERROR: could not seek to requested pos: " << pos

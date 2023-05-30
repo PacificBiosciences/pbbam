@@ -41,7 +41,7 @@ void CheckRoundTrip(const std::string& outFn, const HtslibCompression compressio
     EXPECT_TRUE(std::equal(BedWriterTests::Intervals.cbegin(), BedWriterTests::Intervals.cend(),
                            contents.cbegin()));
 
-    remove(outFn.c_str());
+    std::remove(outFn.c_str());
 }
 
 }  // namespace BedWriterTests

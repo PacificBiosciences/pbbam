@@ -201,7 +201,7 @@ void PbiBuilderBase::Close()
     WritePbiHeader();
     WriteFromTempFile();
 
-    remove(tempFilename_.c_str());
+    std::remove(tempFilename_.c_str());
     isClosed_ = true;
 }
 

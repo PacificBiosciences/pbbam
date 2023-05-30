@@ -72,13 +72,13 @@ public:
         //
 
         const std::string gziFn{bamFilename_ + ".gzi"};
-        std::unique_ptr<FILE, Utility::FileDeleter> gziFile{fopen(gziFn.c_str(), "rb")};
+        std::unique_ptr<std::FILE, Utility::FileDeleter> gziFile{std::fopen(gziFn.c_str(), "rb")};
         if (!gziFile) {
             throw IndexedBamWriterException{gziFn, "could not open *.gzi file"};
         }
 
         std::uint64_t numElements;
-        if (fread(&numElements, sizeof(numElements), 1, gziFile.get()) < 1) {
+        if (std::fread(&numElements, sizeof(numElements), 1, gziFile.get()) < 1) {
             throw IndexedBamWriterException{gziFn, "could not read from *.gzi file"};
         }
         if (ed_is_big()) {
@@ -89,8 +89,10 @@ public:
         result.reserve(numElements);
         for (std::uint32_t i = 0; i < numElements; ++i) {
             GzIndexEntry entry;
-            const auto vReturn = fread(&entry.vAddress, sizeof(entry.vAddress), 1, gziFile.get());
-            const auto uReturn = fread(&entry.uAddress, sizeof(entry.uAddress), 1, gziFile.get());
+            const auto vReturn =
+                std::fread(&entry.vAddress, sizeof(entry.vAddress), 1, gziFile.get());
+            const auto uReturn =
+                std::fread(&entry.uAddress, sizeof(entry.uAddress), 1, gziFile.get());
             if (vReturn < 1 || uReturn < 1) {
                 throw IndexedBamWriterException{gziFn, "could not read from *.gzi file"};
             }
@@ -186,7 +188,7 @@ public:
         CloseBam();
         ClosePbi();
 
-        remove(std::string{bamFilename_ + ".gzi"}.c_str());
+        std::remove(std::string{bamFilename_ + ".gzi"}.c_str());
         isOpen_ = false;
     }
 
@@ -365,7 +367,7 @@ public:
         CloseGzi();
         ClosePbi();
 
-        remove(std::string{bamFilename_ + ".gzi"}.c_str());
+        std::remove(std::string{bamFilename_ + ".gzi"}.c_str());
         isOpen_ = false;
     }
 

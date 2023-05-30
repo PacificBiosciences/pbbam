@@ -96,7 +96,7 @@ void checkSingleRecord(bool useTempFile)
     EXPECT_EQ(rgId, record.ReadGroupId());
 
     // clean up
-    remove(generatedBamFn.c_str());
+    std::remove(generatedBamFn.c_str());
 }
 
 } // namespace BamWriterTests

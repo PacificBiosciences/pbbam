@@ -18,7 +18,7 @@ namespace BAM {
 
 IndexedFastqTextReader::IndexedFastqTextReader(std::string filename)
     : IndexedFastqReaderImpl{std::move(filename)}
-    , file_{fopen(fastqFilename_.c_str(), "r")}
+    , file_{std::fopen(fastqFilename_.c_str(), "r")}
     , seq_{kseq_init(file_.get())}
 {
     // check file handle
@@ -93,7 +93,7 @@ int IndexedFastqTextReader::FetchRecord()
     return seq_->seq.l;
 }
 
-int IndexedFastqTextReader::ReadFromFile(FILE* fp, void* data, std::size_t length)
+int IndexedFastqTextReader::ReadFromFile(std::FILE* fp, void* data, std::size_t length)
 {
     return static_cast<int>(std::fread(data, sizeof(std::uint8_t), length, fp));
 }
@@ -121,7 +121,7 @@ std::pair<std::string, Data::QualityValues> IndexedFastqTextReader::Subsequence(
     }
 
     // seek to sequence 'id' & reset kseq handle
-    auto result = fseek(file_.get(), entry.SeqOffset, SEEK_SET);
+    auto result = std::fseek(file_.get(), entry.SeqOffset, SEEK_SET);
     if (result != 0) {
         std::ostringstream msg;
         msg << "[pbbam] FASTQ reader ERROR: could not seek to requested region:\n"

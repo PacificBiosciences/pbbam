@@ -44,7 +44,7 @@ TEST(BAM_FastaWriter, can_write_fasta_sequence)
     EXPECT_EQ(seq.Name(), seqs[0].Name());
     EXPECT_EQ(seq.Bases(), seqs[0].Bases());
 
-    remove(outFasta.c_str());
+    std::remove(outFasta.c_str());
 }
 
 TEST(BAM_FastaWriter, can_write_fasta_from_bam)
@@ -81,7 +81,7 @@ TEST(BAM_FastaWriter, can_write_fasta_from_bam)
         "AAGTCACCAATGTGGGACGTCCGTCGATGGCAGAAGAGCAGCACGGTAAACAGCGGCAAATCAGCCAGTCCGGCATCAATTGGCCTCCTG"
         "ACCGCTGTACCTGCAGCCAAA"};
 
-    remove(outFasta.c_str());
+    std::remove(outFasta.c_str());
 }
 
 TEST(BAM_FastaWriter, can_write_fasta_from_strings)
@@ -100,5 +100,5 @@ TEST(BAM_FastaWriter, can_write_fasta_from_strings)
     EXPECT_EQ(name, seqs[0].Name());
     EXPECT_EQ(bases, seqs[0].Bases());
 
-    remove(outFasta.c_str());
+    std::remove(outFasta.c_str());
 }

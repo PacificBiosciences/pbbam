@@ -34,5 +34,5 @@ TEST(VCF_VcfSort, sorts_input_file)
     }
 
     // remove temp file
-    remove(VcfSortTests::outputFn.c_str());
+    std::remove(VcfSortTests::outputFn.c_str());
 }

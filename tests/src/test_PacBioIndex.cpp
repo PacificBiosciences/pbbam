@@ -170,8 +170,8 @@ TEST(BAM_PacBioIndex, can_create_from_bam_file)
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, index);
 
     // clean up temp file(s)
-    remove(tempBamFn.c_str());
-    remove(tempPbiFn.c_str());
+    std::remove(tempBamFn.c_str());
+    std::remove(tempPbiFn.c_str());
 }
 
 ::testing::AssertionResult CanRead(BamReader& reader, BamRecord& record, int i)
@@ -249,8 +249,8 @@ TEST(BAM_PacBioIndex, can_create_inline_with_bam_writer)
     PacBioIndexTests::ExpectRawIndicesEqual(expectedIndex, fromBuilt);
 
     // clean up temp file(s)
-    remove(tempBamFn.c_str());
-    remove(tempPbiFn.c_str());
+    std::remove(tempBamFn.c_str());
+    std::remove(tempPbiFn.c_str());
 }
 
 TEST(BAM_PacBioIndex, can_load_from_pbi_file)
@@ -309,8 +309,8 @@ TEST(BAM_PacBioIndex, can_load_sections_from_pbi_file)
     EXPECT_EQ(expectedBcQuality, barcodeData.bcQual_);
 
     // clean up temp file(s)
-    remove(tempBamFn.c_str());
-    remove(tempPbiFn.c_str());
+    std::remove(tempBamFn.c_str());
+    std::remove(tempPbiFn.c_str());
 }
 
 TEST(BAM_PacBioIndex, reference_data_is_absent_from_unsorted_bam)

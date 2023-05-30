@@ -34,7 +34,7 @@ void CheckRoundTrip(const std::string& outFn, const PacBio::BAM::HtslibCompressi
     EXPECT_TRUE(std::equal(TextFileWriterTests::Lines.cbegin(), TextFileWriterTests::Lines.cend(),
                            contents.cbegin()));
 
-    remove(outFn.c_str());
+    std::remove(outFn.c_str());
 }
 
 }  // namespace TextFileWriterTests

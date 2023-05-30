@@ -80,7 +80,7 @@ TEST(BAM_SamWriter, can_roundtrip_header)
     }
 
     // clean up
-    remove(generatedFn.c_str());
+    std::remove(generatedFn.c_str());
 }
 
 TEST(BAM_SamWriter, can_roundtrip_single_record)
@@ -147,7 +147,7 @@ TEST(BAM_SamWriter, can_roundtrip_single_record)
     }
 
     // cleanup
-    remove(generatedFn.c_str());
+    std::remove(generatedFn.c_str());
 }
 
 TEST(BAM_SamWriter, can_roundtrip_long_cigar)

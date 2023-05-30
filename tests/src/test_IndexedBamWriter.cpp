@@ -105,8 +105,8 @@ TEST(BAM_IndexedBamWriter, can_handle_long_reads_spanning_bgzf_blocks)
         }
     }
 
-    remove(outBamFn.c_str());
-    remove(outPbiFn.c_str());
+    std::remove(outBamFn.c_str());
+    std::remove(outPbiFn.c_str());
 }
 
 TEST(BAM_IndexedBamWriter, removes_gzi_file_for_bam_with_no_records)

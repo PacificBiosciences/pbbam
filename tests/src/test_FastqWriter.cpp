@@ -42,7 +42,7 @@ TEST(BAM_FastqWriter, can_write_fastq_sequence)
     EXPECT_EQ(seq.Bases(), seqs[0].Bases());
     EXPECT_EQ(seq.Qualities(), seqs[0].Qualities());
 
-    remove(outFastq.c_str());
+    std::remove(outFastq.c_str());
 }
 
 TEST(BAM_FastqWriter, can_write_fastq_from_bam)
@@ -72,7 +72,7 @@ TEST(BAM_FastqWriter, can_write_fastq_from_bam)
     EXPECT_EQ(bases, seqs[0].Bases());
     EXPECT_EQ(quals, seqs[0].Qualities().Fastq());
 
-    remove(outFastq.c_str());
+    std::remove(outFastq.c_str());
 }
 
 TEST(BAM_FastqWriter, can_write_fastq_from_strings)
@@ -92,5 +92,5 @@ TEST(BAM_FastqWriter, can_write_fastq_from_strings)
     EXPECT_EQ(name, seqs[0].Name());
     EXPECT_EQ(bases, seqs[0].Bases());
 
-    remove(outFastq.c_str());
+    std::remove(outFastq.c_str());
 }
