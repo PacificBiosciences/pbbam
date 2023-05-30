@@ -53,7 +53,7 @@ enum class TagModifier
     ///
     /// SAM/BAM has the concept of an ASCII character that is distinct from an
     /// 8-bit integer. However, there is no such pure separation in C++ - as
-    /// std::int8_t/uint8_t are likely implemented as typedefs around char/unsigned
+    /// std::int8_t/std::uint8_t are likely implemented as typedefs around char/unsigned
     /// char. Thus this modifier can be used to indicate a tag's value should be
     /// interpreted as a printable, ASCII character.
     ///
