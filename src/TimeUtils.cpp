@@ -10,14 +10,14 @@
 namespace PacBio {
 namespace BAM {
 
-std::string FormatTime(const time_t timeT, char const* dtFormat)
+std::string FormatTime(const std::time_t timeT, char const* dtFormat)
 {
     char dateTimeStrBuf[50];  // NOLINT
     static std::mutex m{};
     {
         std::unique_lock<std::mutex> lk(m);
-        const std::tm* ttm = gmtime(&timeT);  // NOLINT(concurrency-mt-unsafe)
-        strftime(dateTimeStrBuf, sizeof(dateTimeStrBuf), dtFormat, ttm);
+        const std::tm* ttm = std::gmtime(&timeT);  // NOLINT(concurrency-mt-unsafe)
+        std::strftime(dateTimeStrBuf, sizeof(dateTimeStrBuf), dtFormat, ttm);
     }
     return {dateTimeStrBuf};
 }
@@ -25,7 +25,7 @@ std::string FormatTime(const time_t timeT, char const* dtFormat)
 std::string TimeUtils::ToIso8601(const std::chrono::system_clock::time_point& tp)
 {
     using namespace std::chrono;
-    const time_t timeT = std::chrono::system_clock::to_time_t(tp);
+    const std::time_t timeT = std::chrono::system_clock::to_time_t(tp);
     const system_clock::time_point tpSec = system_clock::from_time_t(timeT);
     const milliseconds ms = duration_cast<milliseconds>(tp - tpSec);
 
@@ -41,7 +41,7 @@ std::string TimeUtils::ToIso8601(const std::chrono::system_clock::time_point& tp
 std::string TimeUtils::ToDataSetFormat(const std::chrono::system_clock::time_point& tp)
 {
     using namespace std::chrono;
-    const time_t timeT = std::chrono::system_clock::to_time_t(tp);
+    const std::time_t timeT = std::chrono::system_clock::to_time_t(tp);
     const system_clock::time_point tpSec = system_clock::from_time_t(timeT);
     const milliseconds ms = duration_cast<milliseconds>(tp - tpSec);
 

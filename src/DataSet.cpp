@@ -641,7 +641,7 @@ std::string ToDataSetFormat(const std::chrono::system_clock::time_point& tp)
     return TimeUtils::ToDataSetFormat(tp);
 }
 
-std::string ToDataSetFormat(const time_t& t)
+std::string ToDataSetFormat(const std::time_t& t)
 {
     return TimeUtils::ToDataSetFormat(std::chrono::system_clock::from_time_t(t));
 }
@@ -651,7 +651,7 @@ std::string ToIso8601(const std::chrono::system_clock::time_point& tp)
     return TimeUtils::ToIso8601(tp);
 }
 
-std::string ToIso8601(const time_t& t)
+std::string ToIso8601(const std::time_t& t)
 {
     return TimeUtils::ToIso8601(std::chrono::system_clock::from_time_t(t));
 }

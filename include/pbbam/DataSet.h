@@ -848,14 +848,14 @@ PBBAM_EXPORT std::string CurrentTimestamp();
 ///
 PBBAM_EXPORT std::string ToDataSetFormat(const std::chrono::system_clock::time_point& tp);
 
-/// \brief Converts a time_t to "DataSetXML-formatted" timestamp.
+/// \brief Converts a std::time_t to "DataSetXML-formatted" timestamp.
 ///
 /// This is the format used as a component of the DataSet::TimeStampedName
 /// (yymmdd_HHmmssttt>.
 ///
 /// \returns "DataSetXML-formatted" timestamp
 ///
-PBBAM_EXPORT std::string ToDataSetFormat(const time_t& tp);
+PBBAM_EXPORT std::string ToDataSetFormat(const std::time_t& tp);
 
 /// \brief Converts a time_point to ISO-8601 formatted timestamp.
 ///
@@ -865,13 +865,13 @@ PBBAM_EXPORT std::string ToDataSetFormat(const time_t& tp);
 ///
 PBBAM_EXPORT std::string ToIso8601(const std::chrono::system_clock::time_point& tp);
 
-/// \brief Converts a time_t to ISO-8601 formatted timestamp.
+/// \brief Converts a std::time_t to ISO-8601 formatted timestamp.
 ///
 /// This is the format used in DataSet::CreatedAt and DataSet::ModifiedAt.
 ///
 /// \returns ISO-8601 formatted timestamp
 ///
-PBBAM_EXPORT std::string ToIso8601(const time_t& t);
+PBBAM_EXPORT std::string ToIso8601(const std::time_t& t);
 
 /// \}
 
