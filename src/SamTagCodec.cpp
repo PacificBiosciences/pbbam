@@ -76,7 +76,7 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
             // but we'll be a little permissive
             case 'A':
             case 'a': {
-                tags[name] = Tag{static_cast<char>(remainder[0], TagModifier::ASCII_CHAR)};
+                tags[name] = Tag{static_cast<char>(remainder[0]), TagModifier::ASCII_CHAR};
                 break;
             }
 
