@@ -324,7 +324,7 @@ TEST(BAM_Tag, can_describe_uint16_tag)
     const std::uint16_t v = 42;
     const Tag tag(v);
 
-    std::uint16_t v2;
+    std::uint16_t v2{};
     EXPECT_NO_THROW(v2 = tag.ToUInt16());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT16);
@@ -348,7 +348,7 @@ TEST(BAM_Tag, can_describe_int32_tag)
     const std::int32_t v = -42;
     const Tag tag(v);
 
-    std::int32_t v2;
+    std::int32_t v2{};
     EXPECT_NO_THROW(v2 = tag.ToInt32());
 
     EXPECT_TRUE(tag.Type() == TagDataType::INT32);
@@ -372,7 +372,7 @@ TEST(BAM_Tag, can_describe_uint32_tag)
     const std::uint32_t v = 42;
     const Tag tag(v);
 
-    std::uint32_t v2;
+    std::uint32_t v2{};
     EXPECT_NO_THROW(v2 = tag.ToUInt32());
 
     EXPECT_TRUE(tag.Type() == TagDataType::UINT32);
