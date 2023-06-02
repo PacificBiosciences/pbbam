@@ -389,14 +389,10 @@ TEST(BAM_BamRecordImplCore, can_be_copy_constructed)
 TEST(BAM_BamRecordImplCore, can_be_move_assigned)
 {
     BamRecordImpl bam;
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpessimizing-move"
-#endif
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpessimizing-move"
     bam = std::move(BamRecordImplCoreTests::CreateBamImpl());
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+#pragma GCC diagnostic pop
 
     EXPECT_EQ(42, bam.Bin());
     EXPECT_EQ(42, bam.Flag());
@@ -418,14 +414,10 @@ TEST(BAM_BamRecordImplCore, can_be_move_assigned)
 
 TEST(BAM_BamRecordImplCore, can_be_move_constructed)
 {
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpessimizing-move"
-#endif
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpessimizing-move"
     BamRecordImpl bam(std::move(BamRecordImplCoreTests::CreateBamImpl()));
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+#pragma GCC diagnostic pop
 
     EXPECT_EQ(42, bam.Bin());
     EXPECT_EQ(42, bam.Flag());
