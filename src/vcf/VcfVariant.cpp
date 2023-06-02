@@ -7,6 +7,7 @@
 #include "VcfFormatException.h"
 
 #include <type_traits>
+#include <utility>
 
 #include <cassert>
 #include <cmath>
@@ -247,7 +248,7 @@ VcfVariant& VcfVariant::RemoveInfoField(const std::string& id)
 
     for (auto&& field : currentFields) {
         if (field.id != id) {
-            AddInfoField(std::move(field));
+            AddInfoField(field);
         }
     }
 

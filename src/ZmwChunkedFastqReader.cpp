@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <cassert>
@@ -74,7 +75,7 @@ std::unique_ptr<ZmwChunkedFastxReaderImpl> MakeFastqReaderImpl(std::string filen
 class ZmwChunkedFastqReader::ZmwChunkedFastqReaderPrivate
 {
 public:
-    explicit ZmwChunkedFastqReaderPrivate(const std::string& fn, const std::size_t numChunks)
+    explicit ZmwChunkedFastqReaderPrivate(std::string fn, const std::size_t numChunks)
         : reader_{MakeFastqReaderImpl(std::move(fn), numChunks)}
     {
         assert(reader_->chunker_.NumChunks() != 0);
