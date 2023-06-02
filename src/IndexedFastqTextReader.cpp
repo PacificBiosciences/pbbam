@@ -46,7 +46,7 @@ int IndexedFastqTextReader::FetchRecord()
     seq_->comment.l = seq_->seq.l = seq_->qual.l = 0; /* reset all members */
     if (seq_->seq.s == 0) { /* we can do this in the loop below, but that is slower */
         seq_->seq.m = 256;
-        seq_->seq.s = (char*)std::malloc(seq_->seq.m);
+        seq_->seq.s = static_cast<char*>(std::malloc(seq_->seq.m));
     }
     while ((c = ks_getc(ks)) != -1 && c != '>' && c != '+' && c != '@') {
         if (c == '\n') {
@@ -63,7 +63,7 @@ int IndexedFastqTextReader::FetchRecord()
         seq_->seq.m) { /* seq_->seq.s[seq_->seq.l] below may be out of boundary */
         seq_->seq.m = seq_->seq.l + 2;
         kroundup32(seq_->seq.m); /* rounded to the next closest 2^k */
-        seq_->seq.s = (char*)std::realloc(seq_->seq.s, seq_->seq.m);
+        seq_->seq.s = static_cast<char*>(std::realloc(seq_->seq.s, seq_->seq.m));
     }
     seq_->seq.s[seq_->seq.l] = 0; /* null terminated string */
 
@@ -72,7 +72,7 @@ int IndexedFastqTextReader::FetchRecord()
     }
     if (seq_->qual.m < seq_->seq.m) { /* allocate memory for qual in case insufficient */
         seq_->qual.m = seq_->seq.m;
-        seq_->qual.s = (char*)std::realloc(seq_->qual.s, seq_->qual.m);
+        seq_->qual.s = static_cast<char*>(std::realloc(seq_->qual.s, seq_->qual.m));
     }
 
     while ((c = ks_getc(ks)) != -1 && c != '\n') {
