@@ -10,6 +10,8 @@
 
 #include <string>
 
+#include <cstdint>
+
 namespace PacBio {
 namespace BAM {
 

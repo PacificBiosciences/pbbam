@@ -8,6 +8,8 @@
 
 #include <vector>
 
+#include <cstdint>
+
 namespace PacBio {
 namespace BAM {
 

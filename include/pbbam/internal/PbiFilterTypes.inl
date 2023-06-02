@@ -10,6 +10,7 @@
 #include <stdexcept>
 
 #include <cassert>
+#include <cstdint>
 
 namespace PacBio {
 namespace BAM {
