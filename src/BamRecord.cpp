@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <numeric>
 #include <sstream>
 #include <stdexcept>
 #include <utility>
@@ -687,6 +688,33 @@ void BamRecord::ClipTags(const std::size_t clipFrom, const std::size_t clipLengt
         tags[Label(BamRecordTag::BASEMOD_LOCI)] =
             SplitBasemods::SeparatingCToString(sb.RetainedSeparatingC);
         tags[Label(BamRecordTag::BASEMOD_QV)] = std::move(sb.RetainedQuals);
+    }
+
+    // subread pileup tags
+    if (impl_.HasTag("sa") || impl_.HasTag("sm") || impl_.HasTag("sx")) {
+        if (!impl_.HasTag("sa")) {
+            throw std::runtime_error(
+                "[pbbam] BAM record ERROR: cannot clip subread pileup tags without 'sa' tag. ");
+        }
+        if (!impl_.HasTag("sm")) {
+            throw std::runtime_error(
+                "[pbbam] BAM record ERROR: cannot clip subread pileup tags without 'sm' tag. ");
+        }
+        if (!impl_.HasTag("sx")) {
+            throw std::runtime_error(
+                "[pbbam] BAM record ERROR: cannot clip subread pileup tags without 'sx' tag. ");
+        }
+
+        const std::vector<std::uint16_t> coverage{impl_.TagValue("sa").ToUInt16Array()};
+        const std::vector<std::uint8_t> matches{impl_.TagValue("sm").ToUInt8Array()};
+        const std::vector<std::uint8_t> mismatches{impl_.TagValue("sx").ToUInt8Array()};
+
+        SplitSubreadPileup result = ClipSubreadPileupTags(impl_.SequenceLength(), coverage, matches,
+                                                          mismatches, clipFrom, clipLength);
+
+        tags["sa"] = std::move(result.RetainedCoverage);
+        tags["sm"] = std::move(result.RetainedMatches);
+        tags["sx"] = std::move(result.RetainedMismatches);
     }
 
     // internal BAM tags
@@ -1755,6 +1783,106 @@ BamRecord::SplitBasemods BamRecord::ClipBasemodsTag(const std::string& seq,
         result.RetainedSeparatingC.front() = prefixSum[startPos] - numClippedC - 1;
         result.PrefixLostBases = numClippedC - ((startPos >= 1) ? prefixSum[startPos - 1] : 0);
     }
+
+    return result;
+}
+
+BamRecord::SplitSubreadPileup BamRecord::ClipSubreadPileupTags(
+    const std::size_t sequenceLength, const std::span<const std::uint16_t> runLengthEncodedCoverage,
+    const std::span<const std::uint8_t> matches, const std::span<const std::uint8_t> mismatches,
+    const std::size_t clipFrom, const std::size_t clipLength)
+{
+    if (runLengthEncodedCoverage.empty() && matches.empty() && mismatches.empty()) {
+        return {};
+    }
+
+    assert(clipFrom <= sequenceLength);
+    assert((clipFrom + clipLength) <= sequenceLength);
+
+    assert(std::size(matches) == sequenceLength);
+    assert(std::size(mismatches) == sequenceLength);
+    assert((std::size(runLengthEncodedCoverage) % 2U) == 0U);
+
+    std::vector<std::uint16_t> lengths;
+    lengths.reserve(std::size(runLengthEncodedCoverage) / 2U);
+    for (std::int32_t i = 0; i < std::ssize(runLengthEncodedCoverage); i += 2) {
+        lengths.emplace_back(runLengthEncodedCoverage[i]);
+    }
+
+    assert(std::accumulate(std::cbegin(lengths), std::cend(lengths), 0U) == sequenceLength);
+
+    std::vector<std::uint16_t> prefixSum(std::size(lengths));
+    std::inclusive_scan(std::cbegin(lengths), std::cend(lengths), std::begin(prefixSum));
+
+    std::vector<std::uint16_t> suffixSum(std::size(lengths));
+    std::inclusive_scan(std::crbegin(lengths), std::crend(lengths), std::begin(suffixSum));
+
+    const std::int32_t clipBegin = clipFrom;
+    const std::int32_t clipEnd = clipFrom + clipLength;
+
+    const std::int32_t prefixSize = clipBegin;
+    const std::int32_t suffixSize = sequenceLength - clipEnd;
+
+    const auto prefixSumUpperBound =
+        std::upper_bound(std::cbegin(prefixSum), std::cend(prefixSum), prefixSize);
+
+    const auto suffixSumUpperBound =
+        std::upper_bound(std::cbegin(suffixSum), std::cend(suffixSum), suffixSize);
+
+    const std::int32_t clipCoverageBegin =
+        2 * std::distance(std::cbegin(prefixSum), prefixSumUpperBound);
+    const std::int32_t clipCoverageEnd =
+        2 * (std::ssize(suffixSum) - std::distance(std::cbegin(suffixSum), suffixSumUpperBound));
+
+    BamRecord::SplitSubreadPileup result{
+        // Leading
+        {std::cbegin(runLengthEncodedCoverage),
+         std::cbegin(runLengthEncodedCoverage) + clipCoverageBegin},
+        {std::cbegin(matches), std::cbegin(matches) + clipBegin},
+        {std::cbegin(mismatches), std::cbegin(mismatches) + clipBegin},
+        // Retained
+        {std::cbegin(runLengthEncodedCoverage) + clipCoverageBegin,
+         std::cbegin(runLengthEncodedCoverage) + clipCoverageEnd},
+        {std::cbegin(matches) + clipBegin, std::cbegin(matches) + clipEnd},
+        {std::cbegin(mismatches) + clipBegin, std::cbegin(mismatches) + clipEnd},
+        // Trailing
+        {std::cbegin(runLengthEncodedCoverage) + clipCoverageEnd,
+         std::cend(runLengthEncodedCoverage)},
+        {std::cbegin(matches) + clipEnd, std::cend(matches)},
+        {std::cbegin(mismatches) + clipEnd, std::cend(mismatches)}};
+
+    result.LostPrefixBases =
+        prefixSize -
+        ((prefixSumUpperBound != std::cbegin(prefixSum)) ? *std::prev(prefixSumUpperBound) : 0);
+
+    if (result.LostPrefixBases != 0) {
+        result.RetainedCoverage[0] -= result.LostPrefixBases;
+    }
+
+    result.LostSuffixBases =
+        suffixSize -
+        ((suffixSumUpperBound != std::cbegin(suffixSum)) ? *std::prev(suffixSumUpperBound) : 0);
+
+    if (result.LostSuffixBases != 0) {
+        result.RetainedCoverage[std::ssize(result.RetainedCoverage) - 2] -= result.LostSuffixBases;
+    }
+
+    if ((std::ssize(result.RetainedCoverage) == 2) && (result.RetainedCoverage[0] == 0)) {
+        assert(clipLength == 0);
+        result.LostCoverage = result.RetainedCoverage[1];
+        result.RetainedCoverage.clear();
+    }
+
+    assert(std::size(result.RetainedMatches) == clipLength);
+    assert(std::size(result.RetainedMismatches) == clipLength);
+    assert(std::size(result.RetainedCoverage) % 2U == 0U);
+
+    [[maybe_unused]] std::size_t decodedClipLength{0};
+    for (std::int32_t i = 0; i < std::ssize(result.RetainedCoverage); i += 2) {
+        decodedClipLength += result.RetainedCoverage[i];
+    }
+
+    assert(decodedClipLength == clipLength);
 
     return result;
 }

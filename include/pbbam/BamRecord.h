@@ -25,6 +25,7 @@
 #include <pbcopper/json/JSON.h>
 
 #include <memory>
+#include <span>
 #include <string>
 #include <utility>
 #include <vector>
@@ -1485,6 +1486,32 @@ public:
                                          const std::string& oldBasemodsString,
                                          const std::vector<std::uint8_t>& basemodsQVs,
                                          std::size_t clipFrom, std::size_t clipLength);
+
+    /// Splits subread pileup tags 'sa', 'sm' and 'sx'
+    struct SplitSubreadPileup
+    {
+        std::vector<std::uint16_t> LeadingCoverage{};
+        std::vector<std::uint8_t> LeadingMatches{};
+        std::vector<std::uint8_t> LeadingMismatches{};
+
+        std::vector<std::uint16_t> RetainedCoverage{};
+        std::vector<std::uint8_t> RetainedMatches{};
+        std::vector<std::uint8_t> RetainedMismatches{};
+
+        std::vector<std::uint16_t> TrailingCoverage{};
+        std::vector<std::uint8_t> TrailingMatches{};
+        std::vector<std::uint8_t> TrailingMismatches{};
+
+        std::int32_t LostPrefixBases{0};
+        std::int32_t LostSuffixBases{0};
+        std::int32_t LostCoverage{-1};
+
+        bool operator==(const SplitSubreadPileup&) const = default;
+    };
+    static SplitSubreadPileup ClipSubreadPileupTags(
+        std::size_t sequenceLength, std::span<const std::uint16_t> runLengthEncodedCoverage,
+        std::span<const std::uint8_t> matches, std::span<const std::uint8_t> mismatches,
+        std::size_t clipFrom, std::size_t clipLength);
 
     /// Applies clipping to this record
     BamRecord& Clip(ClipType clipType, Data::Position start, Data::Position end,

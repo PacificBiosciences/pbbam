@@ -2976,3 +2976,237 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<std::uint8_t>{}));
     }
 }
+
+TEST(BAM_BamRecordClipping, clips_subread_pileup_tags)
+{
+    const auto makeRecord = [](const std::string& sequence, const std::string& qualities,
+                               const std::vector<std::uint16_t>& coverage,
+                               const std::vector<std::uint8_t>& matches,
+                               const std::vector<std::uint8_t>& mistmatches) {
+        BamRecordImpl impl;
+        impl.SetSequenceAndQualities(sequence, qualities);
+
+        TagCollection tags;
+        tags["sa"] = coverage;
+        tags["sm"] = matches;
+        tags["sx"] = mistmatches;
+
+        impl.Tags(tags);
+
+        const ReadGroupInfo readGroupInfo =
+            BamRecordClippingTests::MakeReadGroup(Data::FrameCodec::V1, "movie", "CCS");
+
+        BamRecord record{std::move(impl)};
+        record.header_.AddReadGroup(readGroupInfo);
+        record.ReadGroup(readGroupInfo);
+        return record;
+    };
+
+    const std::string sequence = "ACTCCACGACTCGTCACACTCACGTCTCA";
+    const std::string qualities = "hNfLpfSlpk59K>22LC'x*2W=*0GWv";
+
+    const std::string subseq{std::cbegin(sequence), std::cbegin(sequence)};
+
+    const std::vector<std::uint16_t> coverage = {4, 3, 15, 4, 10, 2};
+    const std::vector<std::uint8_t> matches = {3, 1, 2, 3, 4, 4, 4, 4, 3, 2, 1, 4, 4, 1, 1,
+                                               3, 3, 3, 4, 2, 0, 1, 2, 2, 2, 1, 1, 2, 2};
+    const std::vector<std::uint8_t> mismatches = {0, 1, 0, 0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 1, 1,
+                                                  0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0};
+
+    const std::size_t sequenceSize = std::size(sequence);
+
+    const auto makeDefaultRecord = [&]() {
+        return makeRecord(sequence, qualities, coverage, matches, mismatches);
+    };
+
+    // empty tags
+    {
+        EXPECT_EQ(BamRecord::ClipSubreadPileupTags(sequenceSize, {}, {}, {}, 0, 0),
+                  BamRecord::SplitSubreadPileup{});
+    }
+
+    // clip whole from left
+    {
+        EXPECT_EQ(BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches,
+                                                   sequenceSize, 0),
+                  (BamRecord::SplitSubreadPileup{.LeadingCoverage = coverage,
+                                                 .LeadingMatches = matches,
+                                                 .LeadingMismatches = mismatches}));
+    }
+
+    // clip from left
+    {
+        EXPECT_EQ(
+            BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 2, 27),
+            (BamRecord::SplitSubreadPileup{
+                .LeadingMatches = {std::cbegin(matches), std::cbegin(matches) + 2},
+                .LeadingMismatches = {std::cbegin(mismatches), std::cbegin(mismatches) + 2},
+                .RetainedCoverage = {2, 3, 15, 4, 10, 2},
+                .RetainedMatches = {std::cbegin(matches) + 2, std::cend(matches)},
+                .RetainedMismatches = {std::cbegin(mismatches) + 2, std::cend(mismatches)},
+                .LostPrefixBases = 2}));
+
+        EXPECT_EQ(
+            BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 4, 25),
+            (BamRecord::SplitSubreadPileup{
+                .LeadingCoverage = {4, 3},
+                .LeadingMatches = {std::cbegin(matches), std::cbegin(matches) + 4},
+                .LeadingMismatches = {std::cbegin(mismatches), std::cbegin(mismatches) + 4},
+                .RetainedCoverage = {15, 4, 10, 2},
+                .RetainedMatches = {std::cbegin(matches) + 4, std::cend(matches)},
+                .RetainedMismatches = {std::cbegin(mismatches) + 4, std::cend(mismatches)}}));
+    }
+
+    // clip whole from right
+    {
+        EXPECT_EQ(
+            BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 0, 0),
+            (BamRecord::SplitSubreadPileup{.TrailingCoverage = coverage,
+                                           .TrailingMatches = matches,
+                                           .TrailingMismatches = mismatches}));
+    }
+
+    // clip from right
+    {
+        EXPECT_EQ(
+            BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 0, 26),
+            (BamRecord::SplitSubreadPileup{
+                .RetainedCoverage = {4, 3, 15, 4, 7, 2},
+                .RetainedMatches = {std::cbegin(matches), std::cbegin(matches) + 26},
+                .RetainedMismatches = {std::cbegin(mismatches), std::cbegin(mismatches) + 26},
+                .TrailingMatches = {std::cbegin(matches) + 26, std::cend(matches)},
+                .TrailingMismatches = {std::cbegin(mismatches) + 26, std::cend(mismatches)},
+                .LostSuffixBases = 3}));
+
+        EXPECT_EQ(
+            BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 0, 19),
+            (BamRecord::SplitSubreadPileup{
+                .RetainedCoverage = {4, 3, 15, 4},
+                .RetainedMatches = {std::cbegin(matches), std::cbegin(matches) + 19},
+                .RetainedMismatches = {std::cbegin(mismatches), std::cbegin(mismatches) + 19},
+                .TrailingCoverage = {10, 2},
+                .TrailingMatches = {std::cbegin(matches) + 19, std::end(matches)},
+                .TrailingMismatches = {std::cbegin(mismatches) + 19, std::end(mismatches)}}));
+    }
+
+    // clip whole in middle
+    {
+        EXPECT_EQ(
+            BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 2, 0),
+            (BamRecord::SplitSubreadPileup{
+                .LeadingMatches = {std::cbegin(matches), std::cbegin(matches) + 2},
+                .LeadingMismatches = {std::cbegin(mismatches), std::cbegin(mismatches) + 2},
+                .TrailingCoverage = {15, 4, 10, 2},
+                .TrailingMatches = {std::cbegin(matches) + 2, std::cend(matches)},
+                .TrailingMismatches = {std::cbegin(mismatches) + 2, std::cend(mismatches)},
+                .LostPrefixBases = 2,
+                .LostSuffixBases = 2,
+                .LostCoverage = 3}));
+
+        EXPECT_EQ(
+            BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 16, 0),
+            (BamRecord::SplitSubreadPileup{
+                .LeadingCoverage = {4, 3},
+                .LeadingMatches = {std::cbegin(matches), std::cbegin(matches) + 16},
+                .LeadingMismatches = {std::cbegin(mismatches), std::cbegin(mismatches) + 16},
+                .TrailingCoverage = {10, 2},
+                .TrailingMatches = {std::cbegin(matches) + 16, std::cend(matches)},
+                .TrailingMismatches = {std::cbegin(mismatches) + 16, std::cend(mismatches)},
+                .LostPrefixBases = 12,
+                .LostSuffixBases = 3,
+                .LostCoverage = 4}));
+
+        EXPECT_EQ(
+            BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 24, 0),
+            (BamRecord::SplitSubreadPileup{
+                .LeadingCoverage = {4, 3, 15, 4},
+                .LeadingMatches = {std::cbegin(matches), std::cbegin(matches) + 24},
+                .LeadingMismatches = {std::cbegin(mismatches), std::cbegin(mismatches) + 24},
+                .TrailingMatches = {std::cbegin(matches) + 24, std::cend(matches)},
+                .TrailingMismatches = {std::cbegin(mismatches) + 24, std::cend(mismatches)},
+                .LostPrefixBases = 5,
+                .LostSuffixBases = 5,
+                .LostCoverage = 2}));
+    }
+
+    // clip nothing
+    {
+        EXPECT_EQ(BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 0,
+                                                   sequenceSize),
+                  (BamRecord::SplitSubreadPileup{.RetainedCoverage = coverage,
+                                                 .RetainedMatches = matches,
+                                                 .RetainedMismatches = mismatches}));
+    }
+
+    // clip in middle
+    {
+        BamRecord::SplitSubreadPileup result{
+            .LeadingMatches = {std::cbegin(matches), std::cbegin(matches) + 3},
+            .LeadingMismatches = {std::cbegin(mismatches), std::cbegin(mismatches) + 3},
+            .RetainedCoverage = {1, 3, 15, 4, 5, 2},
+            .RetainedMatches = {std::cbegin(matches) + 3, std::cbegin(matches) + 24},
+            .RetainedMismatches = {std::cbegin(mismatches) + 3, std::cbegin(mismatches) + 24},
+            .TrailingMatches = {std::cbegin(matches) + 24, std::cend(matches)},
+            .TrailingMismatches = {std::cbegin(mismatches) + 24, std::cend(mismatches)},
+            .LostPrefixBases = 3,
+            .LostSuffixBases = 5};
+
+        EXPECT_EQ(
+            BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 3, 21),
+            result);
+
+        BamRecord record{makeDefaultRecord()};
+        record.Clip(ClipType::CLIP_TO_QUERY, 3, 24);
+        EXPECT_EQ(record.Sequence(), sequence.substr(3, 21));
+        EXPECT_EQ(record.Qualities(), qualities.substr(3, 21));
+        EXPECT_EQ(record.Impl().TagValue("sa").ToUInt16Array(), result.RetainedCoverage);
+        EXPECT_EQ(record.Impl().TagValue("sm").ToUInt8Array(), result.RetainedMatches);
+        EXPECT_EQ(record.Impl().TagValue("sx").ToUInt8Array(), result.RetainedMismatches);
+
+        result = {.LeadingCoverage = {4, 3},
+                  .LeadingMatches = {std::cbegin(matches), std::cbegin(matches) + 4},
+                  .LeadingMismatches = {std::cbegin(mismatches), std::cbegin(mismatches) + 4},
+                  .RetainedCoverage = {15, 4},
+                  .RetainedMatches = {std::cbegin(matches) + 4, std::cbegin(matches) + 19},
+                  .RetainedMismatches = {std::cbegin(mismatches) + 4, std::cbegin(mismatches) + 19},
+                  .TrailingCoverage = {10, 2},
+                  .TrailingMatches = {std::cbegin(matches) + 19, std::cend(matches)},
+                  .TrailingMismatches = {std::cbegin(mismatches) + 19, std::cend(mismatches)}};
+
+        EXPECT_EQ(
+            BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 4, 15),
+            result);
+
+        record = makeDefaultRecord();
+        record.Clip(ClipType::CLIP_TO_QUERY, 4, 19);
+        EXPECT_EQ(record.Sequence(), sequence.substr(4, 15));
+        EXPECT_EQ(record.Qualities(), qualities.substr(4, 15));
+        EXPECT_EQ(record.Impl().TagValue("sa").ToUInt16Array(), result.RetainedCoverage);
+        EXPECT_EQ(record.Impl().TagValue("sm").ToUInt8Array(), result.RetainedMatches);
+        EXPECT_EQ(record.Impl().TagValue("sx").ToUInt8Array(), result.RetainedMismatches);
+
+        result = {.LeadingCoverage = {4, 3},
+                  .LeadingMatches = {std::cbegin(matches), std::cbegin(matches) + 6},
+                  .LeadingMismatches = {std::cbegin(mismatches), std::cbegin(mismatches) + 6},
+                  .RetainedCoverage = {11, 4},
+                  .RetainedMatches = {std::cbegin(matches) + 6, std::cbegin(matches) + 17},
+                  .RetainedMismatches = {std::cbegin(mismatches) + 6, std::cbegin(mismatches) + 17},
+                  .TrailingCoverage = {10, 2},
+                  .TrailingMatches = {std::cbegin(matches) + 17, std::cend(matches)},
+                  .TrailingMismatches = {std::cbegin(mismatches) + 17, std::cend(mismatches)},
+                  .LostPrefixBases = 2,
+                  .LostSuffixBases = 2};
+
+        EXPECT_EQ(
+            BamRecord::ClipSubreadPileupTags(sequenceSize, coverage, matches, mismatches, 6, 11),
+            result);
+
+        record = makeDefaultRecord();
+        record.Clip(ClipType::CLIP_TO_QUERY, 6, 17);
+        EXPECT_EQ(record.Sequence(), sequence.substr(6, 11));
+        EXPECT_EQ(record.Qualities(), qualities.substr(6, 11));
+        EXPECT_EQ(record.Impl().TagValue("sa").ToUInt16Array(), result.RetainedCoverage);
+        EXPECT_EQ(record.Impl().TagValue("sm").ToUInt8Array(), result.RetainedMatches);
+        EXPECT_EQ(record.Impl().TagValue("sx").ToUInt8Array(), result.RetainedMismatches);
+    }
+}
