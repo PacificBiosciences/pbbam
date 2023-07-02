@@ -1788,8 +1788,8 @@ BamRecord::SplitBasemods BamRecord::ClipBasemodsTag(const std::string& seq,
 }
 
 BamRecord::SplitSubreadPileup BamRecord::ClipSubreadPileupTags(
-    const std::size_t sequenceLength, const std::span<const std::uint16_t> runLengthEncodedCoverage,
-    const std::span<const std::uint8_t> matches, const std::span<const std::uint8_t> mismatches,
+    const std::size_t sequenceLength, const std::vector<std::uint16_t>& runLengthEncodedCoverage,
+    const std::vector<std::uint8_t>& matches, const std::vector<std::uint8_t>& mismatches,
     const std::size_t clipFrom, const std::size_t clipLength)
 {
     if (runLengthEncodedCoverage.empty() && matches.empty() && mismatches.empty()) {

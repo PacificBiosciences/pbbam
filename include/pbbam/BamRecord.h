@@ -25,7 +25,6 @@
 #include <pbcopper/json/JSON.h>
 
 #include <memory>
-#include <span>
 #include <string>
 #include <utility>
 #include <vector>
@@ -1509,8 +1508,8 @@ public:
         bool operator==(const SplitSubreadPileup&) const = default;
     };
     static SplitSubreadPileup ClipSubreadPileupTags(
-        std::size_t sequenceLength, std::span<const std::uint16_t> runLengthEncodedCoverage,
-        std::span<const std::uint8_t> matches, std::span<const std::uint8_t> mismatches,
+        std::size_t sequenceLength, const std::vector<std::uint16_t>& runLengthEncodedCoverage,
+        const std::vector<std::uint8_t>& matches, const std::vector<std::uint8_t>& mismatches,
         std::size_t clipFrom, std::size_t clipLength);
 
     /// Applies clipping to this record
