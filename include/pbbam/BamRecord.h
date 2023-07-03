@@ -1504,8 +1504,6 @@ public:
         std::int32_t LostPrefixBases{0};
         std::int32_t LostSuffixBases{0};
         std::int32_t LostCoverage{-1};
-
-        bool operator==(const SplitSubreadPileup&) const = default;
     };
     static SplitSubreadPileup ClipSubreadPileupTags(
         std::size_t sequenceLength, const std::vector<std::uint16_t>& runLengthEncodedCoverage,

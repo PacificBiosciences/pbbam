@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -2976,6 +2977,25 @@ TEST(BAM_BamRecordClipping, clips_basemods_tags)
         EXPECT_EQ(splitBasemods.TrailingQuals, (std::vector<std::uint8_t>{}));
     }
 }
+
+namespace PacBio {
+namespace BAM {
+
+inline bool operator==(const BamRecord::SplitSubreadPileup& lhs,
+                       const BamRecord::SplitSubreadPileup& rhs)
+{
+    return std::tie(lhs.LeadingCoverage, lhs.LeadingMatches, lhs.LeadingMismatches,
+                    lhs.RetainedCoverage, lhs.RetainedMatches, lhs.RetainedMismatches,
+                    lhs.TrailingCoverage, lhs.TrailingMatches, lhs.TrailingMismatches,
+                    lhs.LostPrefixBases, lhs.LostSuffixBases, lhs.LostCoverage) ==
+           std::tie(rhs.LeadingCoverage, rhs.LeadingMatches, rhs.LeadingMismatches,
+                    rhs.RetainedCoverage, rhs.RetainedMatches, rhs.RetainedMismatches,
+                    rhs.TrailingCoverage, rhs.TrailingMatches, rhs.TrailingMismatches,
+                    rhs.LostPrefixBases, rhs.LostSuffixBases, rhs.LostCoverage);
+}
+
+}  // namespace BAM
+}  // namespace PacBio
 
 TEST(BAM_BamRecordClipping, clips_subread_pileup_tags)
 {
