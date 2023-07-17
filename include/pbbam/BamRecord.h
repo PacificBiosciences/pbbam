@@ -1489,15 +1489,15 @@ public:
     /// Splits subread pileup tags 'sa', 'sm' and 'sx'
     struct SplitSubreadPileup
     {
-        std::vector<std::uint16_t> LeadingCoverage{};
+        std::vector<std::uint32_t> LeadingCoverage{};
         std::vector<std::uint8_t> LeadingMatches{};
         std::vector<std::uint8_t> LeadingMismatches{};
 
-        std::vector<std::uint16_t> RetainedCoverage{};
+        std::vector<std::uint32_t> RetainedCoverage{};
         std::vector<std::uint8_t> RetainedMatches{};
         std::vector<std::uint8_t> RetainedMismatches{};
 
-        std::vector<std::uint16_t> TrailingCoverage{};
+        std::vector<std::uint32_t> TrailingCoverage{};
         std::vector<std::uint8_t> TrailingMatches{};
         std::vector<std::uint8_t> TrailingMismatches{};
 
@@ -1506,7 +1506,7 @@ public:
         std::int32_t LostCoverage{-1};
     };
     static SplitSubreadPileup ClipSubreadPileupTags(
-        std::size_t sequenceLength, const std::vector<std::uint16_t>& runLengthEncodedCoverage,
+        std::size_t sequenceLength, const std::vector<std::uint32_t>& runLengthEncodedCoverage,
         const std::vector<std::uint8_t>& matches, const std::vector<std::uint8_t>& mismatches,
         std::size_t clipFrom, std::size_t clipLength);
 

@@ -705,7 +705,7 @@ void BamRecord::ClipTags(const std::size_t clipFrom, const std::size_t clipLengt
                 "[pbbam] BAM record ERROR: cannot clip subread pileup tags without 'sx' tag. ");
         }
 
-        const std::vector<std::uint16_t> coverage{impl_.TagValue("sa").ToUInt16Array()};
+        const std::vector<std::uint32_t> coverage{impl_.TagValue("sa").ToUInt32Array()};
         const std::vector<std::uint8_t> matches{impl_.TagValue("sm").ToUInt8Array()};
         const std::vector<std::uint8_t> mismatches{impl_.TagValue("sx").ToUInt8Array()};
 
@@ -1788,7 +1788,7 @@ BamRecord::SplitBasemods BamRecord::ClipBasemodsTag(const std::string& seq,
 }
 
 BamRecord::SplitSubreadPileup BamRecord::ClipSubreadPileupTags(
-    const std::size_t sequenceLength, const std::vector<std::uint16_t>& runLengthEncodedCoverage,
+    const std::size_t sequenceLength, const std::vector<std::uint32_t>& runLengthEncodedCoverage,
     const std::vector<std::uint8_t>& matches, const std::vector<std::uint8_t>& mismatches,
     const std::size_t clipFrom, const std::size_t clipLength)
 {

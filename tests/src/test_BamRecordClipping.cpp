@@ -3000,7 +3000,7 @@ inline bool operator==(const BamRecord::SplitSubreadPileup& lhs,
 TEST(BAM_BamRecordClipping, clips_subread_pileup_tags)
 {
     const auto makeRecord = [](const std::string& sequence, const std::string& qualities,
-                               const std::vector<std::uint16_t>& coverage,
+                               const std::vector<std::uint32_t>& coverage,
                                const std::vector<std::uint8_t>& matches,
                                const std::vector<std::uint8_t>& mistmatches) {
         BamRecordImpl impl;
@@ -3027,7 +3027,7 @@ TEST(BAM_BamRecordClipping, clips_subread_pileup_tags)
 
     const std::string subseq{std::cbegin(sequence), std::cbegin(sequence)};
 
-    const std::vector<std::uint16_t> coverage = {4, 3, 15, 4, 10, 2};
+    const std::vector<std::uint32_t> coverage = {4, 3, 15, 4, 10, 2};
     const std::vector<std::uint8_t> matches = {3, 1, 2, 3, 4, 4, 4, 4, 3, 2, 1, 4, 4, 1, 1,
                                                3, 3, 3, 4, 2, 0, 1, 2, 2, 2, 1, 1, 2, 2};
     const std::vector<std::uint8_t> mismatches = {0, 1, 0, 0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 1, 1,
@@ -3179,7 +3179,7 @@ TEST(BAM_BamRecordClipping, clips_subread_pileup_tags)
         record.Clip(ClipType::CLIP_TO_QUERY, 3, 24);
         EXPECT_EQ(record.Sequence(), sequence.substr(3, 21));
         EXPECT_EQ(record.Qualities(), qualities.substr(3, 21));
-        EXPECT_EQ(record.Impl().TagValue("sa").ToUInt16Array(), result.RetainedCoverage);
+        EXPECT_EQ(record.Impl().TagValue("sa").ToUInt32Array(), result.RetainedCoverage);
         EXPECT_EQ(record.Impl().TagValue("sm").ToUInt8Array(), result.RetainedMatches);
         EXPECT_EQ(record.Impl().TagValue("sx").ToUInt8Array(), result.RetainedMismatches);
 
@@ -3201,7 +3201,7 @@ TEST(BAM_BamRecordClipping, clips_subread_pileup_tags)
         record.Clip(ClipType::CLIP_TO_QUERY, 4, 19);
         EXPECT_EQ(record.Sequence(), sequence.substr(4, 15));
         EXPECT_EQ(record.Qualities(), qualities.substr(4, 15));
-        EXPECT_EQ(record.Impl().TagValue("sa").ToUInt16Array(), result.RetainedCoverage);
+        EXPECT_EQ(record.Impl().TagValue("sa").ToUInt32Array(), result.RetainedCoverage);
         EXPECT_EQ(record.Impl().TagValue("sm").ToUInt8Array(), result.RetainedMatches);
         EXPECT_EQ(record.Impl().TagValue("sx").ToUInt8Array(), result.RetainedMismatches);
 
@@ -3225,7 +3225,7 @@ TEST(BAM_BamRecordClipping, clips_subread_pileup_tags)
         record.Clip(ClipType::CLIP_TO_QUERY, 6, 17);
         EXPECT_EQ(record.Sequence(), sequence.substr(6, 11));
         EXPECT_EQ(record.Qualities(), qualities.substr(6, 11));
-        EXPECT_EQ(record.Impl().TagValue("sa").ToUInt16Array(), result.RetainedCoverage);
+        EXPECT_EQ(record.Impl().TagValue("sa").ToUInt32Array(), result.RetainedCoverage);
         EXPECT_EQ(record.Impl().TagValue("sm").ToUInt8Array(), result.RetainedMatches);
         EXPECT_EQ(record.Impl().TagValue("sx").ToUInt8Array(), result.RetainedMismatches);
     }
