@@ -67,7 +67,8 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
         const auto type = token.at(3);
         const auto remainder = token.substr(5);
         if (remainder.empty()) {
-            throw std::runtime_error{"[pbbam] SAM tag ERROR: malformed tag: " + token};
+            throw std::runtime_error{"[pbbam] SAM tag ERROR: malformed tag '" + name +
+                                     "': " + token};
         }
 
         switch (type) {
@@ -158,8 +159,9 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
                         break;
                     default:
                         throw std::runtime_error{
-                            "[pbbam] SAM tag ERROR: unsupported array-tag-type encountered: " +
-                            std::string{1, elementType}};
+                            "[pbbam] SAM tag ERROR: unsupported array-tag-type encountered for tag "
+                            "'" +
+                            name + "': " + std::string{1, elementType}};
                 }
                 break;
             }
@@ -167,8 +169,8 @@ TagCollection SamTagCodec::Decode(const std::string& tagString)
             // unsupported SAM tag type
             default:
                 throw std::runtime_error{
-                    "[pbbam] SAM tag ERROR: unsupported tag-type encountered: " +
-                    std::string{1, type}};
+                    "[pbbam] SAM tag ERROR: unsupported tag-type encountered for tag '" + name +
+                    "': " + std::string{1, type}};
         }
     }
 
@@ -268,8 +270,9 @@ std::string SamTagCodec::Encode(const std::string& name, const PacBio::BAM::Tag&
             }
             break;
         default:
-            throw std::runtime_error{"[pbbam] SAM tag ERROR: unsupported tag-type encountered: " +
-                                     std::to_string(static_cast<std::uint16_t>(tag.Type()))};
+            throw std::runtime_error{
+                "[pbbam] SAM tag ERROR: unsupported tag-type encountered for tag '" + name +
+                "': " + std::to_string(static_cast<std::uint16_t>(tag.Type()))};
     }
     return result.str();
 }

@@ -870,6 +870,33 @@ TEST(BAM_SamTagCodec, can_decode_string_to_tags)
     EXPECT_EQ(std::vector<std::int32_t>({42, -100, 37, 2048}), tags["VC"].ToInt32Array());
 }
 
+TEST(BAM_SamTagCodec, can_decode_string_to_tags_bad_tags)
+{
+    // unsupported array-tag-type
+    std::string tagString;
+    tagString.append("VC:B:z,42,-100,37,2048");
+
+    try {
+        TagCollection tags = SamTagCodec::Decode(tagString);
+        EXPECT_FALSE("did not throw");
+    } catch (const std::exception& e) {
+        const std::string_view msg(e.what());
+        EXPECT_TRUE(msg.find("tag 'VC'") != std::string::npos);
+    }
+
+    // unsupported tag-type
+    tagString.clear();
+    tagString.append("AB:p:-42");
+
+    try {
+        TagCollection tags = SamTagCodec::Decode(tagString);
+        EXPECT_FALSE("did not throw");
+    } catch (const std::exception& e) {
+        const std::string_view msg(e.what());
+        EXPECT_TRUE(msg.find("tag 'AB'") != std::string::npos);
+    }
+}
+
 TEST(BAM_SamTagCodec, can_encode_tag_to_string)
 {
     {  // string

@@ -450,7 +450,8 @@ uint8_t BamRecord::BarcodeQuality() const
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::BARCODE_QUALITY);
     const auto bq = impl_.TagValue(tagName);
     if (bq.IsNull()) {
-        return 0;  // ?? "missing" value for tags ?? should we consider std::optional<T> for these kind of guys ??
+        throw std::runtime_error{
+            "[pbbam] BAM record ERROR: barcode tag (bq) was requested but is missing"};
     }
     return bq.ToUInt8();
 }
@@ -1036,6 +1037,10 @@ int BamRecord::EstimatedBytesUsed() const noexcept
 std::string BamRecord::FetchBasesRaw(const BamRecordTag tag) const
 {
     const Tag seqTag = impl_.TagValue(tag);
+    if (seqTag.IsNull()) {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag '" + BamRecordTags::LabelFor(tag) +
+                                 "' was requested but is missing"};
+    }
     return seqTag.ToString();
 }
 
@@ -1090,8 +1095,9 @@ Data::Frames BamRecord::FetchFramesRaw(const BamRecordTag tag) const
 {
     const auto frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) {
-        return {};
-    }  // throw ?
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag '" + BamRecordTags::LabelFor(tag) +
+                                 "' was requested but is missing"};
+    }
 
     // lossy frame codes
     if (frameTag.IsUInt8Array()) {
@@ -1156,7 +1162,8 @@ std::vector<float> BamRecord::FetchPhotonsRaw(const BamRecordTag tag) const
 {
     const auto frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) {
-        return {};
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag '" + BamRecordTags::LabelFor(tag) +
+                                 "' was requested but is missing"};
     }
     if (!frameTag.IsUInt16Array()) {
         throw std::runtime_error{
@@ -1215,6 +1222,10 @@ std::vector<float> BamRecord::FetchPhotons(const BamRecordTag tag,
 Data::QualityValues BamRecord::FetchQualitiesRaw(const BamRecordTag tag) const
 {
     const auto qvsTag = impl_.TagValue(tag);
+    if (qvsTag.IsNull()) {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag '" + BamRecordTags::LabelFor(tag) +
+                                 "' was requested but is missing"};
+    }
     return Data::QualityValues::FromFastq(qvsTag.ToString());
 }
 
@@ -1272,7 +1283,8 @@ std::vector<std::uint32_t> BamRecord::FetchUInt32sRaw(const BamRecordTag tag) co
     // fetch tag data
     const auto frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) {
-        return {};
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag " + BamRecordTags::LabelFor(tag) +
+                                 " was requested but is missing"};
     }
     if (!frameTag.IsUInt32Array()) {
         throw std::runtime_error{
@@ -1326,7 +1338,8 @@ std::vector<std::uint8_t> BamRecord::FetchUInt8sRaw(const BamRecordTag tag) cons
     // fetch tag data
     const auto frameTag = impl_.TagValue(tag);
     if (frameTag.IsNull()) {
-        return {};
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag " + BamRecordTags::LabelFor(tag) +
+                                 " was requested but is missing"};
     }
     if (!frameTag.IsUInt8Array()) {
         throw std::runtime_error{
@@ -1616,7 +1629,8 @@ Data::Frames BamRecord::IPDRaw(Data::Orientation orientation) const
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::IPD);
     const auto frameTag = impl_.TagValue(tagName);
     if (frameTag.IsNull()) {
-        return {};
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag " + tagName +
+                                 " was requested but is missing"};
     }
 
     Data::Frames frames;
@@ -1664,6 +1678,10 @@ Data::LocalContextFlags BamRecord::LocalContextFlags() const
     assert(HasLocalContextFlags());
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::CONTEXT_FLAGS);
     const auto cxTag = impl_.TagValue(tagName);
+    if (cxTag.IsNull()) {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag " + tagName +
+                                 " was requested but is missing"};
+    }
     return static_cast<Data::LocalContextFlags>(cxTag.ToUInt8());
 }
 
@@ -2166,7 +2184,8 @@ Data::Frames BamRecord::PulseWidthRaw(Data::Orientation orientation, bool /* ali
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::PULSE_WIDTH);
     const auto frameTag = impl_.TagValue(tagName);
     if (frameTag.IsNull()) {
-        return {};
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag " + tagName +
+                                 " was requested but is missing"};
     }
 
     Data::Frames frames;
@@ -2446,7 +2465,8 @@ std::string BamRecord::ReadGroupId() const
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::READ_GROUP);
     const auto rgTag = impl_.TagValue(tagName);
     if (rgTag.IsNull()) {
-        return {};
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag " + tagName +
+                                 " was requested but is missing"};
     }
     return rgTag.ToString();
 }
@@ -2540,6 +2560,10 @@ VirtualRegionType BamRecord::ScrapRegionType() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SCRAP_REGION_TYPE);
     const auto srTag = impl_.TagValue(tagName);
+    if (srTag.IsNull()) {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag " + tagName +
+                                 " was requested but is missing"};
+    }
     return VirtualRegionTypeMap::ParseChar[srTag.ToUInt8()];
 }
 
@@ -2559,6 +2583,10 @@ ZmwType BamRecord::ScrapZmwType() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SCRAP_ZMW_TYPE);
     const auto szTag = impl_.TagValue(tagName);
+    if (szTag.IsNull()) {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag " + tagName +
+                                 " was requested but is missing"};
+    }
     return ZmwTypeMap::ParseChar[szTag.ToUInt8()];
 }
 
@@ -2584,6 +2612,10 @@ std::vector<float> BamRecord::SignalToNoise() const
 {
     const auto tagName = BamRecordTags::LabelFor(BamRecordTag::SIGNAL_TO_NOISE);
     const auto snTag = impl_.TagValue(tagName);
+    if (snTag.IsNull()) {
+        throw std::runtime_error{"[pbbam] BAM record ERROR: tag " + tagName +
+                                 " was requested but is missing"};
+    }
     return snTag.ToFloatArray();
 }
 

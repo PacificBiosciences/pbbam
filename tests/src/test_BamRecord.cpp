@@ -14,6 +14,7 @@
 #include <exception>
 #include <initializer_list>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include <cassert>
@@ -2736,7 +2737,7 @@ TEST(BAM_BamRecord, cannot_be_converted_to_pbcopper_read_if_local_context_is_mis
     }
 }
 
-TEST(BAM_BamRecord, can_convert_ccs_read_to_pbcopper_read) 
+TEST(BAM_BamRecord, can_convert_ccs_read_to_pbcopper_read)
 {
     const std::string ccsFn{PbbamTestsConfig::Data_Dir + "/23.ccs.bam"};
     BamRecord bam;
@@ -2893,6 +2894,60 @@ TEST(BAM_BamRecord, can_determine_num_deletion_operations)
             Data::Strand::FORWARD
         );
         EXPECT_EQ(0, record.NumDeletionOperations());
+    }
+}
+
+TEST(BAM_BamRecord, throws_on_null_tags)
+{
+    {
+        BamRecord bam;
+        try{
+            bam.BarcodeQuality();
+            EXPECT_FALSE("did not throw");
+        } catch (const std::exception& e) {
+            const std::string_view msg(e.what());
+            EXPECT_TRUE(msg.find("barcode tag (bq)") != std::string::npos);
+        }
+    }
+    {
+        BamRecord bam;
+        try{
+            bam.ReadGroupId();
+            EXPECT_FALSE("did not throw");
+        } catch (const std::exception& e) {
+            const std::string_view msg(e.what());
+            EXPECT_TRUE(msg.find("tag RG") != std::string::npos);
+        }
+    }
+    {
+        BamRecord bam;
+        try{
+            bam.ScrapRegionType();
+            EXPECT_FALSE("did not throw");
+        } catch (const std::exception& e) {
+            const std::string_view msg(e.what());
+            EXPECT_TRUE(msg.find("tag sc") != std::string::npos);
+        }
+    }
+    {
+        BamRecord bam;
+        try{
+            bam.ScrapZmwType();
+            EXPECT_FALSE("did not throw");
+        } catch (const std::exception& e) {
+            const std::string_view msg(e.what());
+            EXPECT_TRUE(msg.find("tag sz") != std::string::npos);
+        }
+    }
+    {
+        BamRecord bam;
+        try{
+            bam.SignalToNoise();
+            EXPECT_FALSE("did not throw");
+        } catch (const std::exception& e) {
+            const std::string_view msg(e.what());
+            EXPECT_TRUE(msg.find("tag sn") != std::string::npos);
+        }
     }
 }
 
