@@ -26,8 +26,6 @@ namespace PacBio {
 namespace BAM {
 namespace {
 
-const std::string defaultVersion{"4.0.0"};
-
 void GetAllFiles(const ExternalResources& resources, std::vector<std::string>* result)
 {
     for (const auto& resource : resources) {
