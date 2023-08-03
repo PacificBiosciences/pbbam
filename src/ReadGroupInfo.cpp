@@ -58,7 +58,6 @@ static const std::string feature_PM{"PkMid"};
 static const std::string feature_PA{"PkMean"};
 static const std::string feature_PI{"PkMid2"};
 static const std::string feature_PS{"PkMean2"};
-static const std::string feature_LT{"Label"};
 static const std::string feature_PQ{"LabelQV"};
 static const std::string feature_PT{"AltLabel"};
 static const std::string feature_PV{"AltLabelQV"};
